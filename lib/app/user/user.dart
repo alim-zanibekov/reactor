@@ -1,0 +1,284 @@
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+
+import '../../core/api/api.dart';
+import '../../core/auth/auth.dart';
+import '../../core/content/types/module.dart';
+import '../common/future-page.dart';
+import '../common/tabs-wrapper.dart';
+import '../page/pages.dart';
+import '../post/post-list.dart';
+import '../post/post-loader.dart';
+import 'user-awards.dart';
+import 'user-main-tags.dart';
+import 'user-rating.dart';
+import 'user-short.dart';
+import 'user-stats.dart';
+import 'user-tags.dart';
+
+class AppUserPage extends StatefulWidget {
+  final String username;
+  final String link;
+  final bool main;
+
+  const AppUserPage(
+      {Key key,
+      @required this.username,
+      @required this.link,
+      this.main = false})
+      : assert(username != null || link != null),
+        super(key: key);
+
+  @override
+  _AppUserPageState createState() => _AppUserPageState();
+}
+
+class _AppUserPageState extends State<AppUserPage>
+    with AutomaticKeepAliveClientMixin {
+  PostLoader _loaderUserPosts;
+  PostLoader _loaderUserSubs;
+  PostLoader _loaderUserFavorite;
+  String _link;
+
+  @override
+  void initState() {
+    _link = widget.link ?? widget.username.replaceAll(' ', '+');
+
+    _loaderUserPosts = PostLoader(path: _link, user: true);
+    _loaderUserFavorite = PostLoader(favorite: _link);
+    if (widget.main) {
+      _loaderUserSubs = PostLoader(subscriptions: true);
+    }
+    super.initState();
+  }
+
+  @override
+  bool get wantKeepAlive => widget.main;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return AppTabsWrapper(
+        tabs: ['Профиль', 'Посты', 'Закладки', if (widget.main) 'Подписки'],
+        title: widget.username,
+        actions: widget.main
+            ? <Widget>[
+                PopupMenuButton(
+                  offset: const Offset(0, 100),
+                  icon: const Icon(Icons.more_vert),
+                  tooltip: 'Меню профиля',
+                  onSelected: (e) {
+                    Auth().logout();
+                    AppPages.appBottomBarPage.add(AppBottomBarPage.PROFILE);
+                  },
+                  itemBuilder: (context) => const [
+                    PopupMenuItem(child: Text('Выход'), value: 0),
+                  ],
+                ),
+              ]
+            : null,
+        builder:
+            (BuildContext context, int index, onScrollChange, onReloadPress) {
+          if (index == 0)
+            return _AppUserLoader(
+                key: PageStorageKey<String>(widget.username + index.toString()),
+                username: widget.username,
+                link: _link,
+                reloadNotifier: onReloadPress,
+                onScrollChange: onScrollChange);
+          if (index == 1)
+            return AppPostList(
+                pageStorageKey:
+                    PageStorageKey<String>(widget.username + index.toString()),
+                onScrollChange: onScrollChange,
+                reloadNotifier: onReloadPress,
+                loader: _loaderUserPosts);
+
+          if (index == 2)
+            return AppPostList(
+                pageStorageKey:
+                    PageStorageKey<String>(widget.username + index.toString()),
+                onScrollChange: onScrollChange,
+                reloadNotifier: onReloadPress,
+                loader: _loaderUserFavorite);
+
+          return AppPostList(
+              pageStorageKey:
+                  PageStorageKey<String>(widget.username + index.toString()),
+              onScrollChange: onScrollChange,
+              reloadNotifier: onReloadPress,
+              loader: _loaderUserSubs);
+        });
+  }
+}
+
+class _AppUserLoader extends StatefulWidget {
+  final String username;
+  final String link;
+  final void Function(double delta) onScrollChange;
+  final ChangeNotifier reloadNotifier;
+
+  _AppUserLoader(
+      {Key key,
+      @required this.username,
+      @required this.link,
+      this.onScrollChange,
+      this.reloadNotifier})
+      : assert(username != null),
+        assert(link != null),
+        super(key: key);
+
+  @override
+  _AppUserLoaderState createState() => _AppUserLoaderState();
+}
+
+class _AppUserLoaderState extends State<_AppUserLoader>
+    with AutomaticKeepAliveClientMixin {
+  final _pageKey = GlobalKey();
+  ScrollController _scrollController;
+  double _scrollPrevious = 0;
+
+  @override
+  void initState() {
+    _scrollController = ScrollController();
+    _scrollController.addListener(() {
+      if (widget.onScrollChange != null) {
+        widget.onScrollChange(_scrollController.offset - _scrollPrevious);
+      }
+      _scrollPrevious = _scrollController.offset;
+    });
+    widget.reloadNotifier?.addListener(_reload);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    widget.reloadNotifier?.removeListener(_reload);
+    super.dispose();
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+
+  void _reload() {
+    _scrollController.jumpTo(0);
+    Future.microtask(() {
+      AppFuturePageState appFuturePageState = _pageKey.currentState;
+      appFuturePageState?.reload();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return AppFuturePage<UserFull>(
+      key: _pageKey,
+      load: (_) => Api().loadUserPage(widget.link),
+      builder: (context, user, _) {
+        return OrientationBuilder(
+          builder: (context, orientation) {
+            return SingleChildScrollView(
+              controller: _scrollController,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height,
+                ),
+                child: AppUser(
+                  user: user,
+                  onScrollChange: widget.onScrollChange,
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class AppUser extends StatefulWidget {
+  final UserFull user;
+  final void Function(double delta) onScrollChange;
+
+  const AppUser({Key key, @required this.user, this.onScrollChange})
+      : super(key: key);
+
+  @override
+  _AppUserState createState() => _AppUserState();
+}
+
+class _AppUserState extends State<AppUser> {
+  final _defaultPadding = EdgeInsets.only(left: 8, right: 8);
+  TextStyle _textStyle;
+
+  @override
+  Widget build(BuildContext context) {
+    final user = widget.user;
+    if (user == null) {
+      return SizedBox();
+    }
+    _textStyle = DefaultTextStyle.of(context).style;
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+              padding: _defaultPadding,
+              child: AppShortUser(user: user.toShort(), size: 50)),
+          const Divider(),
+          Padding(
+              padding: _defaultPadding,
+              child: AppUserAwards(
+                awards: user.awards,
+              )),
+          Padding(padding: _defaultPadding, child: AppUserRating(user: user)),
+          if (user.activeIn != null && user.activeIn.isNotEmpty)
+            _wrapWithTitle(
+                'Активный участник',
+                AppUserMainTags(
+                    tags: user.activeIn, defaultPadding: _defaultPadding),
+                childPadding: false),
+          if (user.moderating != null && user.moderating.isNotEmpty)
+            _wrapWithTitle('Модерирует', AppUserTags(tags: user.moderating)),
+          if (user.subscriptions != null && user.subscriptions.isNotEmpty)
+            _wrapWithTitle('Читает', AppUserTags(tags: user.subscriptions)),
+          if (user.ignore != null && user.ignore.isNotEmpty)
+            _wrapWithTitle('Не читает', AppUserTags(tags: user.ignore)),
+          if (user.subscriptions != null && user.subscriptions.isNotEmpty)
+            _wrapWithTitle(
+                'Темы постов',
+                AppUserTags(
+                  tags: user.tagCloud,
+                  canHide: false,
+                )),
+          _wrapWithTitle('Статистика', AppUserStats(stats: user.stats)),
+          const SizedBox(height: 20)
+        ],
+      ),
+    );
+  }
+
+  Widget _wrapWithTitle(String title, Widget child, {childPadding = true}) =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: _defaultPadding.copyWith(top: 10),
+            child: Text(title,
+                style: _textStyle.copyWith(
+                    fontWeight: FontWeight.w500, fontSize: 18)),
+          ),
+          Padding(
+            padding: _defaultPadding,
+            child: Divider(height: 15),
+          ),
+          Padding(
+            padding: childPadding ? _defaultPadding : EdgeInsets.zero,
+            child: child,
+          )
+        ],
+      );
+}

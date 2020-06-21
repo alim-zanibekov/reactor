@@ -1,0 +1,42 @@
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" height="640" preserveAspectRatio="xMidYMid meet"
+    version="1.1" viewBox="0 0 640 640" width="640" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <path
+            d="M320 7.44C147.38 7.44 7.44 147.38 7.44 320C7.44 492.62 147.38 632.56 320 632.56C492.62 632.56 632.56 492.62 632.56 320C632.56 147.38 492.62 7.44 320 7.44Z"
+            id="a1sGlvKJJ0" />
+        <linearGradient gradientUnits="userSpaceOnUse" id="gradientc1P4XFQPa7" x1="7.44" x2="7.44"
+            y1="7.44" y2="632.56">
+            <stop style="stop-color: #ff5500;stop-opacity: 1" offset="0%" />
+            <stop style="stop-color: #ff2200;stop-opacity: 1" offset="100%" />
+        </linearGradient>
+        <path
+            d="M320 7.44C147.38 7.44 7.44 147.38 7.44 320C7.44 492.62 147.38 632.56 320 632.56C492.62 632.56 632.56 492.62 632.56 320C632.56 147.38 492.62 7.44 320 7.44Z"
+            id="a2JPlW6gw0" />
+        <path d="M253.02 491.16L290.23 320L253.02 148.84L461.4 320L253.02 491.16Z" id="cpKqZcWRj" />
+    </defs>
+    <g>
+        <g>
+            <g>
+                <use fill="url(#gradientc1P4XFQPa7)" opacity="1" xlink:href="#a1sGlvKJJ0" />
+                <g>
+                    <use fill-opacity="0" opacity="1" stroke="#cc4400" stroke-opacity="1"
+                        stroke-width="1" xlink:href="#a1sGlvKJJ0" />
+                </g>
+            </g>
+            <g>
+                <use fill="#000000" fill-opacity="0.08" opacity="1" xlink:href="#a2JPlW6gw0" />
+                <g>
+                    <use fill-opacity="0" opacity="1" stroke="#cc4400" stroke-opacity="1"
+                        stroke-width="1" xlink:href="#a2JPlW6gw0" />
+                </g>
+            </g>
+            <g>
+                <use fill="#ffffff" fill-opacity="1" opacity="1" xlink:href="#cpKqZcWRj" />
+                <g>
+                    <use fill-opacity="0" opacity="1" stroke="#000000" stroke-opacity="0"
+                        stroke-width="1" xlink:href="#cpKqZcWRj" />
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

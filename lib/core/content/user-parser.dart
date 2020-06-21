@@ -1,0 +1,137 @@
+import 'package:html/dom.dart';
+import 'package:html/parser.dart' as parser;
+
+import 'stats-parser.dart';
+import 'types/module.dart';
+
+class UserParser {
+  UserFull parse(String c, String link) {
+    final parsedPage = parser.parse(c);
+    final sidebar = parsedPage.getElementById('sidebar');
+
+    final userBlock = sidebar.querySelector('.user');
+    final avatar = (userBlock.querySelector('img')?.attributes ?? {})['src'];
+    final username = userBlock.querySelector('span')?.text?.trim();
+
+    final awards = sidebar
+        .querySelectorAll('.user-awards .award')
+        .map((e) => Award(
+            icon: e?.attributes['src'],
+            title: e?.attributes['title']?.trim(),
+            id: int.tryParse(e?.attributes['src']?.split('/')?.last)))
+        .toList();
+    final stars = sidebar.querySelectorAll('.stars .star-0').length;
+
+    final ratingBlock = sidebar.querySelector('#rating-text');
+
+    final Tag mainTag = Tag(ratingBlock?.querySelector('a')?.text?.trim());
+    final rating = _getNumber(ratingBlock?.querySelector('b')?.text ?? '0');
+
+    final ratingWeekDelta =
+        _getNumber(ratingBlock?.querySelector('div')?.text ?? '0');
+
+    final sidebarBlocks = sidebar.querySelectorAll('.sidebar_block');
+    final activeInBlock =
+        StatsParser.getBlockByName(sidebarBlocks, 'Активный участник');
+
+    final activeIn = activeInBlock?.querySelectorAll('.blogs tr')?.map((e) {
+      final tagImg = e.querySelector('img');
+      final infoBlock = e.querySelector('small');
+      final rating = _getNumber(infoBlock?.nodes?.first?.text);
+      final ratingWeekDelta = _getNumber(infoBlock?.querySelector('div')?.text);
+      final link = e.querySelector('a');
+      var icon = (tagImg?.attributes ?? {})['src'];
+
+      if (icon.startsWith('/')) icon = 'http://joyreactor.cc$icon';
+      return UserTag(link?.text,
+          isMain: Tag.parseIsMain((link?.attributes ?? {})['href']),
+          prefix: Tag.parsePrefix((link?.attributes ?? {})['href']),
+          link: Tag.parseLink((link?.attributes ?? {})['href']),
+          icon: icon,
+          rating: rating,
+          ratingWeekDelta: ratingWeekDelta);
+    })?.toList();
+
+    final moderatingBlock =
+        StatsParser.getBlockByName(sidebarBlocks, 'Модерирует');
+    final moderating = _parseTags(moderatingBlock);
+
+    final readingBlock = StatsParser.getBlockByName(sidebarBlocks, 'Читает');
+    final subscriptions = _parseTags(readingBlock);
+
+    final ignoreBlock = StatsParser.getBlockByName(sidebarBlocks, 'Не любит');
+    final ignore = _parseTags(ignoreBlock);
+
+    final tagCloud = _parseWeightedTags(sidebar.querySelector('#tagcloud'));
+    final profileBlock = StatsParser.getBlockByName(sidebarBlocks, 'Профиль');
+    final profileText = profileBlock?.text ?? '';
+    final bestPostCount =
+        int.tryParse(bestCountRegex.firstMatch(profileText)?.group(1) ?? '');
+    final goodPostCount =
+        int.tryParse(goodCountRegex.firstMatch(profileText)?.group(1) ?? '');
+    final postCount =
+        int.tryParse(postsCountRegex.firstMatch(profileText)?.group(1) ?? '');
+    final commentsCount = int.tryParse(
+        commentsCountRegex.firstMatch(profileText)?.group(1) ?? '');
+    final daysCount =
+        int.tryParse(daysCountRegex.firstMatch(profileText)?.group(1) ?? '');
+    final lastEnterArr = lastEnterRegex.firstMatch(profileText)?.group(1);
+    DateTime lastEnter;
+    if (lastEnterArr != null) {
+      lastEnter = DateTime.parse(lastEnterArr);
+    }
+
+    return UserFull(
+        avatar: avatar,
+        link: link,
+        username: username,
+        stars: stars,
+        awards: awards,
+        mainTag: mainTag,
+        rating: rating,
+        ratingWeekDelta: ratingWeekDelta,
+        activeIn: activeIn,
+        moderating: moderating,
+        subscriptions: subscriptions,
+        ignore: ignore,
+        tagCloud: tagCloud,
+        stats: UserStats(
+            bestPostCount: bestPostCount,
+            goodPostCount: goodPostCount,
+            postCount: postCount,
+            commentsCount: commentsCount,
+            daysCount: daysCount,
+            lastEnter: lastEnter));
+  }
+
+  List<Tag> _parseTags(Element element) =>
+      (element?.querySelectorAll('a') ?? [])
+          .map((e) => Tag(
+                e.text?.trim(),
+                isMain: Tag.parseIsMain((e.attributes ?? {})['href']),
+                prefix: Tag.parsePrefix((e.attributes ?? {})['href']),
+                link: Tag.parseLink((e.attributes ?? {})['href']),
+              ))
+          .toList();
+
+  List<UserTag> _parseWeightedTags(Element element) =>
+      (element?.querySelectorAll('a') ?? [])
+          .map((e) => UserTag(e.text?.trim(),
+              weight: -_getNumber(e?.attributes['style'])))
+          .toList();
+
+  double _getNumber(String str) =>
+      str != null ? double.tryParse(str.replaceAll(numberRegex, '')) : null;
+
+  static final numberRegex = RegExp(r'[^\-0-9\.]');
+
+  static final postsCountRegex = RegExp(r'Постов:\s+([0-9]+)', unicode: true);
+  static final bestCountRegex = RegExp(r'лучших:\s+([0-9]+)', unicode: true);
+  static final goodCountRegex = RegExp(r'хороших:\s+([0-9]+)', unicode: true);
+  static final commentsCountRegex =
+      RegExp(r'Комментариев:\s+([0-9]+)', unicode: true);
+  static final lastEnterRegex =
+      RegExp(r'Последний раз заходил:\s+([0-9\-]+)', unicode: true);
+  static final daysCountRegex =
+      RegExp(r'Дней подряд:\s+([0-9]+)', unicode: true);
+}

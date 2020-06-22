@@ -153,14 +153,31 @@ String _initPlayerJS = '''(function() {
  
   buttons.parentNode.removeChild(buttons);
   
+  const replay = document.createElement('button');
+  replay.style = 'display: none; top: 50vh; height: 36px; margin-top: -18px; z-index: 10000;' + 
+  'position: absolute; background: transparent; border: 0; left: 50vw; margin-left: -18px;';
+  replay.innerHTML = '<div class="ytp-icon ytp-icon-replay"></div>';
+  
+  setTimeout(function () {
+    player.appendChild(replay);
+  }, 2000);
+  
+  video.onended = function () {
+    replay.style.display = 'block';
+  };
+  
+  replay.onclick = function () {
+    replay.style.display = 'none';
+    video.pause();
+    video.currentTime = 0;
+    video.play();
+  };
+  
+  player.appendChild(replay);
+  
   document.body.style.display = 'flex';
   document.body.style.alignItems = 'center';
   document.body.style.justifyContent = 'center';
-  
-  video.oncanplay = function () {
-    replayBtn.style.top = '48vh';
-    replayBtn.style.height = '36px';
-  }
   
   const callback = function(mutationsList, observer) {
     observer.disconnect();

@@ -91,7 +91,10 @@ class _AppVideoPlayerState extends State<AppVideoPlayer> {
           _controller.removeListener(_onChangeVideoState);
           _controller.dispose();
           _controller = null;
-          _streamController.add(1);
+
+          if (_streamController.hasListener) {
+            _streamController.add(1);
+          }
         });
       }
       return;

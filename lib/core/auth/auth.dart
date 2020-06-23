@@ -6,6 +6,7 @@ import 'package:html/parser.dart' as parser;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../common/types.dart';
+import '../external/sentry.dart';
 import '../http/session.dart';
 import 'types.dart';
 
@@ -14,6 +15,7 @@ StreamController<bool> _authState = StreamController<bool>.broadcast();
 class Auth {
   static final Auth _auth = Auth._internal();
   static final Session _session = Session();
+  static final SentryReporter _sentryReporter = SentryReporter();
 
   factory Auth() {
     return _auth;
@@ -34,6 +36,7 @@ class Auth {
       if (prefs.getBool('auth') ?? false) {
         _token = prefs.getString('auth-token');
         _username = prefs.getString('username');
+        _sentryReporter.setUserContext(_username);
         _session.setToken(_token);
         _authorized = true;
       }
@@ -80,20 +83,22 @@ class Auth {
 
       if (res.statusCode != 302) {
         throw UnauthorizedException('Invalid Username or Password');
-      } else {
-        final token = _getTokenHeader(res);
-
-        final prefs = await SharedPreferences.getInstance();
-        prefs.setString('auth-token', token);
-        prefs.setString('username', username);
-        prefs.setBool('auth', true);
-
-        _token = token;
-        _authorized = true;
-        _session.setToken(_token);
-        _username = username;
-        _authState.add(authorized);
       }
+
+      final token = _getTokenHeader(res);
+
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('auth-token', token);
+      prefs.setString('username', username);
+      prefs.setBool('auth', true);
+
+      _token = token;
+      _authorized = true;
+      _session.setToken(_token);
+      _username = username;
+      _authState.add(authorized);
+
+      _sentryReporter.setUserContext(username);
     } on Exception {
       _logout();
       rethrow;
@@ -109,6 +114,8 @@ class Auth {
     prefs.setBool('auth', false);
     prefs.remove('auth-token');
     prefs.remove('username');
+
+    _sentryReporter.resetUserContext();
   }
 
   Future logout() async {

@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:reactor/core/external/sentry.dart';
 
 import 'app/page/pages.dart';
 import 'core/auth/auth.dart';
 import 'core/common/retry-netwok-image.dart';
-import 'core/external/sentry.dart';
 import 'core/preferences/preferences.dart';
 import 'variables.dart';
 
@@ -23,6 +23,7 @@ class EmptyBehavior extends ScrollBehavior {
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  final sentryReporter = SentryReporter()..init();
 
   FlutterError.onError = (FlutterErrorDetails details) {
     if (isInDebugMode) {
@@ -49,7 +50,7 @@ void main() {
         );
       },
     ));
-  }, reportError);
+  }, sentryReporter.reportError);
 }
 
 class App extends StatelessWidget {

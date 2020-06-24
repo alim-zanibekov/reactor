@@ -4,8 +4,6 @@ import 'package:device_info/device_info.dart';
 import 'package:package_info/package_info.dart';
 import 'package:sentry/sentry.dart';
 
-import '../../variables.dart';
-
 class SentryReporter {
   static final SentryReporter _sentryReporter = SentryReporter.internal();
   static final DateTime _startTime = DateTime.now();
@@ -18,7 +16,7 @@ class SentryReporter {
 
   final SentryClient _sentry = SentryClient(
     dsn:
-    'https://20004fb264fd46598cc10667f873df42@o410122.ingest.sentry.io/5283781',
+        'https://20004fb264fd46598cc10667f873df42@o410122.ingest.sentry.io/5283781',
   );
 
   Map<String, dynamic> _extra;
@@ -84,28 +82,20 @@ class SentryReporter {
           identifier: packageInfo.packageName,
           deviceAppHash: appHash,
           startTime: _startTime,
-          buildType: 'production'
-      ),
+          buildType: 'production'),
       device: device,
     );
   }
 
   void setUserContext(String username) {
-    _userContext = User(
-        id: username.toLowerCase(),
-        username: username
-    );
+    _userContext = User(id: username.toLowerCase(), username: username);
   }
 
   void resetUserContext() {
     _userContext = null;
   }
 
-  Future<void> reportError(dynamic error, dynamic stackTrace) async {
-    print('Caught error: $error');
-    if (isInDebugMode) {
-      print(stackTrace);
-    } else {
+  Future<void> capture(dynamic error, dynamic stackTrace) =>
       _sentry.capture(
         event: Event(
             environment: 'production',
@@ -115,6 +105,4 @@ class SentryReporter {
             userContext: _userContext,
             extra: _extra),
       );
-    }
-  }
 }

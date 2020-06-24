@@ -16,6 +16,7 @@ class Preferences {
   AppTheme _theme;
   AppPostsType _postsType;
   bool _sfw;
+  bool _sendErrorStatistics;
 
   Preferences._internal();
 
@@ -26,6 +27,9 @@ class Preferences {
         _postsType = AppPostsType.values[openDefault];
         final sfw = prefs.getBool('sfw') ?? false;
         _sfw = sfw;
+        final sendErrorStatistics =
+            prefs.getBool('send-error-statistics') ?? true;
+        _sendErrorStatistics = sendErrorStatistics;
 
         _session.setSFW(_sfw);
       });
@@ -35,6 +39,8 @@ class Preferences {
   AppTheme get theme => _theme;
 
   bool get sfw => _sfw;
+
+  bool get sendErrorStatistics => _sendErrorStatistics;
 
   setTheme(AppTheme theme) async {
     final prefs = await SharedPreferences.getInstance();
@@ -53,5 +59,11 @@ class Preferences {
     prefs.setBool('sfw', state);
     _sfw = state;
     _session.setSFW(state);
+  }
+
+  setSendErrorStatistics(bool state) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('send-error-statistics', state);
+    _sendErrorStatistics = state;
   }
 }

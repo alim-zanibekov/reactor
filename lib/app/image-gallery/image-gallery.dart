@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
-import '../../core/common/retry-netwok-image.dart';
+import '../../core/common/retry-network-image.dart';
 import '../../core/common/save-image.dart';
 import '../../core/common/value-updater.dart';
 import '../../core/widgets/gesture-detector.dart';

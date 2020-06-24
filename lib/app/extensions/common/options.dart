@@ -1,4 +1,5 @@
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+
 import '../../../variables.dart';
 
 InAppWebViewGroupOptions inAppWebViewDefaultOptions() =>

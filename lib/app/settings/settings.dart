@@ -15,12 +15,14 @@ class _AppSettingsState extends State<AppSettings> {
   AppTheme _theme;
   AppPostsType _postsType;
   bool _sfw;
+  bool _sendErrorStatistics;
 
   @override
   void initState() {
     _theme = _preferences.theme;
     _postsType = _preferences.postsType;
     _sfw = _preferences.sfw;
+    _sendErrorStatistics = _preferences.sendErrorStatistics;
     super.initState();
   }
 
@@ -104,6 +106,25 @@ class _AppSettingsState extends State<AppSettings> {
                 _sfw = sfw;
               });
               await _preferences.setSFW(sfw);
+            },
+          ),
+          SwitchListTile(
+            title: const Text('Отправлять отчеты об ошибках'),
+            value: _sendErrorStatistics,
+            activeColor: Theme.of(context).accentColor,
+            onChanged: (bool sendErrorStatistics) async {
+              Scaffold.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Пока что нельзя это выключить, подождите более стабильной версии',
+                  ),
+                ),
+              );
+              return;
+              setState(() {
+                _sendErrorStatistics = sendErrorStatistics;
+              });
+              await _preferences.setSendErrorStatistics(sendErrorStatistics);
             },
           )
         ],

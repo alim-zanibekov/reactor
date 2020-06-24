@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/common/datetime-formatter.dart';
-import '../../core/common/retry-netwok-image.dart';
+import '../../core/common/retry-network-image.dart';
 import '../../core/content/types/module.dart';
 import '../common/open.dart';
 

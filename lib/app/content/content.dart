@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/common/metadata.dart';
-import '../../core/common/retry-netwok-image.dart';
+import '../../core/common/retry-network-image.dart';
 import '../../core/common/types.dart';
 import '../../core/content/types/module.dart';
 import '../../core/widgets/safe-image.dart';

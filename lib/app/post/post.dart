@@ -382,6 +382,8 @@ class _AppPostContentState extends State<AppPostContent>
 
       if (!_post.expanded) {
         _setPostHeight();
+      } else {
+        _currentMaxHeight = _realPostHeight;
       }
     }
   }
@@ -401,6 +403,8 @@ class _AppPostContentState extends State<AppPostContent>
 
     if (!_post.expanded) {
       _setPostHeight();
+    } else {
+      _currentMaxHeight = _realPostHeight;
     }
   }
 

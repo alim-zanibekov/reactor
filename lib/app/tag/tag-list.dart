@@ -88,10 +88,7 @@ class _AppTagListState extends State<AppTagList>
           child: Padding(
             padding:
                 const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
-            child: AppTag(
-              size: 70,
-              tag: _tags[index],
-            ),
+            child: AppTag(size: 70, tag: _tags[index]),
           ),
         ),
       );
@@ -110,7 +107,8 @@ class _AppTagListState extends State<AppTagList>
           padding: EdgeInsets.all(10),
           child: Center(
             child: Text(
-                _tags.isNotEmpty ? 'Больше тут ничего нет' : 'Тут ничего нет'),
+              _tags.isNotEmpty ? 'Больше тут ничего нет' : 'Тут ничего нет',
+            ),
           ),
         );
       }

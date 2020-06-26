@@ -51,30 +51,31 @@ class ContentParser {
             ?.contains('delete');
 
     return Post(
-        id: id,
-        censored: censored,
-        tags: tags,
-        content: content,
-        rating: rating,
-        favorite: favorite,
-        comments: comments,
-        user: user,
-        hidden: hidden ?? false,
-        votedUp: votedUp,
-        votedDown: votedDown,
-        canVote: canVote,
-        dateTime: dateTime,
-        commentsCount: commentsCount,
-        bestComment: bestComment);
+      id: id,
+      censored: censored,
+      tags: tags,
+      content: content,
+      rating: rating,
+      favorite: favorite,
+      comments: comments,
+      user: user,
+      hidden: hidden ?? false,
+      votedUp: votedUp,
+      votedDown: votedDown,
+      canVote: canVote,
+      dateTime: dateTime,
+      commentsCount: commentsCount,
+      bestComment: bestComment,
+    );
   }
 
   ContentPage<Post> parsePage(String c) {
     final parsedPage = parser.parse(c);
     final current = parsedPage.querySelector('.pagination_expanded .current');
     final pageId = current != null
-        ? int.tryParse(parsedPage
-                .querySelector('.pagination_expanded .current')
-                .text) ??
+        ? int.tryParse(
+              parsedPage.querySelector('.pagination_expanded .current')?.text,
+            ) ??
             0
         : 0;
 
@@ -82,21 +83,21 @@ class ContentParser {
         TagParser.parsePageInfo(parsedPage.getElementById('tagArticle'));
 
     return ContentPage<Post>(
-        authorized:
-            parsedPage.querySelector('#topbar .login #settings') != null,
-        pageInfo: pageInfo,
-        isLast: pageId <= 1,
-        content: parsedPage
-            .querySelectorAll('.postContainer')
-            .map((e) {
-              final id = int.tryParse(
-                      e.attributes['id'].replaceAll('postContainer', '')) ??
-                  0;
-              return _parse(id, e, false);
-            })
-            .where((element) => element != null)
-            .toList(),
-        id: pageId);
+      authorized: parsedPage.querySelector('#topbar .login #settings') != null,
+      pageInfo: pageInfo,
+      isLast: pageId <= 1,
+      content: parsedPage
+          .querySelectorAll('.postContainer')
+          .map((e) {
+        final id = int.tryParse(
+            e.attributes['id'].replaceAll('postContainer', '')) ??
+            0;
+        return _parse(id, e, false);
+      })
+          .where((element) => element != null)
+          .toList(),
+      id: pageId,
+    );
   }
 
   List<ContentUnit> parseContent(String c) {
@@ -240,18 +241,23 @@ class ContentParser {
     final canVote = bottom.querySelector('.vote-plus') != null;
 
     return PostComment(
-        id: id,
-        postId: postId,
-        votedUp: votedUp ?? false,
-        votedDown: votedDown ?? false,
-        canVote: canVote ?? false,
-        time: time,
-        rating: double.tryParse(ratingText?.trim() ?? ''),
-        hidden: hidden,
-        user: UserShort(
-            id: creatorId, avatar: avatar, username: username, link: userLink),
-        content: !hidden ? _parseContent(element.querySelector('.txt')) : null,
-        depth: depth);
+      id: id,
+      postId: postId,
+      votedUp: votedUp ?? false,
+      votedDown: votedDown ?? false,
+      canVote: canVote ?? false,
+      time: time,
+      rating: double.tryParse(ratingText?.trim() ?? ''),
+      hidden: hidden,
+      user: UserShort(
+        id: creatorId,
+        avatar: avatar,
+        username: username,
+        link: userLink,
+      ),
+      content: !hidden ? _parseContent(element.querySelector('.txt')) : null,
+      depth: depth,
+    );
   }
 
   PostComment _parseBestComment(Element element, int depth, int postId) {
@@ -279,18 +285,23 @@ class ContentParser {
         (usernameElement?.attributes ?? {})['href']?.split('/')?.last;
 
     return PostComment(
-        id: id,
-        time: time,
-        postId: postId,
-        votedUp: false,
-        votedDown: false,
-        canVote: false,
-        rating: double.tryParse(ratingText?.replaceAll('+', '')?.trim() ?? ''),
-        hidden: hidden,
-        user: UserShort(
-            id: creatorId, avatar: avatar, username: username, link: userLink),
-        content: !hidden ? _parseContent(element) : null,
-        depth: depth);
+      id: id,
+      time: time,
+      postId: postId,
+      votedUp: false,
+      votedDown: false,
+      canVote: false,
+      rating: double.tryParse(ratingText?.replaceAll('+', '')?.trim() ?? ''),
+      hidden: hidden,
+      user: UserShort(
+        id: creatorId,
+        avatar: avatar,
+        username: username,
+        link: userLink,
+      ),
+      content: !hidden ? _parseContent(element) : null,
+      depth: depth,
+    );
   }
 
   ContentUnit _parseImage(Element element) {
@@ -336,9 +347,13 @@ class ContentParser {
       if (height == null || width == null) {
         width = height = null;
       }
-      return ContentUnitImage(image.attributes['src'], width, height,
-          prettyImageLink:
-              prettyPhoto != null ? prettyPhoto.attributes['href'] : null);
+      return ContentUnitImage(
+        image.attributes['src'],
+        width,
+        height,
+        prettyImageLink:
+        prettyPhoto != null ? prettyPhoto.attributes['href'] : null,
+      );
     }
     return null;
   }
@@ -440,13 +455,17 @@ class ContentParser {
           links.add(Pair(nextDepth,
               (element.localName == 'a') ? element.attributes['href'] : null));
 
-          if (block)
+          if (block) {
             nodes.add(
-                Pair(nextDepth, ContentUnitBreak(ContentBreak.BLOCK_BREAK)));
+              Pair(nextDepth, ContentUnitBreak(ContentBreak.BLOCK_BREAK)),
+            );
+          }
           nodes.addAll(node.nodes.reversed.map((e) => Pair(nextDepth, e)));
-          if (block)
+          if (block) {
             nodes.add(
-                Pair(nextDepth, ContentUnitBreak(ContentBreak.BLOCK_BREAK)));
+              Pair(nextDepth, ContentUnitBreak(ContentBreak.BLOCK_BREAK)),
+            );
+          }
         }
       } else if (node is Node &&
           node.nodeType == Node.TEXT_NODE &&
@@ -464,10 +483,18 @@ class ContentParser {
             link = Uri.decodeQueryComponent(
                 redirectRegex.firstMatch(link).group(1));
           }
-          result
-              .add(ContentUnitLink(text, link: link, size: size, style: style));
+          result.add(ContentUnitLink(
+            text,
+            link: link,
+            size: size,
+            style: style,
+          ));
         } else {
-          result.add(ContentUnitText(text, size: size, style: style));
+          result.add(ContentUnitText(
+            text,
+            size: size,
+            style: style,
+          ));
         }
       }
     }
@@ -505,33 +532,15 @@ class ContentParser {
   }
 
   static final youtubeRegex = RegExp(
-      r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})',
-      caseSensitive: false);
+    r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})',
+    caseSensitive: false,
+  );
 
   static final redirectRegex = RegExp(
-      r'(?:https?)?:?\/\/(?:joy|[^\/\.]+\.)?reactor.cc\/redirect\?url=([^\&]+)',
-      caseSensitive: false);
+    r'(?:https?)?:?\/\/(?:joy|[^\/\.]+\.)?reactor.cc\/redirect\?url=([^\&]+)',
+    caseSensitive: false,
+  );
 
-  static final soundCloudRegex = RegExp(
-      'https?:\/\/(?:w\.|www\.|)(?:soundcloud\.com\/)',
-      caseSensitive: false);
-
-  static const List<String> TEXT_NODES = [
-    'p',
-    'span',
-    'b',
-    's',
-    'strike',
-    'i',
-    'strong',
-    'a',
-    'h1',
-    'h2',
-    'h3',
-    'h4',
-    'h5',
-    'h6'
-  ];
   static const List<String> BLOCK_NODES = [
     'p',
     'div',

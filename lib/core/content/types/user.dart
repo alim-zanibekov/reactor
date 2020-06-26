@@ -23,15 +23,16 @@ class UserTag extends Tag {
   final double ratingWeekDelta;
   final String icon;
 
-  UserTag(String value,
-      {this.icon,
-      this.rating,
-      this.ratingWeekDelta,
-      this.weight,
-      isMain,
-      prefix,
-      link})
-      : super(value, isMain: isMain, prefix: prefix, link: link);
+  UserTag(
+    String value, {
+    this.icon,
+    this.rating,
+    this.ratingWeekDelta,
+    this.weight,
+    isMain,
+    prefix,
+    link,
+  }) : super(value, isMain: isMain, prefix: prefix, link: link);
 }
 
 class UserStats {
@@ -42,13 +43,14 @@ class UserStats {
   final int daysCount;
   final DateTime lastEnter;
 
-  UserStats(
-      {this.postCount,
-      this.bestPostCount,
-      this.goodPostCount,
-      this.commentsCount,
-      this.daysCount,
-      this.lastEnter});
+  UserStats({
+    this.postCount,
+    this.bestPostCount,
+    this.goodPostCount,
+    this.commentsCount,
+    this.daysCount,
+    this.lastEnter,
+  });
 }
 
 class UserFull {
@@ -68,22 +70,23 @@ class UserFull {
   final double ratingWeekDelta;
   final UserStats stats;
 
-  UserFull(
-      {this.id,
-      this.link,
-      this.username,
-      this.activeIn,
-      this.avatar,
-      this.awards,
-      this.rating,
-      this.stars,
-      this.tagCloud,
-      this.mainTag,
-      this.ignore,
-      this.ratingWeekDelta,
-      this.moderating,
-      this.stats,
-      this.subscriptions});
+  UserFull({
+    this.id,
+    this.link,
+    this.username,
+    this.activeIn,
+    this.avatar,
+    this.awards,
+    this.rating,
+    this.stars,
+    this.tagCloud,
+    this.mainTag,
+    this.ignore,
+    this.ratingWeekDelta,
+    this.moderating,
+    this.stats,
+    this.subscriptions,
+  });
 
   UserShort toShort() => UserShort(id: id, avatar: avatar, username: username);
 }

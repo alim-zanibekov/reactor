@@ -19,9 +19,12 @@ class AppContent extends StatefulWidget {
   final void Function(List<Pair<double, Size>>) onLoad;
   final bool noHorizontalPadding;
 
-  const AppContent(
-      {Key key, this.content, this.onLoad, this.noHorizontalPadding = false})
-      : super(key: key);
+  const AppContent({
+    Key key,
+    this.content,
+    this.onLoad,
+    this.noHorizontalPadding = false,
+  }) : super(key: key);
 
   @override
   _AppContentState createState() => _AppContentState();
@@ -164,8 +167,9 @@ class _AppContentState extends State<AppContent> {
         textStack.add(entry);
       } else if (textStack.isNotEmpty) {
         newChildren.add(Padding(
-            child: _textArrayToRichText(context, textStack),
-            padding: dPadding));
+          child: _textArrayToRichText(context, textStack),
+          padding: dPadding,
+        ));
         textStack.clear();
       }
 
@@ -175,120 +179,106 @@ class _AppContentState extends State<AppContent> {
 
       if (entry is ContentUnitImage) {
         final currentImageIndex = imagesIndex;
-        newChildren.add(
-          Container(
-            margin: (entry.width ?? 150) >= 150
-                ? dPadding.copyWith(left: 0, right: 0)
-                : dPadding,
-            width: (entry.width ?? 150) < 150 ? entry.width : null,
-            child: GestureDetector(
-              onTap: () {
-                _fillGalleryImages();
-                openImage(context, _imagesForGallery, currentImageIndex);
-              },
-              child: AspectRatio(
-                aspectRatio: (entry.width != null && entry.height != null)
-                    ? entry.width / entry.height
-                    : 9.0 / 16.0,
-                child: AppSafeImage(
-                  imageProvider: _images[currentImageIndex],
-                  onInfo: (e) => _onImageInfo(e, entry),
-                ),
+        newChildren.add(Container(
+          margin: (entry.width ?? 150) >= 150
+              ? dPadding.copyWith(left: 0, right: 0)
+              : dPadding,
+          width: (entry.width ?? 150) < 150 ? entry.width : null,
+          child: GestureDetector(
+            onTap: () {
+              _fillGalleryImages();
+              openImage(context, _imagesForGallery, currentImageIndex);
+            },
+            child: AspectRatio(
+              aspectRatio: (entry.width != null && entry.height != null)
+                  ? entry.width / entry.height
+                  : 9.0 / 16.0,
+              child: AppSafeImage(
+                imageProvider: _images[currentImageIndex],
+                onInfo: (e) => _onImageInfo(e, entry),
               ),
             ),
           ),
-        );
+        ));
 
         imagesIndex++;
       }
       if (entry is ContentUnitGif) {
-        newChildren.add(
-          Padding(
-            padding: dPadding.copyWith(left: 0, right: 0),
-            child: AppVideoPlayer(
-                key: ObjectKey(entry),
-                aspectRatio: entry.width / entry.height,
-                url: entry.value),
-          ),
-        );
+        newChildren.add(Padding(
+          padding: dPadding.copyWith(left: 0, right: 0),
+          child: AppVideoPlayer(
+              key: ObjectKey(entry),
+              aspectRatio: entry.width / entry.height,
+              url: entry.value),
+        ));
       }
       if (entry is ContentUnitYouTubeVideo) {
-        newChildren.add(
-          Padding(
-            padding: dPadding.copyWith(left: 0, right: 0),
-            child: AppYouTubePlayer(
-              videoId: entry.value,
-              metadata: entry.metadata,
-              futureMetadata: _futures[futuresIndex],
-            ),
+        newChildren.add(Padding(
+          padding: dPadding.copyWith(left: 0, right: 0),
+          child: AppYouTubePlayer(
+            videoId: entry.value,
+            metadata: entry.metadata,
+            futureMetadata: _futures[futuresIndex],
           ),
-        );
+        ));
 
         futuresIndex++;
       }
       if (entry is ContentUnitCoubVideo) {
-        newChildren.add(
-          Padding(
-            padding: dPadding.copyWith(left: 0, right: 0),
-            child: AppCoubPlayer(
-              videoId: entry.value,
-              metadata: entry.metadata,
-              futureMetadata: _futures[futuresIndex],
-            ),
+        newChildren.add(Padding(
+          padding: dPadding.copyWith(left: 0, right: 0),
+          child: AppCoubPlayer(
+            videoId: entry.value,
+            metadata: entry.metadata,
+            futureMetadata: _futures[futuresIndex],
           ),
-        );
+        ));
 
         futuresIndex++;
       }
       if (entry is ContentUnitVimeoVideo) {
-        newChildren.add(
-          Padding(
-            padding: dPadding.copyWith(left: 0, right: 0),
-            child: AppVimeoPlayer(
-              videoId: entry.value,
-              metadata: entry.metadata,
-              futureMetadata: _futures[futuresIndex],
-            ),
+        newChildren.add(Padding(
+          padding: dPadding.copyWith(left: 0, right: 0),
+          child: AppVimeoPlayer(
+            videoId: entry.value,
+            metadata: entry.metadata,
+            futureMetadata: _futures[futuresIndex],
           ),
-        );
+        ));
 
         futuresIndex++;
       }
       if (entry is ContentUnitSoundCloudAudio) {
-        newChildren.add(
-          Padding(
-            padding: dPadding.copyWith(left: 0, right: 0),
-            child: AppSoundCloudPlayer(
-              url: entry.value,
-              metadata: entry.metadata,
-              futureMetadata:
-                  entry.metadata == null ? entry.loadMetadata() : null,
-            ),
+        newChildren.add(Padding(
+          padding: dPadding.copyWith(left: 0, right: 0),
+          child: AppSoundCloudPlayer(
+            url: entry.value,
+            metadata: entry.metadata,
+            futureMetadata:
+                entry.metadata == null ? entry.loadMetadata() : null,
           ),
-        );
+        ));
       }
     }
 
     if (textStack.isNotEmpty) {
-      newChildren.add(
-        Padding(
-          child: _textArrayToRichText(context, textStack),
-          padding: widget.noHorizontalPadding
-              ? dPadding.copyWith(bottom: 0)
-              : dPadding,
-        ),
-      );
+      newChildren.add(Padding(
+        child: _textArrayToRichText(context, textStack),
+        padding: widget.noHorizontalPadding
+            ? dPadding.copyWith(bottom: 0)
+            : dPadding,
+      ));
       textStack.clear();
     }
 
-    return Wrap(
-      children: <Widget>[...newChildren],
-    );
+    return Wrap(children: <Widget>[
+      ...newChildren,
+    ]);
   }
 
   Widget _textArrayToRichText(
       BuildContext context, List<ContentUnitText> list) {
-    List<TextSpan> result = [];
+    List<InlineSpan> result = [];
     for (final text in list) {
       double fontSize = 0;
 
@@ -348,12 +338,16 @@ class _AppContentState extends State<AppContent> {
       ));
     }
     return Align(
-        alignment: Alignment.centerLeft,
-        child: RichText(
-          text: TextSpan(
-              text: '',
-              style: DefaultTextStyle.of(context).style,
-              children: result),
-        ));
+      alignment: Alignment.centerLeft,
+      child: RichText(
+        text: TextSpan(
+          text: '',
+          style: DefaultTextStyle
+              .of(context)
+              .style,
+          children: result,
+        ),
+      ),
+    );
   }
 }

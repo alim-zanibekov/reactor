@@ -11,9 +11,9 @@ class AppCategoriesComments extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int index = 0;
-    return Column(
-      children: comments.map((e) => _children(context, e, ++index)).toList(),
-    );
+    return Column(children: <Widget>[
+      ...comments.map((e) => _children(context, e, ++index))
+    ]);
   }
 
   Widget _children(context, StatsComment comment, int index) {
@@ -57,7 +57,7 @@ class AppCategoriesComments extends StatelessWidget {
                     style: const TextStyle(fontSize: 12),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

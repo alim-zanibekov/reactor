@@ -21,16 +21,18 @@ class AppUserRating extends StatelessWidget {
           child: Wrap(
             spacing: 2,
             runSpacing: 2,
-            children: [
+            children: <Widget>[
               for (int i = 0; i < 10; i++)
                 Icon(Icons.star,
                     color: i < user.stars ? color : Colors.grey[200], size: 20),
               if (user.stars >= 10) ...[
                 SizedBox(width: double.infinity),
                 for (int i = 10; i < 20; i++)
-                  Icon(Icons.star,
-                      color: i < user.stars ? color : Colors.grey[300],
-                      size: 20)
+                  Icon(
+                    Icons.star,
+                    color: i < user.stars ? color : Colors.grey[300],
+                    size: 20,
+                  )
               ]
             ],
           ),
@@ -39,23 +41,28 @@ class AppUserRating extends StatelessWidget {
           padding: const EdgeInsets.only(top: 10),
           child: RichText(
             textAlign: TextAlign.left,
-            text:
-                TextSpan(style: DefaultTextStyle.of(context).style, children: [
-              const TextSpan(text: 'Рейтинг - '),
-              if (user.mainTag?.value != null)
-                TextSpan(
+            text: TextSpan(
+              style: DefaultTextStyle.of(context).style,
+              children: <InlineSpan>[
+                const TextSpan(text: 'Рейтинг - '),
+                if (user.mainTag?.value != null)
+                  TextSpan(
                     text: user.mainTag.value + '\n\n',
                     recognizer: TapGestureRecognizer()
                       ..onTap = () => openTag(context, user.mainTag),
                     style:
-                        const TextStyle(decoration: TextDecoration.underline)),
-              TextSpan(
-                  text: user?.rating?.toString() ?? '––',
-                  style: const TextStyle(fontWeight: FontWeight.w500)),
-              if (user.ratingWeekDelta != null)
+                        const TextStyle(decoration: TextDecoration.underline),
+                  ),
                 TextSpan(
-                    text: ' (за неделю ${_toRating(user?.ratingWeekDelta)})')
-            ]),
+                  text: user?.rating?.toString() ?? '––',
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+                if (user.ratingWeekDelta != null)
+                  TextSpan(
+                    text: ' (за неделю ${_toRating(user?.ratingWeekDelta)})',
+                  )
+              ],
+            ),
           ),
         )
       ],

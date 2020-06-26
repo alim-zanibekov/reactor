@@ -79,25 +79,27 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
     List<Widget> children = [];
     if (_post?.comments == null) {
       children.add(SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: FadeIcon(
-            key: ObjectKey(_post.dateTime),
-            icon: Icon(Icons.speaker_notes, color: Colors.grey[500], size: 44),
-          )));
+        height: MediaQuery.of(context).size.height,
+        child: FadeIcon(
+          key: ObjectKey(_post.dateTime),
+          icon: Icon(Icons.speaker_notes, color: Colors.grey[500], size: 44),
+        ),
+      ));
     } else {
       List<AppComment> comments;
       comments = AppComments.getCommentsList(
-          comments: _post.comments,
-          showAnswer: true,
-          goTo: (e) {
-            int i = comments.indexWhere((element) => element.comment.id == e);
-            _itemScrollController.scrollTo(
-                index: i + 1,
-                duration: const Duration(milliseconds: 150),
-                curve: Curves.easeInOut);
-          },
-          reload: _loadComments,
-          getColor: _getColor);
+        comments: _post.comments,
+        showAnswer: true,
+        goTo: (e) {
+          int i = comments.indexWhere((element) => element.comment.id == e);
+          _itemScrollController.scrollTo(
+              index: i + 1,
+              duration: const Duration(milliseconds: 150),
+              curve: Curves.easeInOut);
+        },
+        reload: _loadComments,
+        getColor: _getColor,
+      );
       _post.commentsCount = comments.length;
 
       children = [
@@ -138,7 +140,8 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
               } on Exception {
                 Scaffold.of(context).showSnackBar(
                   const SnackBar(
-                      content: Text('Не удалось загрзить содержимое поста')),
+                    content: Text('Не удалось загрзить содержимое поста'),
+                  ),
                 );
               }
             },
@@ -199,16 +202,16 @@ class AppPostContent extends StatefulWidget {
   final Function loadContent;
   final Function(MountInfo) onMountInfo;
 
-  AppPostContent(
-      {Key key,
-      this.post,
-      this.loadContent,
-      this.onPage = false,
-      this.onCollapse,
-      this.collapseDuration = Duration.zero,
-      this.onMountInfo,
-      this.collapseCurve = Curves.easeInOut})
-      : super(key: key);
+  AppPostContent({
+    Key key,
+    this.post,
+    this.loadContent,
+    this.onPage = false,
+    this.onCollapse,
+    this.collapseDuration = Duration.zero,
+    this.onMountInfo,
+    this.collapseCurve = Curves.easeInOut,
+  }) : super(key: key);
 
   @override
   _AppPostContentState createState() => _AppPostContentState();
@@ -268,29 +271,35 @@ class _AppPostContentState extends State<AppPostContent>
 
   @override
   Widget build(BuildContext context) {
-    _width = MediaQuery.of(context).size.width;
-    _isDark = Theme.of(context).brightness == Brightness.dark;
+    _width = MediaQuery
+        .of(context)
+        .size
+        .width;
+    _isDark = Theme
+        .of(context)
+        .brightness == Brightness.dark;
 
-    return Column(
-      children: <Widget>[
-        Column(
-          key: _wrapKey,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            getPostTopControls(),
-            getPostTags(),
-            if (!_post.censored && !_post.hidden)
-              AnimatedContainer(
-                  duration: widget.collapseDuration,
-                  curve: widget.collapseCurve,
-                  key: _postKey,
-                  height: _currentMaxHeight,
-                  child: AppContent(
-                    key: ObjectKey(_post),
-                    content: _post.content,
-                    onLoad: _onLoad,
-                  ))
-            else if (_post.censored)
+    return Column(children: <Widget>[
+      Column(
+        key: _wrapKey,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          getPostTopControls(),
+          getPostTags(),
+          if (!_post.censored && !_post.hidden)
+            AnimatedContainer(
+              duration: widget.collapseDuration,
+              curve: widget.collapseCurve,
+              key: _postKey,
+              height: _currentMaxHeight,
+              child: AppContent(
+                key: ObjectKey(_post),
+                content: _post.content,
+                onLoad: _onLoad,
+              ),
+            )
+          else
+            if (_post.censored)
               Container(
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(10),
@@ -303,8 +312,11 @@ class _AppPostContentState extends State<AppPostContent>
                   direction: Axis.vertical,
                   children: const <Widget>[
                     Icon(Icons.pan_tool),
-                    Text('Контент запрещен на территории РФ',
-                        textScaleFactor: 1.2, textAlign: TextAlign.center),
+                    Text(
+                      'Контент запрещен на территории РФ',
+                      textScaleFactor: 1.2,
+                      textAlign: TextAlign.center,
+                    ),
                   ],
                 ),
               )
@@ -313,44 +325,44 @@ class _AppPostContentState extends State<AppPostContent>
                 padding: const EdgeInsets.all(10),
                 child: Center(
                   child: OutlineButton(
-                    highlightedBorderColor: Theme.of(context).accentColor,
-                    onPressed: () {
-                      setState(() {
-                        if (widget.loadContent != null) {
-                          _loading = true;
-                          widget.loadContent();
-                        }
-                      });
-                    },
+                    highlightedBorderColor: Theme
+                        .of(context)
+                        .accentColor,
+                    onPressed: () =>
+                        setState(() {
+                          if (widget.loadContent != null) {
+                            _loading = true;
+                            widget.loadContent();
+                          }
+                        }),
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 150),
                       child: IndexedStack(
                         key: ValueKey<int>(_loading ? 1 : 0),
                         index: _loading ? 1 : 0,
                         children: const <Widget>[
+                          Center(child: Text('Показать сдержимое поста')),
                           Center(
-                            child: Text('Показать сдержимое поста'),
+                            child: SizedBox(
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 1.5),
+                              height: 16,
+                              width: 16,
+                            ),
                           ),
-                          Center(
-                              child: SizedBox(
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 1.5),
-                                  height: 16,
-                                  width: 16))
                         ],
                       ),
                     ),
                   ),
                 ),
               ),
-            if (_currentMaxHeight != null) getExpandCollapse(),
-            if (_post.bestComment != null) getBestComment(),
-            getPostControls(),
-            getBottomGradient()
-          ],
-        ),
-      ],
-    );
+          if (_currentMaxHeight != null) getExpandCollapse(),
+          if (_post.bestComment != null) getBestComment(),
+          getPostControls(),
+          getBottomGradient()
+        ],
+      ),
+    ]);
   }
 
   void _setPostHeight() {
@@ -429,16 +441,18 @@ class _AppPostContentState extends State<AppPostContent>
       child: FlatButton(
         color: _isDark ? Colors.grey[900] : Colors.grey[100],
         onPressed: _toggle,
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
-          Text(_post.expanded ? 'Свернуть' : 'Развернуть'),
-          Padding(
-            padding: const EdgeInsets.only(top: 3),
-            child: Icon(_post.expanded
-                ? Icons.keyboard_arrow_up
-                : Icons.keyboard_arrow_down),
-          )
-        ]),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Text(_post.expanded ? 'Свернуть' : 'Развернуть'),
+            Padding(
+              padding: const EdgeInsets.only(top: 3),
+              child: Icon(_post.expanded
+                  ? Icons.keyboard_arrow_up
+                  : Icons.keyboard_arrow_down),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -535,13 +549,10 @@ class _AppPostContentState extends State<AppPostContent>
         key: ObjectKey(_post.user),
         color: Colors.transparent,
         padding: const EdgeInsets.all(8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            AppPostUser(user: _post.user, dateTime: _post.dateTime),
-            copyLinkPopup()
-          ],
-        ),
+        child: Row(children: <Widget>[
+          AppPostUser(user: _post.user, dateTime: _post.dateTime),
+          copyLinkPopup()
+        ], mainAxisAlignment: MainAxisAlignment.spaceBetween),
       ),
     );
   }
@@ -576,25 +587,23 @@ class _AppPostContentState extends State<AppPostContent>
   }
 
   Widget getBestComment() {
-    return Column(
-      children: <Widget>[
-        Container(
-          height: 1,
-          color: _isDark ? Colors.black26 : Colors.grey[300],
+    return Column(children: <Widget>[
+      Container(
+        height: 1,
+        color: _isDark ? Colors.black26 : Colors.grey[300],
+      ),
+      Container(
+        padding: EdgeInsets.all(8).copyWith(bottom: 0),
+        alignment: Alignment.centerLeft,
+        child: const Text('Отличный комментарий!',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+      ),
+      SizedBox(
+        child: AppComments(
+          key: ObjectKey(_post.bestComment),
+          comments: [_post.bestComment],
         ),
-        Container(
-          padding: EdgeInsets.all(8).copyWith(bottom: 0),
-          alignment: Alignment.centerLeft,
-          child: const Text('Отличный комментарий!',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-        ),
-        SizedBox(
-          child: AppComments(
-            key: ObjectKey(_post.bestComment),
-            comments: [_post.bestComment],
-          ),
-        )
-      ],
-    );
+      ),
+    ]);
   }
 }

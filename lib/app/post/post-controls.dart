@@ -82,62 +82,60 @@ class _AppPostControlsState extends State<AppPostControls> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              SizedBox(
-                height: 30,
-                child: ButtonTheme(
-                  height: 30.0,
-                  child: OutlineButton(
-                    highlightedBorderColor: Theme.of(context).accentColor,
-                    padding: EdgeInsets.only(left: 8, right: 8),
-                    onPressed: () {
-                      widget.onCommentsClick();
-                    },
-                    child: Text('Комментарии ${widget.post.commentsCount}'),
-                  ),
+          Row(children: <Widget>[
+            SizedBox(
+              height: 30,
+              child: ButtonTheme(
+                height: 30.0,
+                child: OutlineButton(
+                  highlightedBorderColor: Theme.of(context).accentColor,
+                  padding: EdgeInsets.only(left: 8, right: 8),
+                  onPressed: () {
+                    widget.onCommentsClick();
+                  },
+                  child: Text('Комментарии ${widget.post.commentsCount}'),
                 ),
               ),
-              if (_auth.authorized)
-                Padding(
-                  padding: const EdgeInsets.only(left: 15),
-                  child: InkWell(
-                    onTap: _toggleFavorite,
-                    child: widget.post.favorite
-                        ? Icon(Icons.star,
-                            color: Theme.of(context).accentColor, size: 22)
-                        : Icon(Icons.star_border, size: 22),
-                  ),
-                )
-            ],
-          ),
+            ),
+            if (_auth.authorized)
+              Padding(
+                padding: const EdgeInsets.only(left: 15),
+                child: InkWell(
+                  onTap: _toggleFavorite,
+                  child: widget.post.favorite
+                      ? Icon(
+                          Icons.star,
+                          color: Theme.of(context).accentColor,
+                          size: 22,
+                        )
+                      : Icon(Icons.star_border, size: 22),
+                ),
+              )
+          ]),
           if (_auth.authorized)
-            Row(
-              children: <Widget>[
-                if (widget.post.canVote)
-                  Padding(
-                    padding: EdgeInsets.only(right: 10),
-                    child: InkWell(
-                      onTap: () => _vote(VoteType.UP),
-                      child: widget.post.votedUp
-                          ? Icon(Icons.mood, color: Colors.green[600], size: 22)
-                          : Icon(Icons.mood, size: 22),
-                    ),
+            Row(children: <Widget>[
+              if (widget.post.canVote)
+                Padding(
+                  padding: EdgeInsets.only(right: 10),
+                  child: InkWell(
+                    onTap: () => _vote(VoteType.UP),
+                    child: widget.post.votedUp
+                        ? Icon(Icons.mood, color: Colors.green[600], size: 22)
+                        : Icon(Icons.mood, size: 22),
                   ),
-                Text(widget.post?.rating?.toString() ?? '––'),
-                if (widget.post.canVote)
-                  Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: InkWell(
-                      onTap: () => _vote(VoteType.DOWN),
-                      child: widget.post.votedDown
-                          ? Icon(Icons.mood_bad,
-                              color: Colors.red[600], size: 22)
-                          : Icon(Icons.mood_bad, size: 22),
-                    ),
+                ),
+              Text(widget.post?.rating?.toString() ?? '––'),
+              if (widget.post.canVote)
+                Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: InkWell(
+                    onTap: () => _vote(VoteType.DOWN),
+                    child: widget.post.votedDown
+                        ? Icon(Icons.mood_bad, color: Colors.red[600], size: 22)
+                        : Icon(Icons.mood_bad, size: 22),
                   ),
-              ],
-            )
+                ),
+            ])
           else
             Text(widget.post?.rating?.toString() ?? '––')
         ],

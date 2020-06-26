@@ -129,45 +129,46 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
         animation: _animationController,
         builder: (BuildContext context, Widget child) {
           return SizedBox(
-              height: _bottomBarHeight * _animationController.value,
-              child: OverflowBox(
-                alignment: Alignment.topLeft,
-                maxHeight: _bottomBarMaxHeight,
-                child: BottomNavigationBar(
-                  currentIndex: _currentIndex,
-                  onTap: (index) {
-                    if (_currentIndex != index) {
-                      pageController.jumpToPage(index);
-                      _currentIndex = index;
-                      _animationController.notifyListeners();
-                      if (_authorized != _auth.authorized) {
-                        setState(() {
-                          _authorized = _auth.authorized;
-                        });
-                      }
+            height: _bottomBarHeight * _animationController.value,
+            child: OverflowBox(
+              alignment: Alignment.topLeft,
+              maxHeight: _bottomBarMaxHeight,
+              child: BottomNavigationBar(
+                currentIndex: _currentIndex,
+                onTap: (index) {
+                  if (_currentIndex != index) {
+                    pageController.jumpToPage(index);
+                    _currentIndex = index;
+                    _animationController.notifyListeners();
+                    if (_authorized != _auth.authorized) {
+                      setState(() {
+                        _authorized = _auth.authorized;
+                      });
                     }
-                  },
-                  type: BottomNavigationBarType.fixed,
-                  items: const <BottomNavigationBarItem>[
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.view_stream),
-                      title: SizedBox.shrink(),
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.category),
-                      title: SizedBox.shrink(),
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.portrait),
-                      title: SizedBox.shrink(),
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.settings),
-                      title: SizedBox.shrink(),
-                    ),
-                  ],
-                ),
-              ));
+                  }
+                },
+                type: BottomNavigationBarType.fixed,
+                items: const <BottomNavigationBarItem>[
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.view_stream),
+                    title: SizedBox.shrink(),
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.category),
+                    title: SizedBox.shrink(),
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.portrait),
+                    title: SizedBox.shrink(),
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.settings),
+                    title: SizedBox.shrink(),
+                  ),
+                ],
+              ),
+            ),
+          );
         },
       ),
     );

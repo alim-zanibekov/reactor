@@ -29,30 +29,18 @@ class _AppCategoriesState extends State<AppCategories>
       body: AppFuturePage<Stats>(
         load: (_) => Api().loadSidebar(),
         builder: (context, stats, _) {
-          return CustomScrollView(
-            slivers: <Widget>[
-              SliverToBoxAdapter(
-                child: Column(
-                  children: <Widget>[
-                    ..._title('Основные разделы'),
-                    const AppCategoriesMain()
-                  ],
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: _trends(stats),
-              ),
-              SliverToBoxAdapter(
-                child: _tags(stats),
-              ),
-              SliverToBoxAdapter(
-                child: _comments(stats),
-              ),
-              SliverToBoxAdapter(
-                child: _users(stats),
-              ),
-            ],
-          );
+          return CustomScrollView(slivers: <Widget>[
+            SliverToBoxAdapter(
+              child: Column(children: <Widget>[
+                ..._title('Основные разделы'),
+                const AppCategoriesMain()
+              ]),
+            ),
+            SliverToBoxAdapter(child: _trends(stats)),
+            SliverToBoxAdapter(child: _tags(stats)),
+            SliverToBoxAdapter(child: _comments(stats)),
+            SliverToBoxAdapter(child: _users(stats)),
+          ]);
         },
       ),
     );
@@ -61,55 +49,47 @@ class _AppCategoriesState extends State<AppCategories>
   Widget _tags(Stats stats) {
     return DefaultTabController(
       length: 3,
-      child: Column(
-        children: <Widget>[
-          ..._title('Наши любимые теги'),
-          const Padding(
-            padding: EdgeInsets.only(bottom: 10),
-            child: TabBar(
-              labelPadding: EdgeInsets.symmetric(vertical: 10),
-              tabs: <Widget>[Text('2 дня'), Text('Неделя'), Text('Все время')],
-            ),
+      child: Column(children: <Widget>[
+        ..._title('Наши любимые теги'),
+        const Padding(
+          padding: EdgeInsets.only(bottom: 10),
+          child: TabBar(
+            labelPadding: EdgeInsets.symmetric(vertical: 10),
+            tabs: <Widget>[Text('2 дня'), Text('Неделя'), Text('Все время')],
           ),
-          SizedBox(
-            height: stats.twoDayTags.length * 60.0,
-            child: TabBarView(
-              children: <Widget>[
-                AppCategoriesTags(tags: stats.twoDayTags),
-                AppCategoriesTags(tags: stats.weekTags),
-                AppCategoriesTags(tags: stats.allTimeTags)
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+        SizedBox(
+          height: stats.twoDayTags.length * 60.0,
+          child: TabBarView(children: <Widget>[
+            AppCategoriesTags(tags: stats.twoDayTags),
+            AppCategoriesTags(tags: stats.weekTags),
+            AppCategoriesTags(tags: stats.allTimeTags)
+          ]),
+        ),
+      ]),
     );
   }
 
   Widget _comments(Stats stats) {
     return DefaultTabController(
       length: 2,
-      child: Column(
-        children: <Widget>[
-          ..._title('Топ комментов'),
-          const Padding(
-            padding: EdgeInsets.only(bottom: 10),
-            child: TabBar(
-              labelPadding: EdgeInsets.symmetric(vertical: 10),
-              tabs: <Widget>[Text('2 дня'), Text('Неделя')],
-            ),
+      child: Column(children: <Widget>[
+        ..._title('Топ комментов'),
+        const Padding(
+          padding: EdgeInsets.only(bottom: 10),
+          child: TabBar(
+            labelPadding: EdgeInsets.symmetric(vertical: 10),
+            tabs: <Widget>[Text('2 дня'), Text('Неделя')],
           ),
-          SizedBox(
-            height: stats.twoDayComments.length * 40.0,
-            child: TabBarView(
-              children: <Widget>[
-                AppCategoriesComments(comments: stats.twoDayComments),
-                AppCategoriesComments(comments: stats.weekComments)
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+        SizedBox(
+          height: stats.twoDayComments.length * 40.0,
+          child: TabBarView(children: <Widget>[
+            AppCategoriesComments(comments: stats.twoDayComments),
+            AppCategoriesComments(comments: stats.weekComments)
+          ]),
+        ),
+      ]),
     );
   }
 
@@ -139,27 +119,23 @@ class _AppCategoriesState extends State<AppCategories>
   Widget _users(Stats stats) {
     return DefaultTabController(
       length: 2,
-      child: Column(
-        children: <Widget>[
-          ..._title('Топ пользователей'),
-          const Padding(
-            padding: EdgeInsets.only(bottom: 10),
-            child: TabBar(
-              labelPadding: EdgeInsets.symmetric(vertical: 10),
-              tabs: <Widget>[Text('Неделя'), Text('Месяц')],
-            ),
+      child: Column(children: <Widget>[
+        ..._title('Топ пользователей'),
+        const Padding(
+          padding: EdgeInsets.only(bottom: 10),
+          child: TabBar(
+            labelPadding: EdgeInsets.symmetric(vertical: 10),
+            tabs: <Widget>[Text('Неделя'), Text('Месяц')],
           ),
-          SizedBox(
-            height: stats.weekUsers.length * 40.0,
-            child: TabBarView(
-              children: <Widget>[
-                AppCategoriesUsers(users: stats.weekUsers),
-                AppCategoriesUsers(users: stats.monthUsers)
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+        SizedBox(
+          height: stats.weekUsers.length * 40.0,
+          child: TabBarView(children: <Widget>[
+            AppCategoriesUsers(users: stats.weekUsers),
+            AppCategoriesUsers(users: stats.monthUsers)
+          ]),
+        ),
+      ]),
     );
   }
 

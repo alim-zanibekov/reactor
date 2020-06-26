@@ -11,9 +11,9 @@ class AppCategoriesTags extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: tags.map((e) => _children(context, e)).toList(),
-    );
+    return Column(children: <Widget>[
+      ...tags.map((e) => _children(context, e)),
+    ]);
   }
 
   Widget _children(context, ExtendedTag tag) {
@@ -27,9 +27,7 @@ class AppCategoriesTags extends StatelessWidget {
           height: 60,
           alignment: Alignment.center,
           child: Center(
-            child: AppTag(
-              tag: tag,
-            ),
+            child: AppTag(tag: tag),
           ),
         ),
       ),

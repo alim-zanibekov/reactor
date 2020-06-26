@@ -34,39 +34,43 @@ class _AppUserTagsState extends State<AppUserTags> {
   @override
   Widget build(BuildContext context) {
     return RichText(
-        textAlign: TextAlign.left,
-        text: TextSpan(
-            style: DefaultTextStyle.of(context).style.copyWith(height: 1.5),
-            children: [
-              ...tags.map((e) => TextSpan(children: [
-                    TextSpan(
-                        text: e.value,
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () => openTag(context, e),
-                        style: TextStyle(
-                          fontSize: 14 *
-                              (e is UserTag && e.weight != null
-                                  ? e.weight * 0.8
-                                  : 1.0),
-                          decoration: TextDecoration.underline,
-                        )),
-                    const TextSpan(text: '  ')
-                  ])),
-              if (!_opened)
-                WidgetSpan(
-                    child: GestureDetector(
-                  onTap: () => setState(() {
-                    tags = widget.tags;
-                    _opened = true;
-                  }),
-                  child: Container(
-                    width: 40,
-                    height: 20,
-                    color: Colors.transparent,
-                    alignment: Alignment.bottomLeft,
-                    child: const Text('...'),
+      textAlign: TextAlign.left,
+      text: TextSpan(
+        style: DefaultTextStyle.of(context).style.copyWith(height: 1.5),
+        children: <InlineSpan>[
+          ...tags.map((e) => TextSpan(children: <InlineSpan>[
+                TextSpan(
+                  text: e.value,
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () => openTag(context, e),
+                  style: TextStyle(
+                    fontSize: 14 *
+                        (e is UserTag && e.weight != null
+                            ? e.weight * 0.8
+                            : 1.0),
+                    decoration: TextDecoration.underline,
                   ),
-                ))
-            ]));
+                ),
+                const TextSpan(text: '  '),
+              ])),
+          if (!_opened)
+            WidgetSpan(
+              child: GestureDetector(
+                onTap: () => setState(() {
+                  tags = widget.tags;
+                  _opened = true;
+                }),
+                child: Container(
+                  width: 40,
+                  height: 20,
+                  color: Colors.transparent,
+                  alignment: Alignment.bottomLeft,
+                  child: const Text('...'),
+                ),
+              ),
+            )
+        ],
+      ),
+    );
   }
 }

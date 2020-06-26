@@ -226,21 +226,26 @@ class _AppUserState extends State<AppUser> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
-              padding: _defaultPadding,
-              child: AppShortUser(user: user.toShort(), size: 50)),
+            padding: _defaultPadding,
+            child: AppShortUser(user: user.toShort(), size: 50),
+          ),
           const Divider(),
           Padding(
-              padding: _defaultPadding,
-              child: AppUserAwards(
-                awards: user.awards,
-              )),
+            padding: _defaultPadding,
+            child: AppUserAwards(
+              awards: user.awards,
+            ),
+          ),
           Padding(padding: _defaultPadding, child: AppUserRating(user: user)),
           if (user.activeIn != null && user.activeIn.isNotEmpty)
             _wrapWithTitle(
-                'Активный участник',
-                AppUserMainTags(
-                    tags: user.activeIn, defaultPadding: _defaultPadding),
-                childPadding: false),
+              'Активный участник',
+              AppUserMainTags(
+                tags: user.activeIn,
+                defaultPadding: _defaultPadding,
+              ),
+              childPadding: false,
+            ),
           if (user.moderating != null && user.moderating.isNotEmpty)
             _wrapWithTitle('Модерирует', AppUserTags(tags: user.moderating)),
           if (user.subscriptions != null && user.subscriptions.isNotEmpty)
@@ -249,11 +254,12 @@ class _AppUserState extends State<AppUser> {
             _wrapWithTitle('Не читает', AppUserTags(tags: user.ignore)),
           if (user.subscriptions != null && user.subscriptions.isNotEmpty)
             _wrapWithTitle(
-                'Темы постов',
-                AppUserTags(
-                  tags: user.tagCloud,
-                  canHide: false,
-                )),
+              'Темы постов',
+              AppUserTags(
+                tags: user.tagCloud,
+                canHide: false,
+              ),
+            ),
           _wrapWithTitle('Статистика', AppUserStats(stats: user.stats)),
           const SizedBox(height: 20)
         ],
@@ -262,23 +268,24 @@ class _AppUserState extends State<AppUser> {
   }
 
   Widget _wrapWithTitle(String title, Widget child, {childPadding = true}) =>
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: _defaultPadding.copyWith(top: 10),
-            child: Text(title,
-                style: _textStyle.copyWith(
-                    fontWeight: FontWeight.w500, fontSize: 18)),
+      Column(children: <Widget>[
+        Padding(
+          padding: _defaultPadding.copyWith(top: 10),
+          child: Text(
+            title,
+            style: _textStyle.copyWith(
+              fontWeight: FontWeight.w500,
+              fontSize: 18,
+            ),
           ),
-          Padding(
-            padding: _defaultPadding,
-            child: Divider(height: 15),
-          ),
-          Padding(
-            padding: childPadding ? _defaultPadding : EdgeInsets.zero,
-            child: child,
-          )
-        ],
-      );
+        ),
+        Padding(
+          padding: _defaultPadding,
+          child: Divider(height: 15),
+        ),
+        Padding(
+          padding: childPadding ? _defaultPadding : EdgeInsets.zero,
+          child: child,
+        ),
+      ], crossAxisAlignment: CrossAxisAlignment.start);
 }

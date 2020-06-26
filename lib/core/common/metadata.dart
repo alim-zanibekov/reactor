@@ -58,19 +58,20 @@ class OEmbedMetadata {
 
   static _load(Map<String, dynamic> metadata) {
     return OEmbedMetadata(
-        authorName: metadata['author_name'],
-        providerName: metadata['provider_name'],
-        width: toInt(metadata['width']),
-        authorUrl: metadata['author_url'],
-        height: toInt(metadata['height']),
-        title: metadata['title'],
-        type: metadata['type'],
-        version: metadata['version'].toString(),
-        thumbnailWidth: toInt(metadata['thumbnail_width']),
-        providerUrl: metadata['provider_url'],
-        thumbnailHeight: toInt(metadata['thumbnail_height']),
-        html: metadata['html'],
-        thumbnailUrl: metadata['thumbnail_url']);
+      authorName: metadata['author_name'],
+      providerName: metadata['provider_name'],
+      width: toInt(metadata['width']),
+      authorUrl: metadata['author_url'],
+      height: toInt(metadata['height']),
+      title: metadata['title'],
+      type: metadata['type'],
+      version: metadata['version'].toString(),
+      thumbnailWidth: toInt(metadata['thumbnail_width']),
+      providerUrl: metadata['provider_url'],
+      thumbnailHeight: toInt(metadata['thumbnail_height']),
+      html: metadata['html'],
+      thumbnailUrl: metadata['thumbnail_url'],
+    );
   }
 
   static int toInt(dynamic i) => i is int ? i : int.tryParse(i ?? '');

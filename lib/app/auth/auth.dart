@@ -44,7 +44,8 @@ class _AppAuthPageState extends State<AppAuthPage> {
                       opacity: _error ? 1 : 0,
                       child: Text(
                         'Неверное имя пользователя или пароль',
-                        style: style.apply(color: Theme.of(context).errorColor),
+                        style:
+                            style.copyWith(color: Theme.of(context).errorColor),
                       ),
                     ),
                   ),
@@ -82,51 +83,52 @@ class _AppAuthPageState extends State<AppAuthPage> {
                 Container(
                   width: double.infinity,
                   child: OutlineButton(
-                      highlightedBorderColor: Theme.of(context).accentColor,
-                      padding:
-                          const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                      onPressed: () async {
-                        if (_formKey.currentState.validate()) {
-                          FocusScope.of(context).requestFocus(FocusNode());
+                    highlightedBorderColor: Theme
+                        .of(context)
+                        .accentColor,
+                    padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                    onPressed: () async {
+                      if (_formKey.currentState.validate()) {
+                        FocusScope.of(context).requestFocus(FocusNode());
+                        setState(() {
+                          _loading = true;
+                        });
+                        try {
+                          await Auth().login(
+                              _usernameEditingController.value.text,
+                              _passwordEditingController.value.text);
+                          _loading = false;
+                          AppPages.appBottomBarPage.add(AppBottomBarPage.MAIN);
+                        } on UnauthorizedException {
                           setState(() {
-                            _loading = true;
-                          });
-                          try {
-                            await Auth().login(
-                                _usernameEditingController.value.text,
-                                _passwordEditingController.value.text);
+                            _error = true;
                             _loading = false;
-                            AppPages.appBottomBarPage
-                                .add(AppBottomBarPage.MAIN);
-                          } on UnauthorizedException {
-                            setState(() {
-                              _error = true;
-                              _loading = false;
-                            });
-                          }
+                          });
                         }
-                      },
-                      child: AnimatedSwitcher(
-                        duration: Duration(milliseconds: 150),
-                        child: IndexedStack(
-                          key: ValueKey<int>(_loading ? 1 : 0),
-                          index: _loading ? 1 : 0,
-                          children: <Widget>[
-                            Center(
-                              child: Text('Войти', style: style),
-                            ),
-                            const Center(
-                              child: SizedBox(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 1.5,
-                                ),
-                                height: 16,
-                                width: 16,
+                      }
+                    },
+                    child: AnimatedSwitcher(
+                      duration: Duration(milliseconds: 150),
+                      child: IndexedStack(
+                        key: ValueKey<int>(_loading ? 1 : 0),
+                        index: _loading ? 1 : 0,
+                        children: <Widget>[
+                          Center(
+                            child: Text('Войти', style: style),
+                          ),
+                          const Center(
+                            child: SizedBox(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 1.5,
                               ),
-                            )
-                          ],
-                        ),
-                      )),
+                              height: 16,
+                              width: 16,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 15.0),
               ],

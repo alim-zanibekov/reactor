@@ -16,8 +16,9 @@ class _FadeIconState extends State<FadeIcon> with TickerProviderStateMixin {
   @override
   void initState() {
     _controller = AnimationController(
-        duration: const Duration(milliseconds: 500), vsync: this)
-      ..repeat(reverse: true, min: 0.5, max: 1);
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    )..repeat(reverse: true, min: 0.5, max: 1);
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
     super.initState();
   }

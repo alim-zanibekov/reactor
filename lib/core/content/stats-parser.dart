@@ -40,14 +40,15 @@ class StatsParser {
         trendsBlock.querySelectorAll('tr').map((e) => _parseTrend(e)).toList();
 
     return Stats(
-        weekComments: weekComments,
-        weekTags: weekTags,
-        weekUsers: weekUsers,
-        twoDayComments: twoDayComments,
-        twoDayTags: twoDayTags,
-        monthUsers: monthUsers,
-        allTimeTags: allTimeTags,
-        trends: trends);
+      weekComments: weekComments,
+      weekTags: weekTags,
+      weekUsers: weekUsers,
+      twoDayComments: twoDayComments,
+      twoDayTags: twoDayTags,
+      monthUsers: monthUsers,
+      allTimeTags: allTimeTags,
+      trends: trends,
+    );
   }
 
   ExtendedTag _parseTag(Element element) {
@@ -59,13 +60,15 @@ class StatsParser {
     var icon = (tagImg?.attributes ?? {})['src'];
 
     if (icon.startsWith('/')) icon = 'http://joyreactor.cc$icon';
-    return ExtendedTag((link?.attributes ?? {})['title'],
-        isMain: Tag.parseIsMain((link?.attributes ?? {})['href']),
-        prefix: Tag.parsePrefix((link?.attributes ?? {})['href']),
-        link: Tag.parseLink((link?.attributes ?? {})['href']),
-        icon: icon,
-        subscribersCount: !isDelta ? subscribersDeltaCount.toInt() : null,
-        subscribersDeltaCount: isDelta ? subscribersDeltaCount.toInt() : null);
+    return ExtendedTag(
+      (link?.attributes ?? {})['title'],
+      isMain: Tag.parseIsMain((link?.attributes ?? {})['href']),
+      prefix: Tag.parsePrefix((link?.attributes ?? {})['href']),
+      link: Tag.parseLink((link?.attributes ?? {})['href']),
+      icon: icon,
+      subscribersCount: !isDelta ? subscribersDeltaCount.toInt() : null,
+      subscribersDeltaCount: isDelta ? subscribersDeltaCount.toInt() : null,
+    );
   }
 
   IconTag _parseTrend(Element element) {
@@ -75,11 +78,13 @@ class StatsParser {
     var icon = (tagImg?.attributes ?? {})['src'];
 
     if (icon.startsWith('/')) icon = 'http://joyreactor.cc$icon';
-    return IconTag((link?.attributes ?? {})['title'],
-        isMain: Tag.parseIsMain((link?.attributes ?? {})['href']),
-        prefix: Tag.parsePrefix((link?.attributes ?? {})['href']),
-        link: Tag.parseLink((link?.attributes ?? {})['href']),
-        icon: icon);
+    return IconTag(
+      (link?.attributes ?? {})['title'],
+      isMain: Tag.parseIsMain((link?.attributes ?? {})['href']),
+      prefix: Tag.parsePrefix((link?.attributes ?? {})['href']),
+      link: Tag.parseLink((link?.attributes ?? {})['href']),
+      icon: icon,
+    );
   }
 
   List<StatsComment> _parseComments(Element element) {
@@ -101,11 +106,12 @@ class StatsParser {
           final link =
               (linkElement?.attributes ?? {})['href']?.split('/')?.last;
           comments.add(StatsComment(
-              username: username,
-              userLink: link,
-              rating: rating,
-              postId: postId,
-              id: id));
+            username: username,
+            userLink: link,
+            rating: rating,
+            postId: postId,
+            id: id,
+          ));
           i += 2;
         }
       }
@@ -115,10 +121,18 @@ class StatsParser {
   }
 
   StatsUser _parseUser(Element element) {
-    final username = element.querySelector('a')?.text?.trim();
-    final rating = _getNumber(element.querySelector('.weekrating')?.text);
+    final username = element
+        .querySelector('a')
+        ?.text
+        ?.trim();
+    final rating = _getNumber(element
+        .querySelector('.weekrating')
+        ?.text);
 
-    return StatsUser(username: username, ratingDelta: rating);
+    return StatsUser(
+      username: username,
+      ratingDelta: rating,
+    );
   }
 
   double _getNumber(String str) =>

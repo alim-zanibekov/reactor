@@ -21,15 +21,17 @@ class ImageGalleryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: ColoredBox(
-      color: Colors.black,
-      child: ImageGallery(
+      body: ColoredBox(
+        color: Colors.black,
+        child: ImageGallery(
           imageProviders: imageProviders,
           selectedIndex: selectedIndex,
           onClose: () {
             Navigator.pop(context);
-          }),
-    ));
+          },
+        ),
+      ),
+    );
   }
 }
 
@@ -117,8 +119,7 @@ class _ImageGalleryState extends State<ImageGallery>
     _scrollUpdater.value = details.position.dx;
 
     final rect = _activeImage.boxer.getRect(_activeImage.transform);
-    _canSlideLeft =
-        rect.left.round() == 0 && _images.indexOf(_activeImage) > 0;
+    _canSlideLeft = rect.left.round() == 0 && _images.indexOf(_activeImage) > 0;
     _canSlideRight = rect.right.round() == _maxWidth.round() &&
         _images.indexOf(_activeImage) < _images.length - 1;
 
@@ -231,7 +232,8 @@ class _ImageGalleryState extends State<ImageGallery>
       _controllerImage.forward(from: 0);
     } else {
       _activeImage.transformPrev = _activeImage.transform.clone();
-      _activeImage.boxer.fit(_activeImage.transform, details.position, scaleDelta: 0.4);
+      _activeImage.boxer
+          .fit(_activeImage.transform, details.position, scaleDelta: 0.4);
       _activeImage.boxer.clamp(_activeImage.transform);
       _controllerImage.forward(from: 0);
     }
@@ -293,8 +295,9 @@ class _ImageGalleryState extends State<ImageGallery>
             (_activeImage.imageProvider as AppNetworkImageWithRetry).url;
         try {
           await SaveImage.saveImage(url, rawBytes);
-          Scaffold.of(context)
-              .showSnackBar(const SnackBar(content: Text('Сохранено')));
+          Scaffold.of(context).showSnackBar(
+            const SnackBar(content: Text('Сохранено')),
+          );
         } on Exception {
           Scaffold.of(context).showSnackBar(
             const SnackBar(content: Text('Не удалось сохранить изображение')),
@@ -312,94 +315,92 @@ class _ImageGalleryState extends State<ImageGallery>
 
     if (_images == null) {
       _images = widget.imageProviders
-          .map((e) =>
-              ImageUnit(size: Size(_maxWidth, _maxHeight), imageProvider: e))
+          .map((e) => ImageUnit(
+                size: Size(_maxWidth, _maxHeight),
+                imageProvider: e,
+              ))
           .toList();
 
       _activeImage = _images[widget.selectedIndex];
     }
 
-    return Stack(
-      children: <Widget>[
-        MatrixGestureDetector(
-          onDoubleTap: _onDoubleTap,
-          onUpdate: _onUpdate,
-          onStart: _onStart,
-          onEnd: _onEnd,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            controller: _scrollController,
-            physics: NeverScrollableScrollPhysics(),
-            child: OrientationBuilder(
-              builder: (context, orientation) {
-                final media = MediaQuery.of(context);
-                _maxWidth = media.size.width;
-                _maxHeight = media.size.height;
+    return Stack(children: <Widget>[
+      MatrixGestureDetector(
+        onDoubleTap: _onDoubleTap,
+        onUpdate: _onUpdate,
+        onStart: _onStart,
+        onEnd: _onEnd,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          controller: _scrollController,
+          physics: NeverScrollableScrollPhysics(),
+          child: OrientationBuilder(builder: (context, orientation) {
+            final media = MediaQuery.of(context);
+            _maxWidth = media.size.width;
+            _maxHeight = media.size.height;
 
-                _images.forEach((image) {
-                  if (image.info != null) {
-                    _onInfo(image.info, image);
-                  }
-                });
+            _images.forEach((image) {
+              if (image.info != null) {
+                _onInfo(image.info, image);
+              }
+            });
 
-                (() async {
-                  await Future.delayed(Duration(milliseconds: 1));
-                  _scrollController.jumpTo(widget.selectedIndex * _maxWidth);
-                })();
+            (() async {
+              await Future.delayed(Duration(milliseconds: 1));
+              _scrollController.jumpTo(widget.selectedIndex * _maxWidth);
+            })();
 
-                return Row(
-                  children: _images
-                      .map(
-                        (image) => Container(
-                          height: _maxHeight,
-                          width: _maxWidth,
-                          alignment: Alignment.topLeft,
-                          child: AnimatedBuilder(
-                            animation: _controllerImage,
-                            builder: (BuildContext context, Widget child) {
-                              child = SizedBox(
-                                width: image.size.width,
-                                height: image.size.height,
-                                child: AppSafeImage(
-                                  background: Colors.black,
-                                  imageProvider: image.imageProvider,
-                                  fit: BoxFit.contain,
-                                  onInfo: (info) => _onInfo(info, image),
-                                ),
-                              );
+            return Row(
+              children: _images
+                  .map(
+                    (image) => Container(
+                      height: _maxHeight,
+                      width: _maxWidth,
+                      alignment: Alignment.topLeft,
+                      child: AnimatedBuilder(
+                        animation: _controllerImage,
+                        builder: (BuildContext context, Widget child) {
+                          child = SizedBox(
+                            width: image.size.width,
+                            height: image.size.height,
+                            child: AppSafeImage(
+                              background: Colors.black,
+                              imageProvider: image.imageProvider,
+                              fit: BoxFit.contain,
+                              onInfo: (info) => _onInfo(info, image),
+                            ),
+                          );
 
-                              if (image.transform == null) {
-                                return child;
-                              }
+                          if (image.transform == null) {
+                            return child;
+                          }
 
-                              return Transform(
-                                transform: _animating
-                                    ? MatrixScaleTranslate4Tween(
-                                            begin: image.transformPrev,
-                                            end: image.transform)
-                                        .evaluate(
-                                        _controllerImage,
-                                      )
-                                    : image.transform,
-                                child: child,
-                              );
-                            },
-                          ),
-                        ),
-                      )
-                      .toList(),
-                );
-              },
-            ),
-          ),
+                          return Transform(
+                            transform: _animating
+                                ? MatrixScaleTranslate4Tween(
+                                        begin: image.transformPrev,
+                                        end: image.transform)
+                                    .evaluate(
+                                    _controllerImage,
+                                  )
+                                : image.transform,
+                            child: child,
+                          );
+                        },
+                      ),
+                    ),
+                  )
+                  .toList(),
+            );
+          }),
         ),
-        Positioned(
-          top: 0,
-          right: 0,
-          child: copyLinkPopup(),
-        ),
-      ],
-    );
+      ),
+      Positioned(
+        top: 0,
+        right: 0,
+        child: copyLinkPopup(),
+      ),
+    ]);
   }
 }
 

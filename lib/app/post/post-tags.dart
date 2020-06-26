@@ -35,8 +35,9 @@ class _AppPostTagsState extends State<AppPostTags> {
       padding: const EdgeInsets.fromLTRB(10, 4.5, 10, 4.5),
       child: Text(text, style: const TextStyle(fontSize: 13)),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(50),
-          color: Theme.of(context).splashColor),
+        borderRadius: BorderRadius.circular(50),
+        color: Theme.of(context).splashColor,
+      ),
     );
   }
 
@@ -47,27 +48,31 @@ class _AppPostTagsState extends State<AppPostTags> {
       runSpacing: 7,
       alignment: WrapAlignment.start,
       children: <Widget>[
-        ..._tags.map((e) => Material(
-              type: MaterialType.transparency,
-              child: InkWell(
-                splashColor: Colors.black12,
-                borderRadius: BorderRadius.circular(50),
-                onTap: () {
-                  widget.openTag(e);
-                },
-                child: _getChip(e.value),
+        ..._tags.map(
+              (e) =>
+              Material(
+                type: MaterialType.transparency,
+                child: InkWell(
+                  splashColor: Colors.black12,
+                  borderRadius: BorderRadius.circular(50),
+                  onTap: () {
+                    widget.openTag(e);
+                  },
+                  child: _getChip(e.value),
+                ),
               ),
-            )),
+        ),
         if (!_opened)
           Material(
             type: MaterialType.transparency,
             child: InkWell(
               splashColor: Colors.black12,
               borderRadius: BorderRadius.circular(50),
-              onTap: () => setState(() {
-                _opened = true;
-                _tags = widget.tags;
-              }),
+              onTap: () =>
+                  setState(() {
+                    _opened = true;
+                    _tags = widget.tags;
+                  }),
               child: _getChip('...'),
             ),
           ),

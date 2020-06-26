@@ -11,49 +11,44 @@ class AppCategoriesUsers extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int index = 0;
-    return Column(
-      children: users.map((e) => _children(context, e, ++index)).toList(),
-    );
+    return Column(children: <Widget>[
+      ...users.map((e) => _children(context, e, ++index))
+    ]);
   }
 
   Widget _children(context, StatsUser user, int index) {
     return Material(
       child: InkWell(
-        onTap: () {
-          openUser(context, user.username, user.link);
-        },
+        onTap: () => openUser(context, user.username, user.link),
         child: Container(
           padding: const EdgeInsets.only(left: 4, right: 8, top: 8, bottom: 8),
           height: 40,
           alignment: Alignment.center,
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              SizedBox(
-                child: Text(
-                  '#' + index.toString(),
-                  style: const TextStyle(fontWeight: FontWeight.w500),
+          child: Row(children: <Widget>[
+            SizedBox(
+              child: Text(
+                '#' + index.toString(),
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+            ),
+            SizedBox(
+              child: Text(
+                '  ${user.username}',
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+            ),
+            const Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(left: 5, right: 10),
+                child: CustomPaint(
+                  painter: DashedLinePainter(),
                 ),
               ),
-              SizedBox(
-                child: Text(
-                  '  ${user.username}',
-                  style: const TextStyle(fontWeight: FontWeight.w500),
-                ),
-              ),
-              const Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 5, right: 10),
-                  child: CustomPaint(
-                    painter: DashedLinePainter(),
-                  ),
-                ),
-              ),
-              SizedBox(
-                child: Text('+${user.ratingDelta}'),
-              ),
-            ],
-          ),
+            ),
+            SizedBox(
+              child: Text('+${user.ratingDelta}'),
+            ),
+          ], mainAxisSize: MainAxisSize.max),
         ),
       ),
     );
@@ -69,6 +64,7 @@ class DashedLinePainter extends CustomPainter {
     final paint = Paint()
       ..color = Colors.grey[500]
       ..strokeWidth = 0.5;
+
     while (startX < size.width) {
       canvas.drawLine(Offset(startX, 0), Offset(startX + dashWidth, 0), paint);
       startX += dashWidth + dashSpace;

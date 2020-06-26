@@ -43,13 +43,15 @@ class UserParser {
       var icon = (tagImg?.attributes ?? {})['src'];
 
       if (icon.startsWith('/')) icon = 'http://joyreactor.cc$icon';
-      return UserTag(link?.text,
-          isMain: Tag.parseIsMain((link?.attributes ?? {})['href']),
-          prefix: Tag.parsePrefix((link?.attributes ?? {})['href']),
-          link: Tag.parseLink((link?.attributes ?? {})['href']),
-          icon: icon,
-          rating: rating,
-          ratingWeekDelta: ratingWeekDelta);
+      return UserTag(
+        link?.text,
+        isMain: Tag.parseIsMain((link?.attributes ?? {})['href']),
+        prefix: Tag.parsePrefix((link?.attributes ?? {})['href']),
+        link: Tag.parseLink((link?.attributes ?? {})['href']),
+        icon: icon,
+        rating: rating,
+        ratingWeekDelta: ratingWeekDelta,
+      );
     })?.toList();
 
     final moderatingBlock =
@@ -82,26 +84,28 @@ class UserParser {
     }
 
     return UserFull(
-        avatar: avatar,
-        link: link,
-        username: username,
-        stars: stars,
-        awards: awards,
-        mainTag: mainTag,
-        rating: rating,
-        ratingWeekDelta: ratingWeekDelta,
-        activeIn: activeIn,
-        moderating: moderating,
-        subscriptions: subscriptions,
-        ignore: ignore,
-        tagCloud: tagCloud,
-        stats: UserStats(
-            bestPostCount: bestPostCount,
-            goodPostCount: goodPostCount,
-            postCount: postCount,
-            commentsCount: commentsCount,
-            daysCount: daysCount,
-            lastEnter: lastEnter));
+      avatar: avatar,
+      link: link,
+      username: username,
+      stars: stars,
+      awards: awards,
+      mainTag: mainTag,
+      rating: rating,
+      ratingWeekDelta: ratingWeekDelta,
+      activeIn: activeIn,
+      moderating: moderating,
+      subscriptions: subscriptions,
+      ignore: ignore,
+      tagCloud: tagCloud,
+      stats: UserStats(
+        bestPostCount: bestPostCount,
+        goodPostCount: goodPostCount,
+        postCount: postCount,
+        commentsCount: commentsCount,
+        daysCount: daysCount,
+        lastEnter: lastEnter,
+      ),
+    );
   }
 
   List<Tag> _parseTags(Element element) =>

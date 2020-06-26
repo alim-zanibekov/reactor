@@ -10,25 +10,25 @@ class TagParser {
     final pageId = current != null
         ? int.tryParse(parsedPage
                 .querySelector('.pagination_expanded .current')
-                .text) ??
+                ?.text) ??
             0
         : 0;
 
     final pageInfo = parsePageInfo(parsedPage.getElementById('tagArticle'));
 
     return ContentPage<ExtendedTag>(
-        authorized:
-            parsedPage.querySelector('#topbar .login #settings') != null,
-        pageInfo: pageInfo,
-        isLast: current == null ||
-            pageId == 0 ||
-            parsedPage.querySelector('.pagination_main.pLeft') != null,
-        content: parsedPage
-            .getElementsByClassName('blog_list_item')
-            .map(_parse)
-            .where((element) => element != null)
-            .toList(),
-        id: pageId);
+      authorized: parsedPage.querySelector('#topbar .login #settings') != null,
+      pageInfo: pageInfo,
+      isLast: current == null ||
+          pageId == 0 ||
+          parsedPage.querySelector('.pagination_main.pLeft') != null,
+      content: parsedPage
+          .getElementsByClassName('blog_list_item')
+          .map(_parse)
+          .where((element) => element != null)
+          .toList(),
+      id: pageId,
+    );
   }
 
   ExtendedTag _parse(Element element) {

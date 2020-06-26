@@ -34,8 +34,18 @@ class Tag {
 class IconTag extends Tag {
   final String icon;
 
-  IconTag(value, {this.icon, isMain, prefix, link})
-      : super(value, isMain: isMain, prefix: prefix, link: link);
+  IconTag(
+    value, {
+    this.icon,
+    isMain,
+    prefix,
+    link,
+  }) : super(
+          value,
+          isMain: isMain,
+          prefix: prefix,
+          link: link,
+        );
 }
 
 class ExtendedTag extends IconTag {
@@ -44,16 +54,22 @@ class ExtendedTag extends IconTag {
   final double commonRating;
   final int subscribersDeltaCount;
 
-  ExtendedTag(String value,
-      {String icon,
-      this.count,
-      this.subscribersCount,
-      this.commonRating,
-      this.subscribersDeltaCount,
-      isMain,
-      prefix,
-      link})
-      : super(value, icon: icon, isMain: isMain, prefix: prefix, link: link);
+  ExtendedTag(String value, {
+    String icon,
+    this.count,
+    this.subscribersCount,
+    this.commonRating,
+    this.subscribersDeltaCount,
+    isMain,
+    prefix,
+    link,
+  }) : super(
+    value,
+    icon: icon,
+    isMain: isMain,
+    prefix: prefix,
+    link: link,
+  );
 }
 
 class PageInfo extends ExtendedTag {
@@ -63,20 +79,22 @@ class PageInfo extends ExtendedTag {
   final int tagId;
   final String bg;
 
-  PageInfo(
-      {icon,
-      this.tagId,
-      this.bg,
-      count,
-      subscribersCount,
-      commonRating,
-      this.blocked = false,
-      this.subscribed = false})
-      : super(null,
-            icon: icon,
-            count: count,
-            subscribersCount: subscribersCount,
-            commonRating: commonRating);
+  PageInfo({
+    icon,
+    this.tagId,
+    this.bg,
+    count,
+    subscribersCount,
+    commonRating,
+    this.blocked = false,
+    this.subscribed = false,
+  }) : super(
+    null,
+    icon: icon,
+    count: count,
+    subscribersCount: subscribersCount,
+    commonRating: commonRating,
+  );
 }
 
 class ContentPage<T> {
@@ -86,8 +104,13 @@ class ContentPage<T> {
   final bool isLast;
   final bool authorized;
 
-  ContentPage(
-      {this.id, this.content, this.pageInfo, this.isLast, this.authorized});
+  ContentPage({
+    this.id,
+    this.content,
+    this.pageInfo,
+    this.isLast,
+    this.authorized,
+  });
 }
 
 class Post {
@@ -114,22 +137,23 @@ class Post {
     return 'http://joyreactor.cc/post/$id';
   }
 
-  Post(
-      {this.id,
-      this.tags,
-      this.content,
-      this.rating,
-      this.bestComment,
-      this.comments,
-      this.user,
-      this.dateTime,
-      this.hidden,
-      this.canVote,
-      this.commentsCount,
-      this.favorite = false,
-      this.votedDown = false,
-      this.votedUp = false,
-      this.censored});
+  Post({
+    this.id,
+    this.tags,
+    this.content,
+    this.rating,
+    this.bestComment,
+    this.comments,
+    this.user,
+    this.dateTime,
+    this.hidden,
+    this.canVote,
+    this.commentsCount,
+    this.favorite = false,
+    this.votedDown = false,
+    this.votedUp = false,
+    this.censored,
+  });
 }
 
 class PostComment implements HasChildren<PostComment> {
@@ -149,18 +173,19 @@ class PostComment implements HasChildren<PostComment> {
 
   bool deleted = false;
 
-  PostComment(
-      {this.id,
-      this.depth,
-      this.user,
-      this.postId,
-      this.content,
-      this.canVote,
-      this.votedUp,
-      this.votedDown,
-      this.rating,
-      this.time,
-      this.hidden = false});
+  PostComment({
+    this.id,
+    this.depth,
+    this.user,
+    this.postId,
+    this.content,
+    this.canVote,
+    this.votedUp,
+    this.votedDown,
+    this.rating,
+    this.time,
+    this.hidden = false,
+  });
 }
 
 class CommentParent implements HasChildren<PostComment> {

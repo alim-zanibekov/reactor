@@ -52,8 +52,10 @@ class _AppPostListState extends State<AppPostList>
 
   @override
   void initState() {
-    _animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 150));
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 150),
+    );
     _animationController.value = 1;
     _scrollController.addListener(_onScrollChange);
     _subscription = Auth().authorized$.listen((event) {
@@ -236,80 +238,77 @@ class _AppPostListState extends State<AppPostList>
   Widget build(BuildContext context) {
     super.build(context);
     _isDark = Theme.of(context).brightness == Brightness.dark;
-    return Stack(
-      children: <Widget>[
-        AppFuturePage<void>(
-          customError: true,
-          key: _pageKey,
-          load: (fromUser) async {
-            if (fromUser) {
-              _posts = null;
-              widget.loader.reset();
+    return Stack(children: <Widget>[
+      AppFuturePage<void>(
+        customError: true,
+        key: _pageKey,
+        load: (fromUser) async {
+          if (fromUser) {
+            _posts = null;
+            widget.loader.reset();
+          }
+          final isFirst = _posts == null || _posts.isEmpty;
+
+          final create =
+              await (isFirst ? widget.loader.load() : widget.loader.loadNext());
+
+          if (isFirst) {
+            _postWidgets = [];
+            _showHeader = false;
+            _collapsing = false;
+            _scrollPrevious = 0;
+            if (_scrollController.hasClients) {
+              _scrollController.jumpTo(0);
             }
-            final isFirst = _posts == null || _posts.isEmpty;
+          }
 
-            final create = await (isFirst
-                ? widget.loader.load()
-                : widget.loader.loadNext());
+          int index = _postWidgets.length;
+          _postWidgets.addAll(
+              create.map((e) => _getAppPostContent(index++, e)).toList());
 
-            if (isFirst) {
-              _postWidgets = [];
-              _showHeader = false;
-              _collapsing = false;
-              _scrollPrevious = 0;
-              if (_scrollController.hasClients) {
-                _scrollController.jumpTo(0);
-              }
-            }
-
-            int index = _postWidgets.length;
-            _postWidgets.addAll(
-                create.map((e) => _getAppPostContent(index++, e)).toList());
-
-            _posts = widget.loader.posts;
-            _showHeader = widget.loader?.firstPage?.pageInfo != null;
-          },
-          builder: (context, _, bool hasError) {
-            if ((_posts?.isEmpty ?? true) && hasError) {
-              return AppOnErrorReloadExpanded(
-                onReloadPressed: () {
-                  _posts = null;
-                  AppFuturePageState appFuturePageState = _pageKey.currentState;
-                  appFuturePageState?.reload(hideContent: true);
-                },
-              );
-            }
-            return ListView.builder(
-              key: widget.pageStorageKey,
-              controller: _scrollController,
-              itemBuilder: (ctx, i) => _itemBuilder(ctx, i, hasError),
-              itemCount: _postWidgets.length + (_showHeader ? 2 : 1),
+          _posts = widget.loader.posts;
+          _showHeader = widget.loader?.firstPage?.pageInfo != null;
+        },
+        builder: (context, _, bool hasError) {
+          if ((_posts?.isEmpty ?? true) && hasError) {
+            return AppOnErrorReloadExpanded(
+              onReloadPressed: () {
+                _posts = null;
+                AppFuturePageState appFuturePageState = _pageKey.currentState;
+                appFuturePageState?.reload(hideContent: true);
+              },
             );
-          },
-        ),
-        AnimatedBuilder(
-          animation: _animationController,
-          child: Container(
-            height: 40,
-            width: 40,
-            decoration: BoxDecoration(
-                color: Theme.of(context).accentColor,
-                borderRadius: BorderRadius.circular(40)),
-            child: IconButton(
-              onPressed: _closePost,
-              icon: const Icon(Icons.keyboard_arrow_up),
-            ),
+          }
+          return ListView.builder(
+            key: widget.pageStorageKey,
+            controller: _scrollController,
+            itemBuilder: (ctx, i) => _itemBuilder(ctx, i, hasError),
+            itemCount: _postWidgets.length + (_showHeader ? 2 : 1),
+          );
+        },
+      ),
+      AnimatedBuilder(
+        animation: _animationController,
+        child: Container(
+          height: 40,
+          width: 40,
+          decoration: BoxDecoration(
+              color: Theme.of(context).accentColor,
+              borderRadius: BorderRadius.circular(40)),
+          child: IconButton(
+            onPressed: _closePost,
+            icon: const Icon(Icons.keyboard_arrow_up),
           ),
-          builder: (BuildContext context, Widget child) {
-            return Positioned(
-              bottom: 10 - 100 * _animationController.value,
-              right: 10,
-              child: child,
-            );
-          },
-        )
-      ],
-    );
+        ),
+        builder: (BuildContext context, Widget child) {
+          return Positioned(
+            bottom: 10 - 100 * _animationController.value,
+            right: 10,
+            child: child,
+          );
+        },
+      )
+    ]);
   }
 
   @override

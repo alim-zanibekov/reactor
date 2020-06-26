@@ -17,16 +17,16 @@ class AppComment extends StatefulWidget {
   final Function onDelete;
   final Function scrollToParent;
 
-  AppComment(
-      {Key key,
-      @required this.depth,
-      @required this.comment,
-      this.onSend,
-      this.showAnswer = false,
-      this.color,
-      this.onDelete,
-      this.scrollToParent})
-      : super(key: key);
+  AppComment({
+    Key key,
+    @required this.depth,
+    @required this.comment,
+    this.onSend,
+    this.showAnswer = false,
+    this.color,
+    this.onDelete,
+    this.scrollToParent,
+  }) : super(key: key);
 
   @override
   _AppCommentState createState() => _AppCommentState();
@@ -114,61 +114,59 @@ class _AppCommentState extends State<AppComment> {
   }
 
   Widget _controls() {
-    return Row(
-      children: <Widget>[
-        if (widget.onSend != null)
-          SizedBox(
-            height: 25,
-            width: 60,
-            child: FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 3.0),
-              onPressed: () {
-                setState(() {
-                  _showAnswer = !_showAnswer;
-                });
-              },
-              child: const Text(
-                'Ответить',
-                style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
-              ),
+    return Row(children: <Widget>[
+      if (widget.onSend != null)
+        SizedBox(
+          height: 25,
+          width: 60,
+          child: FlatButton(
+            padding: EdgeInsets.symmetric(vertical: 3.0),
+            onPressed: () {
+              setState(() {
+                _showAnswer = !_showAnswer;
+              });
+            },
+            child: const Text(
+              'Ответить',
+              style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
             ),
           ),
-        if (widget.showAnswer && widget.comment.user.username == _auth.username)
-          SizedBox(
-            height: 25,
-            child: FlatButton(
-              padding: const EdgeInsets.all(3.0),
-              onPressed: _delete,
-              child: const Text(
-                'Удалить',
-                style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
-              ),
+        ),
+      if (widget.showAnswer && widget.comment.user.username == _auth.username)
+        SizedBox(
+          height: 25,
+          child: FlatButton(
+            padding: const EdgeInsets.all(3.0),
+            onPressed: _delete,
+            child: const Text(
+              'Удалить',
+              style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
             ),
           ),
-        const Expanded(child: SizedBox()),
-        if (widget.comment.canVote)
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: InkWell(
-              onTap: () => _vote(VoteType.UP),
-              child: widget.comment.votedUp
-                  ? Icon(Icons.mood, color: Colors.green[600], size: 18)
-                  : Icon(Icons.mood, size: 18),
-            ),
+        ),
+      const Expanded(child: SizedBox()),
+      if (widget.comment.canVote)
+        Padding(
+          padding: const EdgeInsets.only(right: 10),
+          child: InkWell(
+            onTap: () => _vote(VoteType.UP),
+            child: widget.comment.votedUp
+                ? Icon(Icons.mood, color: Colors.green[600], size: 18)
+                : Icon(Icons.mood, size: 18),
           ),
-        Text(widget.comment?.rating?.toString() ?? '––'),
-        if (widget.comment.canVote)
-          Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: InkWell(
-              onTap: () => _vote(VoteType.DOWN),
-              child: widget.comment.votedDown
-                  ? Icon(Icons.mood_bad, color: Colors.red[600], size: 18)
-                  : Icon(Icons.mood_bad, size: 18),
-            ),
+        ),
+      Text(widget.comment?.rating?.toString() ?? '––'),
+      if (widget.comment.canVote)
+        Padding(
+          padding: const EdgeInsets.only(left: 10),
+          child: InkWell(
+            onTap: () => _vote(VoteType.DOWN),
+            child: widget.comment.votedDown
+                ? Icon(Icons.mood_bad, color: Colors.red[600], size: 18)
+                : Icon(Icons.mood_bad, size: 18),
           ),
-      ],
-    );
+        ),
+    ]);
   }
 
   @override
@@ -207,47 +205,42 @@ class _AppCommentState extends State<AppComment> {
 
     final comment = ColoredBox(
       color: widget.color ?? Colors.transparent,
-      child: Column(
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Padding(
-                  padding: const EdgeInsets.only(bottom: 5, top: 4, left: 8),
-                  child: AppShortUser(user: widget.comment.user)),
-              if (widget.depth != 0 && widget.scrollToParent != null)
-                Padding(
-                  padding: const EdgeInsets.only(right: 5),
-                  child: InkWell(
-                    onTap: widget.scrollToParent,
-                    child: const Icon(Icons.keyboard_arrow_up),
-                  ),
-                )
-            ],
-          ),
+      child: Column(children: <Widget>[
+        Row(children: <Widget>[
           Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-            child: content,
+            padding: const EdgeInsets.only(bottom: 5, top: 4, left: 8),
+            child: AppShortUser(user: widget.comment.user),
           ),
-          Padding(
-            key: ValueKey(widget.comment.id.toString() + 'bottom'),
-            padding:
-                const EdgeInsets.only(top: 5, left: 4, right: 8, bottom: 4),
-            child: _auth.authorized
-                ? _controls()
-                : Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      rating,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: isDark ? Colors.grey[300] : Colors.black45,
-                      ),
+          if (widget.depth != 0 && widget.scrollToParent != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 5),
+              child: InkWell(
+                onTap: widget.scrollToParent,
+                child: const Icon(Icons.keyboard_arrow_up),
+              ),
+            )
+        ], mainAxisAlignment: MainAxisAlignment.spaceBetween),
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+          child: content,
+        ),
+        Padding(
+          key: ValueKey(widget.comment.id.toString() + 'bottom'),
+          padding: const EdgeInsets.only(top: 5, left: 4, right: 8, bottom: 4),
+          child: _auth.authorized
+              ? _controls()
+              : Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    rating,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: isDark ? Colors.grey[300] : Colors.black45,
                     ),
                   ),
-          ),
-        ],
-      ),
+                ),
+        ),
+      ]),
     );
 
     final depth = widget.depth > 10 ? 10 : widget.depth;
@@ -258,24 +251,22 @@ class _AppCommentState extends State<AppComment> {
         if (depth == 0)
           comment
         else
-          Stack(
-            children: <Widget>[
-              for (int i = 1; i <= depth; ++i)
-                Positioned(
-                  top: 0,
-                  bottom: 0,
-                  left: 15.0 * i,
-                  child: VerticalDivider(
-                    width: 1,
-                    color: isDark ? Colors.white38 : Colors.black12,
-                  ),
+          Stack(children: <Widget>[
+            for (int i = 1; i <= depth; ++i)
+              Positioned(
+                top: 0,
+                bottom: 0,
+                left: 15.0 * i,
+                child: VerticalDivider(
+                  width: 1,
+                  color: isDark ? Colors.white38 : Colors.black12,
                 ),
-              Container(
-                child: comment,
-                margin: EdgeInsets.only(left: 15.0 * depth),
-              )
-            ],
-          ),
+              ),
+            Container(
+              child: comment,
+              margin: EdgeInsets.only(left: 15.0 * depth),
+            )
+          ]),
         if (_auth.authorized && widget.showAnswer && _showAnswer)
           AppCommentAnswer(
             key: ValueKey(widget.comment.id.toString() + 'answer'),
@@ -303,16 +294,18 @@ class AppComments extends StatefulWidget {
   @override
   _AppCommentsState createState() => _AppCommentsState();
 
-  static List<AppComment> getCommentsList(
-      {List<PostComment> comments,
-      bool showAnswer,
-      void Function(int) goTo,
-      Function reload,
-      Color Function(int) getColor}) {
+  static List<AppComment> getCommentsList({
+    List<PostComment> comments,
+    bool showAnswer,
+    void Function(int) goTo,
+    Function reload,
+    Color Function(int) getColor,
+  }) {
     final stack = List.of(comments.reversed);
     final depthStack = List.filled(stack.length, 0, growable: true);
     final parentStack = List.filled(stack.length, 0, growable: true);
     final List<AppComment> children = [];
+
     while (stack.length > 0) {
       final comment = stack.removeLast();
       if (comment.deleted) {
@@ -360,6 +353,7 @@ class _AppCommentsState extends State<AppComments> {
     final stack = List.of(widget.comments.reversed);
     final depthStack = List.filled(stack.length, 0, growable: true);
     _children = [];
+
     while (stack.length > 0) {
       final comment = stack.removeLast();
       if (comment.deleted) {
@@ -378,9 +372,9 @@ class _AppCommentsState extends State<AppComments> {
     }
 
     return Container(
-      child: Column(
-        children: <Widget>[..._children],
-      ),
+      child: Column(children: <Widget>[
+        ..._children,
+      ]),
     );
   }
 }

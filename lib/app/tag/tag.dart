@@ -16,15 +16,16 @@ class AppTag extends StatelessWidget {
       children: <Widget>[
         if (tag.icon != null)
           SizedBox(
-              width: size,
-              height: size,
-              child: ClipRRect(
-                child: Image(
-                  fit: BoxFit.cover,
-                  image: AppNetworkImageWithRetry(tag.icon),
-                ),
-                borderRadius: BorderRadius.circular(4),
-              )),
+            width: size,
+            height: size,
+            child: ClipRRect(
+              child: Image(
+                fit: BoxFit.cover,
+                image: AppNetworkImageWithRetry(tag.icon),
+              ),
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
         Expanded(
           child: Container(
             padding: const EdgeInsets.only(left: 7),
@@ -34,38 +35,47 @@ class AppTag extends StatelessWidget {
               text: TextSpan(
                 style:
                     DefaultTextStyle.of(context).style.copyWith(fontSize: 12),
-                children: [
+                children: <InlineSpan>[
                   if (tag.value != null)
                     TextSpan(
-                        text: '${tag.value}',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 15)),
+                      text: '${tag.value}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                      ),
+                    ),
                   if (tag.subscribersCount != null) ...[
                     TextSpan(
-                        text: '\nПодписчиков: ',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            height: tag.value != null ? 2 : 1)),
+                      text: '\nПодписчиков: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        height: tag.value != null ? 2 : 1,
+                      ),
+                    ),
                     TextSpan(text: '${tag.subscribersCount}')
                   ],
                   if (tag.subscribersDeltaCount != null) ...[
                     TextSpan(
-                        text: '\nПодписчиков: ',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            height: tag.value != null ? 2 : 1)),
+                      text: '\nПодписчиков: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        height: tag.value != null ? 2 : 1,
+                      ),
+                    ),
                     TextSpan(text: '+${tag.subscribersDeltaCount}')
                   ],
                   if (tag.count != null) ...[
                     TextSpan(
-                        text: '\nСообщений: ',
-                        style: const TextStyle(fontWeight: FontWeight.w500)),
+                      text: '\nСообщений: ',
+                      style: const TextStyle(fontWeight: FontWeight.w500),
+                    ),
                     TextSpan(text: '${tag.count}')
                   ],
                   if (tag.commonRating != null) ...[
                     TextSpan(
-                        text: '\nРейтинг постов: ',
-                        style: const TextStyle(fontWeight: FontWeight.w500)),
+                      text: '\nРейтинг постов: ',
+                      style: const TextStyle(fontWeight: FontWeight.w500),
+                    ),
                     TextSpan(text: '${tag.commonRating}')
                   ],
                 ],

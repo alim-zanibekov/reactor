@@ -76,13 +76,14 @@ class SentryReporter {
 
     _contexts = Contexts(
       app: App(
-          name: packageInfo.appName,
-          version: packageInfo.version,
-          build: packageInfo.buildNumber,
-          identifier: packageInfo.packageName,
-          deviceAppHash: appHash,
-          startTime: _startTime,
-          buildType: 'production'),
+        name: packageInfo.appName,
+        version: packageInfo.version,
+        build: packageInfo.buildNumber,
+        identifier: packageInfo.packageName,
+        deviceAppHash: appHash,
+        startTime: _startTime,
+        buildType: 'production',
+      ),
       device: device,
     );
   }
@@ -95,14 +96,14 @@ class SentryReporter {
     _userContext = null;
   }
 
-  Future<void> capture(dynamic error, dynamic stackTrace) =>
-      _sentry.capture(
+  Future<void> capture(dynamic error, dynamic stackTrace) => _sentry.capture(
         event: Event(
-            environment: 'production',
-            exception: error,
-            stackTrace: stackTrace,
-            contexts: _contexts,
-            userContext: _userContext,
-            extra: _extra),
+          environment: 'production',
+          exception: error,
+          stackTrace: stackTrace,
+          contexts: _contexts,
+          userContext: _userContext,
+          extra: _extra,
+        ),
       );
 }

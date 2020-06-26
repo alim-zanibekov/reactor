@@ -7,8 +7,13 @@ class StatsComment {
   final String username;
   final String userLink;
 
-  StatsComment(
-      {this.id, this.postId, this.rating, this.username, this.userLink});
+  StatsComment({
+    this.id,
+    this.postId,
+    this.rating,
+    this.username,
+    this.userLink,
+  });
 }
 
 class StatsUser {
@@ -32,13 +37,14 @@ class Stats {
   final List<StatsUser> monthUsers;
   final List<StatsUser> weekUsers;
 
-  Stats(
-      {this.trends,
-      this.weekTags,
-      this.twoDayTags,
-      this.allTimeTags,
-      this.twoDayComments,
-      this.weekComments,
-      this.monthUsers,
-      this.weekUsers});
+  Stats({
+    this.trends,
+    this.weekTags,
+    this.twoDayTags,
+    this.allTimeTags,
+    this.twoDayComments,
+    this.weekComments,
+    this.monthUsers,
+    this.weekUsers,
+  });
 }

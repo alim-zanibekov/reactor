@@ -110,24 +110,21 @@ class _AppSafeImageState extends State<AppSafeImage>
 
     return ColoredBox(
       color: widget.background ?? (isDark ? Colors.black26 : Colors.grey[200]),
-      child: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          if (_animate)
-            Center(
-              child: FadeTransition(
-                opacity: _animation,
-                child: Icon(Icons.image, color: Colors.grey[500], size: 44),
-              ),
+      child: Stack(children: <Widget>[
+        if (_animate)
+          Center(
+            child: FadeTransition(
+              opacity: _animation,
+              child: Icon(Icons.image, color: Colors.grey[500], size: 44),
             ),
-          FadeInImage(
-            fit: widget.fit,
-            fadeInDuration: _fadeInDuration,
-            placeholder: placeholder,
-            image: widget.imageProvider,
-          )
-        ],
-      ),
+          ),
+        FadeInImage(
+          fit: widget.fit,
+          fadeInDuration: _fadeInDuration,
+          placeholder: placeholder,
+          image: widget.imageProvider,
+        ),
+      ], fit: StackFit.expand),
     );
   }
 }

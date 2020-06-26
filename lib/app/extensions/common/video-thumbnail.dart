@@ -24,7 +24,7 @@ class VideoThumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     return AspectRatio(
       aspectRatio: aspectRatio,
-      child: Stack(fit: StackFit.expand, children: [
+      child: Stack(fit: StackFit.expand, children: <Widget>[
         if (imageUrl != null)
           AppSafeImage(
             fit: BoxFit.cover,
@@ -39,7 +39,7 @@ class VideoThumbnail extends StatelessWidget {
               child: Image(image: icon, width: 64, height: 64),
             ),
           ),
-        )
+        ),
       ]),
     );
   }

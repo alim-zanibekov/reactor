@@ -20,15 +20,15 @@ class AppTabsWrapper extends StatefulWidget {
       void Function(double delta) onScrollChange,
       ChangeNotifier onReload) builder;
 
-  const AppTabsWrapper(
-      {Key key,
-      @required this.title,
-      @required this.tabs,
-      this.main = false,
-      this.actions,
-      this.initialIndex,
-      @required this.builder})
-      : assert(tabs != null),
+  const AppTabsWrapper({
+    Key key,
+    @required this.title,
+    @required this.tabs,
+    @required this.builder,
+    this.main = false,
+    this.actions,
+    this.initialIndex,
+  })  : assert(tabs != null),
         assert(builder != null),
         assert(title != null),
         super(key: key);
@@ -129,12 +129,10 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
             actions: <Widget>[
               Transform.translate(
                 offset: Offset(0, -(_maxAppBarHeight - _appBarHeight) * 1.5),
-                child: Row(
-                  children: <Widget>[
-                    reloadButton,
-                    if (widget.actions != null) ...widget.actions.map((e) => e)
-                  ],
-                ),
+                child: Row(children: <Widget>[
+                  reloadButton,
+                  if (widget.actions != null) ...widget.actions.map((e) => e)
+                ]),
               ),
             ],
             bottom: PreferredSize(

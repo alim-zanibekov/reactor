@@ -35,22 +35,24 @@ class _AppUserAwards extends State<AppUserAwards> {
       crossAxisAlignment: WrapCrossAlignment.start,
       spacing: 5,
       runSpacing: 5,
-      children: [
+      children: <Widget>[
         ...awards
-            .map((e) => GestureDetector(
-                  onTap: () {
-                    Scaffold.of(context).removeCurrentSnackBar();
-                    Scaffold.of(context).showSnackBar(SnackBar(
-                        duration: Duration(seconds: 10),
-                        content: Text(e.title)));
-                  },
-                  child: SizedBox(
-                      child: Image(
-                        image: AppNetworkImageWithRetry(e.icon),
-                      ),
-                      width: 25,
-                      height: 25),
-                ))
+            .map(
+              (e) => GestureDetector(
+                onTap: () {
+                  Scaffold.of(context).removeCurrentSnackBar();
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                      duration: Duration(seconds: 10), content: Text(e.title)));
+                },
+                child: SizedBox(
+                  child: Image(
+                    image: AppNetworkImageWithRetry(e.icon),
+                  ),
+                  width: 25,
+                  height: 25,
+                ),
+              ),
+            )
             .toList(),
         if (!_opened)
           GestureDetector(
@@ -62,8 +64,9 @@ class _AppUserAwards extends State<AppUserAwards> {
               padding: const EdgeInsets.fromLTRB(10, 4.5, 10, 4.5),
               child: const Text('...', style: TextStyle(fontSize: 13)),
               decoration: BoxDecoration(
-                  color: isDark ? Colors.black26 : Colors.grey[200],
-                  borderRadius: BorderRadius.circular(50)),
+                color: isDark ? Colors.black26 : Colors.grey[200],
+                borderRadius: BorderRadius.circular(50),
+              ),
             ),
           )
       ],

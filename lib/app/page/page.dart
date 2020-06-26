@@ -47,7 +47,7 @@ class _AppPagePostsState extends State<AppPage> {
         postListType: widget.main ? PostListType.NEW : PostListType.ALL,
         path: widget.tag?.link,
         prefix: widget.tag?.prefix,
-      )
+      ),
     ];
     _title = widget.tag?.value ?? 'Reactor';
 

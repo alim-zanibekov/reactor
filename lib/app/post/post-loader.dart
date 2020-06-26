@@ -87,25 +87,28 @@ class PostLoader {
       return [];
     }
     int id = _pages.last.id - 1;
+    int i = 0;
 
     final List<Post> newPosts = [];
-    while (_posts.length + newPosts.length < (_loadCount + 1) * 10 && id > 0) {
-      final page = await _loaderNext(id);
-      _pages.add(page);
+    for (;_posts.length + newPosts.length < (_loadCount + 1) * 10 && id > 0 && i < 3; i++) {
+      if (i < 2) {
+        final page = await _loaderNext(id);
+        _pages.add(page);
 
-      final pagePosts =
-          page.content.where((page) => !_postIds.contains(page.id)).toList();
-      newPosts.addAll(pagePosts);
+        final pagePosts =
+        page.content.where((page) => !_postIds.contains(page.id)).toList();
+        newPosts.addAll(pagePosts);
 
-      page.content.forEach((post) => _postIds.add(post.id));
+        page.content.forEach((post) => _postIds.add(post.id));
 
-      id--;
+        id--;
+      }
     }
 
     _loadCount += 1;
     _posts.addAll(newPosts);
 
-    if (id <= 0) {
+    if (id <= 0 || i > 2) {
       _complete = true;
     }
 

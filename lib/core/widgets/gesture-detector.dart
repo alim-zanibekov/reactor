@@ -254,7 +254,7 @@ class Boxer {
     return container;
   }
 
-  void fit(Matrix4 matrix, Offset focalPoint) {
+  void fit(Matrix4 matrix, Offset focalPoint, { double scaleDelta = 0 }) {
     container = MatrixUtils.transformRect(matrix, src);
 
     final arContainer = container.size.width / container.size.height;
@@ -266,6 +266,6 @@ class Boxer {
     } else {
       scale = bounds.size.width / container.size.width;
     }
-    matrix.setFrom(MatrixGestureDetector.scaleMatrix(scale, focalPoint));
+    matrix.setFrom(MatrixGestureDetector.scaleMatrix(scale + scaleDelta, focalPoint));
   }
 }

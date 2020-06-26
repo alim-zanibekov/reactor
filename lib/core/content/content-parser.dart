@@ -348,7 +348,11 @@ class ContentParser {
   }
 
   ContentTextSize _extractTextSize(List<ContentTextSize> stack) {
-    return stack.lastWhere((element) => element != null);
+    try {
+      return stack.lastWhere((element) => element != null);
+    } on StateError {
+      return ContentTextSize.s12;
+    }
   }
 
   String _extractLink(List<String> links) {

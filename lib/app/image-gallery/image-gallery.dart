@@ -117,10 +117,9 @@ class _ImageGalleryState extends State<ImageGallery>
     _scrollUpdater.value = details.position.dx;
 
     final rect = _activeImage.boxer.getRect(_activeImage.transform);
-    final posLeft = (_maxWidth - rect.width) ~/ 2;
     _canSlideLeft =
-        rect.left.round() == posLeft && _images.indexOf(_activeImage) > 0;
-    _canSlideRight = rect.right.round() == (posLeft + rect.width).round() &&
+        rect.left.round() == 0 && _images.indexOf(_activeImage) > 0;
+    _canSlideRight = rect.right.round() == _maxWidth.round() &&
         _images.indexOf(_activeImage) < _images.length - 1;
 
     _controllerMove.stop();
@@ -232,7 +231,7 @@ class _ImageGalleryState extends State<ImageGallery>
       _controllerImage.forward(from: 0);
     } else {
       _activeImage.transformPrev = _activeImage.transform.clone();
-      _activeImage.boxer.fit(_activeImage.transform, details.position);
+      _activeImage.boxer.fit(_activeImage.transform, details.position, scaleDelta: 0.4);
       _activeImage.boxer.clamp(_activeImage.transform);
       _controllerImage.forward(from: 0);
     }

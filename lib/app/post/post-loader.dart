@@ -3,6 +3,7 @@ import '../../core/api/types.dart';
 import '../../core/content/types/module.dart';
 
 class PostLoader {
+  static const maxLoads = 5;
   final Api _api;
   final String path;
   final bool user, subscriptions;
@@ -14,9 +15,9 @@ class PostLoader {
       {this.path,
       this.prefix,
       this.postListType = PostListType.ALL,
-      this.user = false,
-      this.subscriptions = false,
-      this.favorite})
+    this.user = false,
+    this.subscriptions = false,
+    this.favorite})
       : _api = prefix == null ? Api() : Api.withPrefix(prefix);
 
   int _loadCount = 0;
@@ -90,8 +91,9 @@ class PostLoader {
     int i = 0;
 
     final List<Post> newPosts = [];
-    for (;_posts.length + newPosts.length < (_loadCount + 1) * 10 && id > 0 && i < 3; i++) {
-      if (i < 2) {
+    for (; _posts.length + newPosts.length < (_loadCount + 1) * 10 && id > 0 &&
+        i < maxLoads; i++) {
+      if (i < maxLoads - 1) {
         final page = await _loaderNext(id);
         _pages.add(page);
 
@@ -108,7 +110,7 @@ class PostLoader {
     _loadCount += 1;
     _posts.addAll(newPosts);
 
-    if (id <= 0 || i > 2) {
+    if (id <= 0 || i > maxLoads - 1) {
       _complete = true;
     }
 

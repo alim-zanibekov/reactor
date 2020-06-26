@@ -232,8 +232,12 @@ class _ImageGalleryState extends State<ImageGallery>
       _controllerImage.forward(from: 0);
     } else {
       _activeImage.transformPrev = _activeImage.transform.clone();
-      _activeImage.boxer
-          .fit(_activeImage.transform, details.position, scaleDelta: 0.4);
+      final screenAspectRatio = _maxWidth / _maxHeight;
+      _activeImage.boxer.fit(
+        _activeImage.transform,
+        details.position,
+        scaleDelta: screenAspectRatio > _activeImage.aspectRatio ? 0 : 0.1,
+      );
       _activeImage.boxer.clamp(_activeImage.transform);
       _controllerImage.forward(from: 0);
     }
@@ -412,6 +416,8 @@ class ImageUnit {
   Matrix4 transform;
   Matrix4 transformPrev;
   Size size;
+
+  double get aspectRatio => size.width / size.height;
 
   ImageUnit({this.imageProvider, this.size});
 }

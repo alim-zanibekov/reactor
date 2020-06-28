@@ -9,9 +9,11 @@ class AppPostControls extends StatefulWidget {
   final Post post;
   final Function onCommentsClick;
 
-  const AppPostControls(
-      {Key key, @required this.post, @required this.onCommentsClick})
-      : super(key: key);
+  const AppPostControls({
+    Key key,
+    @required this.post,
+    @required this.onCommentsClick,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {

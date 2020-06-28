@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/auth/auth.dart';
 import '../../core/auth/types.dart';
-import '../page/pages.dart';
+import '../home.dart';
 
 class AppAuthPage extends StatefulWidget {
   const AppAuthPage({Key key}) : super(key: key);
@@ -40,7 +40,7 @@ class _AppAuthPageState extends State<AppAuthPage> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: AnimatedOpacity(
-                      duration: Duration(milliseconds: 150),
+                      duration: const Duration(milliseconds: 150),
                       opacity: _error ? 1 : 0,
                       child: Text(
                         'Неверное имя пользователя или пароль',
@@ -74,7 +74,7 @@ class _AppAuthPageState extends State<AppAuthPage> {
                     }
                     return null;
                   },
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 15.0),
                     hintText: 'Пароль',
                   ),
@@ -108,7 +108,7 @@ class _AppAuthPageState extends State<AppAuthPage> {
                       }
                     },
                     child: AnimatedSwitcher(
-                      duration: Duration(milliseconds: 150),
+                      duration: const Duration(milliseconds: 150),
                       child: IndexedStack(
                         key: ValueKey<int>(_loading ? 1 : 0),
                         index: _loading ? 1 : 0,

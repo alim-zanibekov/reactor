@@ -8,14 +8,14 @@ import '../common/future-page.dart';
 import 'main.dart';
 import 'tags.dart';
 
-class AppCategories extends StatefulWidget {
-  const AppCategories({Key key}) : super(key: key);
+class AppCategoriesPage extends StatefulWidget {
+  const AppCategoriesPage({Key key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _AppCategoriesState();
+  State<StatefulWidget> createState() => _AppCategoriesPageState();
 }
 
-class _AppCategoriesState extends State<AppCategories>
+class _AppCategoriesPageState extends State<AppCategoriesPage>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final _defaultPadding = EdgeInsets.only(left: 8, right: 8);
 
@@ -29,18 +29,21 @@ class _AppCategoriesState extends State<AppCategories>
       body: AppFuturePage<Stats>(
         load: (_) => Api().loadSidebar(),
         builder: (context, stats, _) {
-          return CustomScrollView(slivers: <Widget>[
-            SliverToBoxAdapter(
-              child: Column(children: <Widget>[
-                ..._title('Основные разделы'),
-                const AppCategoriesMain()
-              ]),
-            ),
-            SliverToBoxAdapter(child: _trends(stats)),
-            SliverToBoxAdapter(child: _tags(stats)),
-            SliverToBoxAdapter(child: _comments(stats)),
-            SliverToBoxAdapter(child: _users(stats)),
-          ]);
+          return CustomScrollView(
+            physics: ClampingScrollPhysics(),
+            slivers: <Widget>[
+              SliverToBoxAdapter(
+                child: Column(children: <Widget>[
+                  ..._title('Основные разделы'),
+                  const AppCategoriesMain()
+                ]),
+              ),
+              SliverToBoxAdapter(child: _trends(stats)),
+              SliverToBoxAdapter(child: _tags(stats)),
+              SliverToBoxAdapter(child: _comments(stats)),
+              SliverToBoxAdapter(child: _users(stats)),
+            ],
+          );
         },
       ),
     );

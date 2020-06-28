@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:uni_links/uni_links.dart';
 
-import '../../core/auth/auth.dart';
-import '../auth/auth.dart';
-import '../categories/categories.dart';
-import '../common/open.dart';
-import '../settings/settings.dart';
-import '../user/user.dart';
-import 'page.dart';
+import '../core/auth/auth.dart';
+import 'auth/auth.dart';
+import 'categories/categories-page.dart';
+import 'common/open.dart';
+import 'page/posts-page.dart';
+import 'settings/settings-page.dart';
+import 'user/user-page.dart';
 
 enum AppBottomBarState { VISIBLE, HIDDEN }
 enum AppBottomBarPage { MAIN, CATEGORIES, PROFILE, SETTINGS }
@@ -114,15 +114,15 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
         physics: NeverScrollableScrollPhysics(),
         children: <Widget>[
           const AppPage(main: true),
-          const AppCategories(key: PageStorageKey('common')),
+          const AppCategoriesPage(key: PageStorageKey('common')),
           !_authorized
               ? const AppAuthPage()
               : AppUserPage(
-                  username: Auth().username,
-                  link: null,
-                  main: true,
-                ),
-          const AppSettings()
+            username: Auth().username,
+            link: null,
+            main: true,
+          ),
+          const AppSettingsPage()
         ],
       ),
       bottomNavigationBar: AnimatedBuilder(

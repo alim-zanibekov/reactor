@@ -25,14 +25,14 @@ class AppOnePostPage extends StatefulWidget {
   final bool scrollToComments;
   final int commentId;
 
-  AppOnePostPage(
-      {Key key,
-      this.post,
-      this.postId,
-      this.loadContent,
-      this.scrollToComments = false,
-      this.commentId})
-      : super(key: key) {
+  AppOnePostPage({
+    Key key,
+    this.post,
+    this.postId,
+    this.loadContent,
+    this.scrollToComments = false,
+    this.commentId,
+  }) : super(key: key) {
     assert(postId == null && post != null || postId != null && post == null);
   }
 
@@ -122,6 +122,7 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
     }
 
     return ScrollablePositionedList.builder(
+      physics: ClampingScrollPhysics(),
       itemCount: children.length + 1,
       initialScrollIndex: widget.scrollToComments ? 1 : 0,
       itemBuilder: (context, index) {
@@ -271,13 +272,8 @@ class _AppPostContentState extends State<AppPostContent>
 
   @override
   Widget build(BuildContext context) {
-    _width = MediaQuery
-        .of(context)
-        .size
-        .width;
-    _isDark = Theme
-        .of(context)
-        .brightness == Brightness.dark;
+    _width = MediaQuery.of(context).size.width;
+    _isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(children: <Widget>[
       Column(

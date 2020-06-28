@@ -5,9 +5,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../core/content/link-parser.dart';
 import '../../core/content/types/module.dart';
 import '../image-gallery/image-gallery.dart';
-import '../page/page.dart';
+import '../page/posts-page.dart';
 import '../post/post.dart';
-import '../user/user.dart';
+import '../user/user-page.dart';
 
 openTag(BuildContext context, Tag tag, {bool animate = true}) {
   Navigator.push(

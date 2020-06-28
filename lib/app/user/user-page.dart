@@ -6,7 +6,7 @@ import '../../core/auth/auth.dart';
 import '../../core/content/types/module.dart';
 import '../common/future-page.dart';
 import '../common/tabs-wrapper.dart';
-import '../page/pages.dart';
+import '../home.dart';
 import '../post/post-list.dart';
 import '../post/post-loader.dart';
 import 'user-awards.dart';
@@ -179,6 +179,7 @@ class _AppUserLoaderState extends State<_AppUserLoader>
         return OrientationBuilder(
           builder: (context, orientation) {
             return SingleChildScrollView(
+              physics: ClampingScrollPhysics(),
               controller: _scrollController,
               child: ConstrainedBox(
                 constraints: BoxConstraints(

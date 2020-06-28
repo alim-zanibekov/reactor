@@ -22,7 +22,6 @@ dependencies:
       url: https://github.com/AlimZanibekov/plugins.git
       ref: add_videoplayer_cache
       path: packages/video_player/video_player
-
   dio: ^3.0.9
   html: ^0.14.0+3
   transparent_image: ^1.0.0

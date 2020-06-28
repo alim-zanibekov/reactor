@@ -3,7 +3,7 @@ import '../../core/api/types.dart';
 import '../../core/content/types/module.dart';
 
 class PostLoader {
-  static const maxLoads = 5;
+  static const maxLoads = 10;
   final Api _api;
   final String path;
   final bool user, subscriptions;
@@ -11,14 +11,14 @@ class PostLoader {
   final String prefix;
   final String favorite;
 
-  PostLoader(
-      {this.path,
-      this.prefix,
-      this.postListType = PostListType.ALL,
+  PostLoader({
+    this.path,
+    this.prefix,
+    this.postListType = PostListType.ALL,
     this.user = false,
     this.subscriptions = false,
-    this.favorite})
-      : _api = prefix == null ? Api() : Api.withPrefix(prefix);
+    this.favorite,
+  }) : _api = prefix == null ? Api() : Api.withPrefix(prefix);
 
   int _loadCount = 0;
   final List<ContentPage<Post>> _pages = [];
@@ -91,14 +91,17 @@ class PostLoader {
     int i = 0;
 
     final List<Post> newPosts = [];
-    for (; _posts.length + newPosts.length < (_loadCount + 1) * 10 && id > 0 &&
-        i < maxLoads; i++) {
+    for (;
+        _posts.length + newPosts.length < (_loadCount + 1) * 10 &&
+            id > 0 &&
+            i < maxLoads;
+        i++) {
       if (i < maxLoads - 1) {
         final page = await _loaderNext(id);
         _pages.add(page);
 
         final pagePosts =
-        page.content.where((page) => !_postIds.contains(page.id)).toList();
+            page.content.where((page) => !_postIds.contains(page.id)).toList();
         newPosts.addAll(pagePosts);
 
         page.content.forEach((post) => _postIds.add(post.id));

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../page/pages.dart';
+import '../home.dart';
 
 class _ReloadNotifier extends ChangeNotifier {
   void notify() {

@@ -98,7 +98,7 @@ packages:
       name: file
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.2.0"
+    version: "5.2.1"
   file_picker:
     dependency: "direct main"
     description:
@@ -131,7 +131,7 @@ packages:
       name: flutter_inappwebview
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.4.0+1"
+    version: "3.4.0+2"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -295,7 +295,7 @@ packages:
       name: permission_handler
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.0.1"
+    version: "5.0.1+1"
   permission_handler_platform_interface:
     dependency: transitive
     description:
@@ -516,7 +516,7 @@ packages:
     description:
       path: "packages/video_player/video_player"
       ref: add_videoplayer_cache
-      resolved-ref: "6dbbd58650cac8eaaf591b39786ff870b49e87d6"
+      resolved-ref: "5caa4796e7904d996a93f40073c0bbd734e561c2"
       url: "https://github.com/AlimZanibekov/plugins.git"
     source: git
     version: "0.10.11+1"
@@ -525,7 +525,7 @@ packages:
     description:
       path: "packages/video_player/video_player_platform_interface"
       ref: add_videoplayer_cache
-      resolved-ref: "6dbbd58650cac8eaaf591b39786ff870b49e87d6"
+      resolved-ref: "5caa4796e7904d996a93f40073c0bbd734e561c2"
       url: "https://github.com/AlimZanibekov/plugins.git"
     source: git
     version: "2.0.2"
@@ -534,7 +534,7 @@ packages:
     description:
       path: "packages/video_player/video_player_web"
       ref: add_videoplayer_cache
-      resolved-ref: "6dbbd58650cac8eaaf591b39786ff870b49e87d6"
+      resolved-ref: "5caa4796e7904d996a93f40073c0bbd734e561c2"
       url: "https://github.com/AlimZanibekov/plugins.git"
     source: git
     version: "0.1.3+1"

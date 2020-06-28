@@ -282,6 +282,7 @@ class _AppPostListState extends State<AppPostList>
           return ListView.builder(
             key: widget.pageStorageKey,
             controller: _scrollController,
+            physics: ClampingScrollPhysics(),
             itemBuilder: (ctx, i) => _itemBuilder(ctx, i, hasError),
             itemCount: _postWidgets.length + (_showHeader ? 2 : 1),
           );
@@ -293,8 +294,9 @@ class _AppPostListState extends State<AppPostList>
           height: 40,
           width: 40,
           decoration: BoxDecoration(
-              color: Theme.of(context).accentColor,
-              borderRadius: BorderRadius.circular(40)),
+            color: Theme.of(context).accentColor,
+            borderRadius: BorderRadius.circular(40),
+          ),
           child: IconButton(
             onPressed: _closePost,
             icon: const Icon(Icons.keyboard_arrow_up),

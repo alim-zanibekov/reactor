@@ -192,8 +192,12 @@ class Api {
   }
 
   Future<void> createComment(
-      int postId, int parentId, String text, File picture,
-      {ProgressCallback onSendProgress}) async {
+    int postId,
+    int parentId,
+    String text,
+    File picture, {
+    ProgressCallback onSendProgress,
+  }) async {
     final file =
         picture != null ? (await MultipartFile.fromFile(picture.path)) : null;
 

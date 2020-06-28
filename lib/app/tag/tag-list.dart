@@ -167,6 +167,7 @@ class _AppTagListState extends State<AppTagList>
         return ListView.builder(
           key: widget.pageStorageKey,
           controller: _scrollController,
+          physics: ClampingScrollPhysics(),
           itemBuilder: (ctx, i) => _itemBuilder(ctx, i, hasError),
           itemCount: _tags.length + (_showHeader ? 2 : 1),
         );

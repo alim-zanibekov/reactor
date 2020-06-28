@@ -4,7 +4,7 @@ import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'app/page/pages.dart';
+import 'app/home.dart';
 import 'core/auth/auth.dart';
 import 'core/common/retry-network-image.dart';
 import 'core/external/error-reporter.dart';

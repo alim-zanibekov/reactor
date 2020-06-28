@@ -7,8 +7,11 @@ class TagLoader {
   final String path;
   final TagListType tagListType;
 
-  TagLoader({this.path, this.tagListType = TagListType.BEST, String prefix})
-      : _api = prefix == null ? Api() : Api.withPrefix(prefix);
+  TagLoader({
+    this.path,
+    this.tagListType = TagListType.BEST,
+    String prefix,
+  }) : _api = prefix == null ? Api() : Api.withPrefix(prefix);
 
   final List<ContentPage<ExtendedTag>> _pages = [];
   final List<ExtendedTag> _tags = [];

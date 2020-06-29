@@ -66,9 +66,9 @@ class _AppVideoPlayerState extends State<AppVideoPlayer> {
   }
 
   Future _safeRemoveController() async {
-    await Future.delayed(Duration(milliseconds: 30));
+    await Future.delayed(const Duration(milliseconds: 30));
     _notify();
-    await Future.delayed(Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 100));
     _disposeController();
     _notify();
   }
@@ -193,10 +193,17 @@ class _AppVideoPlayerState extends State<AppVideoPlayer> {
                     child: Container(
                       color: Colors.transparent,
                       padding: const EdgeInsets.only(
-                          top: 10, right: 10, bottom: 20, left: 20),
+                        top: 10,
+                        right: 10,
+                        bottom: 20,
+                        left: 20,
+                      ),
                       child: IconShadowWidget(
-                        const Icon(Icons.refresh,
-                            size: 22, color: Colors.white),
+                        const Icon(
+                          Icons.refresh,
+                          size: 22,
+                          color: Colors.white,
+                        ),
                         shadowColor: Colors.black,
                       ),
                     ),

@@ -87,16 +87,23 @@ class PostLoader {
     if (_posts.length == 0) {
       return [];
     }
-    int id = _pages.last.id - 1;
-    int i = 0;
-
     final List<Post> newPosts = [];
-    for (;
+
+    int id = _pages.last.id - 1;
+    int i;
+
+    for (i = 0;
         _posts.length + newPosts.length < (_loadCount + 1) * 10 &&
             id > 0 &&
             i < maxLoads;
         i++) {
       if (i < maxLoads - 1) {
+        if (i > 4 && newPosts.isEmpty) {
+          i = maxLoads;
+          break;
+        }
+        await Future.delayed(Duration(milliseconds: i * 400));
+
         final page = await _loaderNext(id);
         _pages.add(page);
 
@@ -113,7 +120,7 @@ class PostLoader {
     _loadCount += 1;
     _posts.addAll(newPosts);
 
-    if (id <= 0 || i > maxLoads - 1) {
+    if (id <= 0 || i >= maxLoads) {
       _complete = true;
     }
 

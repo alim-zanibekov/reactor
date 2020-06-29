@@ -3,7 +3,7 @@ import '../../core/api/types.dart';
 import '../../core/content/types/module.dart';
 
 class PostLoader {
-  static const maxLoads = 10;
+  static const maxLoads = 20;
   final Api _api;
   final String path;
   final bool user, subscriptions;
@@ -25,15 +25,21 @@ class PostLoader {
   final List<Post> _posts = [];
   final Set<int> _postIds = Set();
 
-  bool _complete = false;
-
   bool get complete => (_pages.last?.isLast ?? false) || _complete;
+
+  ContentPage<Post> get firstPage => _pages.first;
+
+  bool _complete = false;
+  bool _destroyed = false;
+
+  destroy() {
+    _destroyed = true;
+    _complete = true;
+  }
 
   get posts {
     return _posts;
   }
-
-  ContentPage<Post> get firstPage => _pages.first;
 
   Future<ContentPage<Post>> _loader() {
     if (favorite != null) {
@@ -84,7 +90,7 @@ class PostLoader {
   }
 
   Future<List<Post>> loadNext() async {
-    if (_posts.length == 0) {
+    if (_posts.length == 0 || _complete) {
       return [];
     }
     final List<Post> newPosts = [];
@@ -95,20 +101,22 @@ class PostLoader {
     for (i = 0;
         _posts.length + newPosts.length < (_loadCount + 1) * 10 &&
             id > 0 &&
-            i < maxLoads;
+            i < maxLoads &&
+            !_destroyed;
         i++) {
       if (i < maxLoads - 1) {
-        if (i > 4 && newPosts.isEmpty) {
+        if (i > maxLoads / 2 && newPosts.isEmpty) {
           i = maxLoads;
           break;
         }
-        await Future.delayed(Duration(milliseconds: i * 400));
+        await Future.delayed(
+            Duration(milliseconds: i * 400 > 2000 ? 2000 : i * 400));
 
         final page = await _loaderNext(id);
         _pages.add(page);
 
         final pagePosts =
-            page.content.where((page) => !_postIds.contains(page.id)).toList();
+        page.content.where((page) => !_postIds.contains(page.id)).toList();
         newPosts.addAll(pagePosts);
 
         page.content.forEach((post) => _postIds.add(post.id));

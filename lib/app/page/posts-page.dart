@@ -55,6 +55,12 @@ class _AppPagePostsState extends State<AppPage> {
   }
 
   @override
+  void dispose() {
+    _postLoaders.forEach((e) => e.destroy());
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AppTabsWrapper(
       initialIndex: _preferences?.postsType?.index,
@@ -94,6 +100,12 @@ class _AppPageTagsState extends State<AppPage> {
     ];
     _title = widget.tag?.value;
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _tagLoaders.forEach((e) => e.destroy());
+    super.dispose();
   }
 
   @override

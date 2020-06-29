@@ -53,6 +53,14 @@ class _AppUserPageState extends State<AppUserPage>
   }
 
   @override
+  void dispose() {
+    _loaderUserPosts.destroy();
+    _loaderUserPosts.destroy();
+    _loaderUserSubs?.destroy();
+    super.dispose();
+  }
+
+  @override
   bool get wantKeepAlive => widget.main;
 
   @override

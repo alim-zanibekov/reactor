@@ -15,7 +15,6 @@ class TagLoader {
 
   final List<ContentPage<ExtendedTag>> _pages = [];
   final List<ExtendedTag> _tags = [];
-  bool _complete = false;
 
   bool get complete {
     return (_pages.last?.isLast ?? false) || _complete;
@@ -26,6 +25,12 @@ class TagLoader {
   }
 
   ContentPage get firstPage => _pages.first;
+
+  bool _complete = false;
+
+  destroy() {
+    _complete = true;
+  }
 
   Future<List<ExtendedTag>> load() async {
     final page = await _api.loadMainTag(path, tagListType);
@@ -41,7 +46,7 @@ class TagLoader {
   }
 
   Future<List<ExtendedTag>> loadNext() async {
-    if (_pages.last.isLast) {
+    if (_pages.last.isLast || _complete) {
       return [];
     }
     int id = _pages.last.id + 1;

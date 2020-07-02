@@ -110,13 +110,14 @@ class PostLoader {
           break;
         }
         await Future.delayed(
-            Duration(milliseconds: i * 400 > 2000 ? 2000 : i * 400));
+          Duration(milliseconds: 1000 + i * 400 > 2000 ? 2000 : i * 400),
+        );
 
         final page = await _loaderNext(id);
         _pages.add(page);
 
         final pagePosts =
-        page.content.where((page) => !_postIds.contains(page.id)).toList();
+            page.content.where((page) => !_postIds.contains(page.id)).toList();
         newPosts.addAll(pagePosts);
 
         page.content.forEach((post) => _postIds.add(post.id));

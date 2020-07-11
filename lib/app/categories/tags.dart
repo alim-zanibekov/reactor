@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/content/types/module.dart';
+import '../../core/parsers/types/module.dart';
 import '../common/open.dart';
 import '../tag/tag.dart';
 
@@ -26,9 +26,7 @@ class AppCategoriesTags extends StatelessWidget {
           padding: const EdgeInsets.only(left: 4, right: 8, top: 8, bottom: 8),
           height: 60,
           alignment: Alignment.center,
-          child: Center(
-            child: AppTag(tag: tag),
-          ),
+          child: Center(child: AppTag(tag: tag)),
         ),
       ),
     );

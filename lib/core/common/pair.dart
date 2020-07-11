@@ -5,5 +5,5 @@ class Pair<T, E> {
   final E right;
 
   @override
-  String toString() => 'Pair[$left, $right]';
+  String toString() => 'Pair($left, $right)]';
 }

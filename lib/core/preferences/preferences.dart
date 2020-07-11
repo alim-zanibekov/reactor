@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../http/session.dart';
 
 enum AppTheme { AUTO, DARK, LIGHT }
-enum AppPostsType { NEW, GOOD, BEST }
+enum AppPostsType { NEW, GOOD, BEST, ALL }
 
 class Preferences {
   static final Preferences _preferences = Preferences._internal();

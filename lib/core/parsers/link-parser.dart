@@ -4,8 +4,9 @@ class _Link {}
 
 class PostLink extends _Link {
   final int id;
+  final int commentId;
 
-  PostLink(this.id);
+  PostLink(this.id, this.commentId);
 }
 
 class TagLink extends _Link {
@@ -25,7 +26,7 @@ class UndefinedLink extends _Link {}
 
 class LinkParser {
   static final _postLinkRegex = RegExp(
-      r'(?:https?:)?\/\/(?:joy|[^\/\.]+\.)reactor.cc\/post\/([^\/]+).*?');
+      r'(?:https?:)?\/\/(?:joy|[^\/\.]+\.)reactor.cc\/post\/([^\/#]+)(#comment([0-9]+))?.*?');
   static final _tagLinkRegex = RegExp(
       r'(?:https?:)?\/\/(joy|[^\/\.]+\.)reactor.cc\/tag\/([^\/]+)(\/rating|\/subtags)?.*?');
   static final _fanLinkRegex =
@@ -35,7 +36,11 @@ class LinkParser {
 
   static _Link parse(String link) {
     if (_postLinkRegex.hasMatch(link)) {
-      return PostLink(int.tryParse(_postLinkRegex.firstMatch(link).group(1)));
+      final match = _postLinkRegex.firstMatch(link);
+      final postId = int.tryParse(match.group(1));
+      final commentId =
+          match.groupCount > 2 ? int.tryParse(match.group(3)) : null;
+      return PostLink(postId, commentId);
     } else if (_tagLinkRegex.hasMatch(link)) {
       final match = _tagLinkRegex.firstMatch(link);
       return TagLink(

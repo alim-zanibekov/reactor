@@ -120,8 +120,13 @@ class UserParser {
 
   List<UserTag> _parseWeightedTags(Element element) =>
       (element?.querySelectorAll('a') ?? [])
-          .map((e) => UserTag(e.text?.trim(),
-              weight: -_getNumber(e?.attributes['style'])))
+          .map((e) => UserTag(
+                e.text?.trim(),
+                weight: -_getNumber(e?.attributes['style']),
+                isMain: Tag.parseIsMain((e.attributes ?? {})['href']),
+                prefix: Tag.parsePrefix((e.attributes ?? {})['href']),
+                link: Tag.parseLink((e.attributes ?? {})['href']),
+              ))
           .toList();
 
   double _getNumber(String str) =>

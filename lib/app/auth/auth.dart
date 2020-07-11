@@ -23,9 +23,7 @@ class _AppAuthPageState extends State<AppAuthPage> {
   Widget build(BuildContext context) {
     final style = DefaultTextStyle.of(context).style;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Аворизация'),
-      ),
+      appBar: AppBar(title: const Text('Аворизация')),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(36.0),
@@ -53,12 +51,8 @@ class _AppAuthPageState extends State<AppAuthPage> {
                 TextFormField(
                   controller: _usernameEditingController,
                   obscureText: false,
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Введите имя пользователя';
-                    }
-                    return null;
-                  },
+                  validator: (value) =>
+                      value.isEmpty ? 'Введите имя пользователя' : null,
                   decoration: const InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 15.0),
                     hintText: 'Имя пользователя',
@@ -68,12 +62,7 @@ class _AppAuthPageState extends State<AppAuthPage> {
                 TextFormField(
                   controller: _passwordEditingController,
                   obscureText: true,
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Введите пароль';
-                    }
-                    return null;
-                  },
+                  validator: (value) => value.isEmpty ? 'Введите пароль' : null,
                   decoration: const InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 15.0),
                     hintText: 'Пароль',
@@ -90,9 +79,7 @@ class _AppAuthPageState extends State<AppAuthPage> {
                     onPressed: () async {
                       if (_formKey.currentState.validate()) {
                         FocusScope.of(context).requestFocus(FocusNode());
-                        setState(() {
-                          _loading = true;
-                        });
+                        setState(() => _loading = true);
                         try {
                           await Auth().login(
                               _usernameEditingController.value.text,
@@ -113,9 +100,7 @@ class _AppAuthPageState extends State<AppAuthPage> {
                         key: ValueKey<int>(_loading ? 1 : 0),
                         index: _loading ? 1 : 0,
                         children: <Widget>[
-                          Center(
-                            child: Text('Войти', style: style),
-                          ),
+                          Center(child: Text('Войти', style: style)),
                           const Center(
                             child: SizedBox(
                               child: CircularProgressIndicator(

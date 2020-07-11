@@ -382,11 +382,9 @@ class _ImageGalleryState extends State<ImageGallery>
                           return Transform(
                             transform: _animating
                                 ? MatrixScaleTranslate4Tween(
-                                        begin: image.transformPrev,
-                                        end: image.transform)
-                                    .evaluate(
-                                    _controllerImage,
-                                  )
+                                    begin: image.transformPrev,
+                                    end: image.transform,
+                                  ).evaluate(_controllerImage)
                                 : image.transform,
                             child: child,
                           );
@@ -423,14 +421,17 @@ class ImageUnit {
 }
 
 class MatrixScaleTranslate4Tween extends Tween<Matrix4> {
-  MatrixScaleTranslate4Tween({Matrix4 begin, Matrix4 end})
-      : super(begin: begin, end: end);
+  MatrixScaleTranslate4Tween({
+    Matrix4 begin,
+    Matrix4 end,
+  })
+      : assert(begin != null),
+        assert(end != null),
+        super(begin: begin, end: end);
   static final vector.Quaternion rotationTrash = vector.Quaternion.identity();
 
   @override
   Matrix4 lerp(double t) {
-    assert(begin != null);
-    assert(end != null);
     final vector.Vector3 beginTranslation = vector.Vector3.zero();
     final vector.Vector3 endTranslation = vector.Vector3.zero();
     final vector.Vector3 beginScale = vector.Vector3.zero();
@@ -443,6 +444,9 @@ class MatrixScaleTranslate4Tween extends Tween<Matrix4> {
     final vector.Vector3 lerpScale = beginScale * (1.0 - t) + endScale * t;
 
     return Matrix4.compose(
-        lerpTranslation, vector.Quaternion.identity(), lerpScale);
+      lerpTranslation,
+      vector.Quaternion.identity(),
+      lerpScale,
+    );
   }
 }

@@ -1,6 +1,6 @@
-import '../../core/api/api.dart';
-import '../../core/api/types.dart';
-import '../../core/content/types/module.dart';
+import '../api/api.dart';
+import '../api/types.dart';
+import '../parsers/types/module.dart';
 
 class TagLoader {
   final _api;

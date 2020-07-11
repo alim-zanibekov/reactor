@@ -93,60 +93,13 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
 
   @override
   Widget build(BuildContext context) {
-    final reloadButton = Padding(
-      padding: EdgeInsets.all(10),
-      child: IconButton(
-        padding: EdgeInsets.zero,
-        onPressed: () {
-          _reloadNotifiers[_tabController.index].notify();
-        },
-        icon: const Icon(Icons.refresh, size: 22),
-      ),
-    );
-
     return DefaultTabController(
       initialIndex: widget.initialIndex ?? 0,
       length: widget.tabs.length,
       child: Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(_appBarHeight),
-          child: AppBar(
-            automaticallyImplyLeading: false,
-            leading: Navigator.canPop(context) && !widget.main
-                ? Transform.translate(
-                    offset:
-                        Offset(0, -(_maxAppBarHeight - _appBarHeight) * 1.5),
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  )
-                : null,
-            title: Transform.translate(
-              offset: Offset(0, -(_maxAppBarHeight - _appBarHeight) * 1.5),
-              child: Text(widget.title ?? ''),
-            ),
-            actions: <Widget>[
-              Transform.translate(
-                offset: Offset(0, -(_maxAppBarHeight - _appBarHeight) * 1.5),
-                child: Row(children: <Widget>[
-                  reloadButton,
-                  if (widget.actions != null) ...widget.actions.map((e) => e)
-                ]),
-              ),
-            ],
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(40),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: TabBar(
-                  controller: _tabController,
-                  isScrollable: true,
-                  tabs: widget.tabs.map((e) => Tab(text: e ?? '')).toList(),
-                ),
-              ),
-            ),
-          ),
+          child: buildAppBar(context),
         ),
         body: TabBarView(
           controller: _tabController,
@@ -159,6 +112,60 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
                   ))
               .values
               .toList(),
+        ),
+      ),
+    );
+  }
+
+  AppBar buildAppBar(BuildContext context) {
+    final reloadButton = Padding(
+      padding: EdgeInsets.all(10),
+      child: IconButton(
+        padding: EdgeInsets.zero,
+        onPressed: () {
+          _reloadNotifiers[_tabController.index].notify();
+        },
+        icon: const Icon(Icons.refresh, size: 22),
+      ),
+    );
+
+    Widget leading;
+
+    if (Navigator.canPop(context) && !widget.main) {
+      leading = Transform.translate(
+        offset: Offset(0, -(_maxAppBarHeight - _appBarHeight) * 1.5),
+        child: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      );
+    }
+
+    return AppBar(
+      automaticallyImplyLeading: false,
+      leading: leading,
+      title: Transform.translate(
+        offset: Offset(0, -(_maxAppBarHeight - _appBarHeight) * 1.5),
+        child: Text(widget.title ?? ''),
+      ),
+      actions: <Widget>[
+        Transform.translate(
+          offset: Offset(0, -(_maxAppBarHeight - _appBarHeight) * 1.5),
+          child: Row(children: <Widget>[
+            reloadButton,
+            if (widget.actions != null) ...widget.actions.map((e) => e)
+          ]),
+        ),
+      ],
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(40),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: TabBar(
+            controller: _tabController,
+            isScrollable: true,
+            tabs: widget.tabs.map((e) => Tab(text: e ?? '')).toList(),
+          ),
         ),
       ),
     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/common/retry-network-image.dart';
-import '../../core/content/types/module.dart';
+import '../../core/parsers/types/module.dart';
 
 class AppUserAwards extends StatefulWidget {
   final List<Award> awards;

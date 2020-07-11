@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/common/retry-network-image.dart';
-import '../../core/content/types/module.dart';
+import '../../core/parsers/types/module.dart';
 import '../common/open.dart';
 
 class AppCategoriesMain extends StatelessWidget {
@@ -63,8 +63,11 @@ class AppCategoriesMain extends StatelessWidget {
           aspectRatio: 1,
           child: Image(
             fit: BoxFit.cover,
-            alignment:
-                Alignment.lerp(Alignment.center, Alignment.centerLeft, 0.34),
+            alignment: Alignment.lerp(
+              Alignment.center,
+              Alignment.centerLeft,
+              0.34,
+            ),
             image: AppNetworkImageWithRetry(source),
           ),
         ),
@@ -77,30 +80,33 @@ class AppCategoriesMain extends StatelessWidget {
     final style = DefaultTextStyle.of(context).style;
 
     return Expanded(
-      child: Row(children: <Widget>[
-        Container(
-          height: 70,
-          padding: const EdgeInsets.only(left: 5, top: 2),
-          child: Text(title, style: style.copyWith(fontSize: 18)),
-        ),
-        if (!tag.isMain && tag.value != 'anon' && tag.value != 'политота')
-          SizedBox(
-            height: 30,
-            child: OutlineButton(
-              highlightedBorderColor: Theme.of(context).accentColor,
-              onPressed: () => openTag(
-                context,
-                Tag(
-                  tag.value,
-                  link: tag.link ?? 'Anime',
-                  isMain: true,
-                  prefix: tag.prefix,
-                ),
-              ),
-              child: Text('Подразделы', style: style.copyWith(fontSize: 12)),
-            ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Container(
+            height: 70,
+            padding: const EdgeInsets.only(left: 5, top: 2),
+            child: Text(title, style: style.copyWith(fontSize: 18)),
           ),
-      ], mainAxisAlignment: MainAxisAlignment.spaceBetween),
+          if (!tag.isMain && tag.value != 'anon' && tag.value != 'политота')
+            SizedBox(
+              height: 30,
+              child: OutlineButton(
+                highlightedBorderColor: Theme.of(context).accentColor,
+                onPressed: () => openTag(
+                  context,
+                  Tag(
+                    tag.value,
+                    link: tag.link ?? 'Anime',
+                    isMain: true,
+                    prefix: tag.prefix,
+                  ),
+                ),
+                child: Text('Подразделы', style: style.copyWith(fontSize: 12)),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -110,10 +116,13 @@ class AppCategoriesMain extends StatelessWidget {
         onTap: () => openTag(context, tag),
         child: Padding(
           padding: const EdgeInsets.all(4).copyWith(right: 8),
-          child: Row(children: <Widget>[
-            _image(source),
-            _content(context, title, tag),
-          ], crossAxisAlignment: CrossAxisAlignment.start),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              _image(source),
+              _content(context, title, tag),
+            ],
+          ),
         ),
       ),
     );

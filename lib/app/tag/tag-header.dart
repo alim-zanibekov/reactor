@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/api/api.dart';
 import '../../core/common/retry-network-image.dart';
-import '../../core/content/types/module.dart';
+import '../../core/parsers/types/module.dart';
 import 'tag.dart';
 
 class AppTagHeader extends StatefulWidget {

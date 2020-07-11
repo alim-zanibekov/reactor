@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../core/content/link-parser.dart';
-import '../../core/content/types/module.dart';
+import '../../core/parsers/link-parser.dart';
+import '../../core/parsers/types/module.dart';
 import '../image-gallery/image-gallery.dart';
 import '../page/posts-page.dart';
 import '../post/post.dart';
 import '../user/user-page.dart';
 
+final _duration = const Duration(milliseconds: 200);
+
 openTag(BuildContext context, Tag tag, {bool animate = true}) {
   Navigator.push(
     context,
     PageTransition(
-      duration: animate ? const Duration(milliseconds: 200) : Duration.zero,
+      duration: animate ? _duration : Duration.zero,
       curve: Curves.easeInOut,
       type: PageTransitionType.rightToLeft,
       child: AppPage(
@@ -28,7 +30,7 @@ openPost(BuildContext context, Post post, Function loadContent,
   Navigator.push(
     context,
     PageTransition(
-      duration: const Duration(milliseconds: 200),
+      duration: _duration,
       curve: Curves.easeInOut,
       type: PageTransitionType.rightToLeft,
       child: AppOnePostPage(
@@ -40,23 +42,12 @@ openPost(BuildContext context, Post post, Function loadContent,
   );
 }
 
-openPostById(BuildContext context, int postId, {bool animate = true}) {
+openPostById(BuildContext context, int postId,
+    {int commentId, bool animate = true}) {
   Navigator.push(
     context,
     PageTransition(
-      duration: animate ? const Duration(milliseconds: 200) : Duration.zero,
-      curve: Curves.easeInOut,
-      type: PageTransitionType.rightToLeft,
-      child: AppOnePostPage(postId: postId),
-    ),
-  );
-}
-
-openPostComment(BuildContext context, int postId, int commentId) {
-  Navigator.push(
-    context,
-    PageTransition(
-      duration: const Duration(milliseconds: 200),
+      duration: animate ? _duration : Duration.zero,
       curve: Curves.easeInOut,
       type: PageTransitionType.rightToLeft,
       child: AppOnePostPage(
@@ -72,7 +63,7 @@ openImage(
   Navigator.push(
     context,
     PageTransition(
-      duration: const Duration(milliseconds: 200),
+      duration: _duration,
       curve: Curves.easeInOut,
       type: PageTransitionType.rightToLeft,
       child: ImageGalleryScreen(
@@ -88,7 +79,7 @@ openUser(BuildContext context, String username, String link,
   Navigator.push(
     context,
     PageTransition(
-      duration: animate ? const Duration(milliseconds: 200) : Duration.zero,
+      duration: animate ? _duration : Duration.zero,
       curve: Curves.easeInOut,
       type: PageTransitionType.rightToLeft,
       child: AppUserPage(
@@ -103,11 +94,11 @@ openUser(BuildContext context, String username, String link,
 goToLinkOrOpen(BuildContext context, String link) async {
   final parsed = LinkParser.parse(link);
   if (parsed is PostLink) {
-    openPostById(context, parsed.id, animate: false);
+    openPostById(context, parsed.id, commentId: parsed.commentId);
   } else if (parsed is TagLink) {
-    openTag(context, parsed.tag, animate: false);
+    openTag(context, parsed.tag);
   } else if (parsed is UserLink) {
-    openUser(context, parsed.username, parsed.link, animate: false);
+    openUser(context, parsed.username, parsed.link);
   } else {
     if (await canLaunch(link)) {
       await launch(link, forceSafariVC: false);
@@ -115,7 +106,7 @@ goToLinkOrOpen(BuildContext context, String link) async {
   }
 }
 
-goToLink(BuildContext context, String link, {throwIsUnknown = false}) {
+goToLink(BuildContext context, String link) {
   final parsed = LinkParser.parse(link);
   if (parsed is PostLink) {
     openPostById(context, parsed.id, animate: false);

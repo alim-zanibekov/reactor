@@ -115,13 +115,13 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
         children: <Widget>[
           const AppPage(main: true),
           const AppCategoriesPage(key: PageStorageKey('common')),
-          !_authorized
+          !_authorized || _auth.username == null
               ? const AppAuthPage()
               : AppUserPage(
-            username: Auth().username,
-            link: null,
-            main: true,
-          ),
+                  username: _auth.username,
+                  link: null,
+                  main: true,
+                ),
           const AppSettingsPage()
         ],
       ),

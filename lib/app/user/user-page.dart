@@ -1,14 +1,15 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../core/api/api.dart';
 import '../../core/auth/auth.dart';
-import '../../core/content/types/module.dart';
+import '../../core/content/post-loader.dart';
+import '../../core/parsers/types/module.dart';
 import '../common/future-page.dart';
 import '../common/tabs-wrapper.dart';
 import '../home.dart';
 import '../post/post-list.dart';
-import '../post/post-loader.dart';
 import 'user-awards.dart';
 import 'user-main-tags.dart';
 import 'user-rating.dart';
@@ -21,12 +22,12 @@ class AppUserPage extends StatefulWidget {
   final String link;
   final bool main;
 
-  const AppUserPage(
-      {Key key,
-      @required this.username,
-      @required this.link,
-      this.main = false})
-      : assert(username != null || link != null),
+  const AppUserPage({
+    Key key,
+    @required this.username,
+    @required this.link,
+    this.main = false,
+  })  : assert(username != null || link != null),
         super(key: key);
 
   @override
@@ -67,56 +68,71 @@ class _AppUserPageState extends State<AppUserPage>
   Widget build(BuildContext context) {
     super.build(context);
     return AppTabsWrapper(
-        tabs: ['Профиль', 'Посты', 'Закладки', if (widget.main) 'Подписки'],
-        title: widget.username,
-        actions: widget.main
-            ? <Widget>[
-                PopupMenuButton(
-                  offset: const Offset(0, 100),
-                  icon: const Icon(Icons.more_vert),
-                  tooltip: 'Меню профиля',
-                  onSelected: (e) {
+      tabs: ['Профиль', 'Посты', 'Закладки', if (widget.main) 'Подписки'],
+      title: widget.username,
+      actions: <Widget>[
+        Builder(
+          builder: (context) =>
+              PopupMenuButton(
+                offset: const Offset(0, 100),
+                icon: const Icon(Icons.more_vert),
+                tooltip: 'Меню профиля',
+                onSelected: (selected) {
+                  if (selected == 0) {
+                    Clipboard.setData(
+                        ClipboardData(
+                            text: 'http://joyreactor.cc/user/$_link'));
+                    Scaffold.of(context).showSnackBar(
+                      const SnackBar(content: Text('Скопировано')),
+                    );
+                  } else {
                     Auth().logout();
                     AppPages.appBottomBarPage.add(AppBottomBarPage.PROFILE);
-                  },
-                  itemBuilder: (context) => const [
-                    PopupMenuItem(child: Text('Выход'), value: 0),
-                  ],
-                ),
-              ]
-            : null,
-        builder:
-            (BuildContext context, int index, onScrollChange, onReloadPress) {
-          if (index == 0)
-            return _AppUserLoader(
-                key: PageStorageKey<String>(widget.username + index.toString()),
-                username: widget.username,
-                link: _link,
-                reloadNotifier: onReloadPress,
-                onScrollChange: onScrollChange);
-          if (index == 1)
-            return AppPostList(
-                pageStorageKey:
-                    PageStorageKey<String>(widget.username + index.toString()),
-                onScrollChange: onScrollChange,
-                reloadNotifier: onReloadPress,
-                loader: _loaderUserPosts);
-
-          if (index == 2)
-            return AppPostList(
-                pageStorageKey:
-                    PageStorageKey<String>(widget.username + index.toString()),
-                onScrollChange: onScrollChange,
-                reloadNotifier: onReloadPress,
-                loader: _loaderUserFavorite);
-
+                  }
+                },
+                itemBuilder: (context) =>
+                [
+                  if (widget.main)
+                    const PopupMenuItem(child: Text('Выход'), value: 0),
+                  const PopupMenuItem(
+                      child: Text('Скопировать ссылку'), value: 0),
+                ],
+              ),
+        )
+      ],
+      builder:
+          (BuildContext context, int index, onScrollChange, onReloadPress) {
+        if (index == 0)
+          return _AppUserLoader(
+              key: PageStorageKey<String>(widget.username + index.toString()),
+              username: widget.username,
+              link: _link,
+              reloadNotifier: onReloadPress,
+              onScrollChange: onScrollChange);
+        if (index == 1)
           return AppPostList(
               pageStorageKey:
-                  PageStorageKey<String>(widget.username + index.toString()),
+              PageStorageKey<String>(widget.username + index.toString()),
               onScrollChange: onScrollChange,
               reloadNotifier: onReloadPress,
-              loader: _loaderUserSubs);
-        });
+              loader: _loaderUserPosts);
+
+        if (index == 2)
+          return AppPostList(
+              pageStorageKey:
+              PageStorageKey<String>(widget.username + index.toString()),
+              onScrollChange: onScrollChange,
+              reloadNotifier: onReloadPress,
+              loader: _loaderUserFavorite);
+
+        return AppPostList(
+            pageStorageKey:
+            PageStorageKey<String>(widget.username + index.toString()),
+            onScrollChange: onScrollChange,
+            reloadNotifier: onReloadPress,
+            loader: _loaderUserSubs);
+      },
+    );
   }
 }
 
@@ -187,11 +203,14 @@ class _AppUserLoaderState extends State<_AppUserLoader>
         return OrientationBuilder(
           builder: (context, orientation) {
             return SingleChildScrollView(
-              physics: ClampingScrollPhysics(),
+              physics: const ClampingScrollPhysics(),
               controller: _scrollController,
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height,
+                  minHeight: MediaQuery
+                      .of(context)
+                      .size
+                      .height,
                 ),
                 child: AppUser(
                   user: user,

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/api/api.dart';
 import '../../core/api/types.dart';
 import '../../core/auth/auth.dart';
-import '../../core/content/types/module.dart';
+import '../../core/parsers/types/module.dart';
 
 class AppPostControls extends StatefulWidget {
   final Post post;
@@ -92,9 +92,7 @@ class _AppPostControlsState extends State<AppPostControls> {
                 child: OutlineButton(
                   highlightedBorderColor: Theme.of(context).accentColor,
                   padding: EdgeInsets.only(left: 8, right: 8),
-                  onPressed: () {
-                    widget.onCommentsClick();
-                  },
+                  onPressed: widget.onCommentsClick,
                   child: Text('Комментарии ${widget.post.commentsCount}'),
                 ),
               ),

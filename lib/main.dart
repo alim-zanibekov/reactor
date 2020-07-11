@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_user_agent/flutter_user_agent.dart';
 
 import 'app/home.dart';
 import 'core/auth/auth.dart';
@@ -38,14 +39,20 @@ void main() {
       builder: (context) {
         AppNetworkImageWithRetry.init();
         return FutureBuilder(
-          future: Future.wait([Auth().init(), Preferences().init(), SentryReporter().init()]),
+          future: Future.wait([
+            Auth().init(),
+            Preferences().init(),
+            SentryReporter().init(),
+            FlutterUserAgent.init(),
+          ]),
           builder: (context, future) {
-            return future.data != null
-                ? StreamBuilder(
-                    stream: _appTheme.stream,
-                    builder: (_, theme) => App(theme: Preferences().theme),
-                  )
-                : Container(color: Color.fromRGBO(51, 51, 51, 1));
+            if (future.data != null) {
+              return StreamBuilder(
+                stream: _appTheme.stream,
+                builder: (_, theme) => App(theme: Preferences().theme),
+              );
+            }
+            return Container(color: Color.fromRGBO(51, 51, 51, 1));
           },
         );
       },
@@ -66,6 +73,8 @@ class App extends StatelessWidget {
     if (theme != AppTheme.AUTO) {
       themeMode = theme == AppTheme.DARK ? ThemeMode.dark : ThemeMode.light;
     }
+    Headers.updateUserAgent(FlutterUserAgent.webViewUserAgent);
+
     return MaterialApp(
       theme: ThemeData(
         primaryColor: Color.fromRGBO(253, 178, 1, 1),
@@ -77,10 +86,7 @@ class App extends StatelessWidget {
       ),
       themeMode: themeMode,
       builder: (context, child) {
-        return ScrollConfiguration(
-          behavior: EmptyBehavior(),
-          child: child,
-        );
+        return ScrollConfiguration(behavior: EmptyBehavior(), child: child);
       },
       home: Scaffold(
         body: DoubleBackToCloseApp(

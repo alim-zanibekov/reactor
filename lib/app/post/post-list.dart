@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 
 import '../../app/tag/tag-header.dart';
 import '../../core/auth/auth.dart';
-import '../../core/content/types/module.dart';
+import '../../core/content/post-loader.dart';
+import '../../core/parsers/types/module.dart';
 import '../../core/widgets/onerror-reload.dart';
 import '../common/future-page.dart';
-import 'post-loader.dart';
 import 'post.dart';
 
 class AppPostList extends StatefulWidget {
@@ -282,7 +282,7 @@ class _AppPostListState extends State<AppPostList>
           return ListView.builder(
             key: widget.pageStorageKey,
             controller: _scrollController,
-            physics: ClampingScrollPhysics(),
+            physics: const ClampingScrollPhysics(),
             itemBuilder: (ctx, i) => _itemBuilder(ctx, i, hasError),
             itemCount: _postWidgets.length + (_showHeader ? 2 : 1),
           );

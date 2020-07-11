@@ -1,6 +1,6 @@
-import '../../core/api/api.dart';
-import '../../core/api/types.dart';
-import '../../core/content/types/module.dart';
+import '../api/api.dart';
+import '../api/types.dart';
+import '../parsers/types/module.dart';
 
 class PostLoader {
   static const maxLoads = 20;
@@ -110,7 +110,7 @@ class PostLoader {
           break;
         }
         await Future.delayed(
-          Duration(milliseconds: 1000 + i * 400 > 2000 ? 2000 : i * 400),
+          Duration(milliseconds: 2500 + (i * 500 > 3000 ? 3000 : i * 500)),
         );
 
         final page = await _loaderNext(id);

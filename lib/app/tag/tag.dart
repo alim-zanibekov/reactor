@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/common/retry-network-image.dart';
-import '../../core/content/types/module.dart';
+import '../../core/parsers/types/module.dart';
 
 class AppTag extends StatelessWidget {
   final ExtendedTag tag;
@@ -38,7 +38,7 @@ class AppTag extends StatelessWidget {
                 children: <InlineSpan>[
                   if (tag.value != null)
                     TextSpan(
-                      text: '${tag.value}',
+                      text: '${tag.value}\n',
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 15,
@@ -46,7 +46,7 @@ class AppTag extends StatelessWidget {
                     ),
                   if (tag.subscribersCount != null) ...[
                     TextSpan(
-                      text: '\nПодписчиков: ',
+                      text: 'Подписчиков: ',
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         height: tag.value != null ? 2 : 1,
@@ -56,7 +56,7 @@ class AppTag extends StatelessWidget {
                   ],
                   if (tag.subscribersDeltaCount != null) ...[
                     TextSpan(
-                      text: '\nПодписчиков: ',
+                      text: 'Подписчиков: ',
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         height: tag.value != null ? 2 : 1,

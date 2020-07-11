@@ -9,13 +9,13 @@ class VideoThumbnail extends StatelessWidget {
   final AssetImage icon;
   final Function onPlay;
 
-  const VideoThumbnail(
-      {Key key,
-      @required this.imageUrl,
-      @required this.aspectRatio,
-      @required this.icon,
-      @required this.onPlay})
-      : assert(icon != null),
+  const VideoThumbnail({
+    Key key,
+    @required this.imageUrl,
+    @required this.aspectRatio,
+    @required this.icon,
+    @required this.onPlay,
+  })  : assert(icon != null),
         assert(onPlay != null),
         assert(aspectRatio != null),
         super(key: key);

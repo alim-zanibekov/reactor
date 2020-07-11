@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/categories/comments.dart';
 import '../../app/categories/users.dart';
 import '../../core/api/api.dart';
-import '../../core/content/types/module.dart';
+import '../../core/parsers/types/module.dart';
 import '../common/future-page.dart';
 import 'main.dart';
 import 'tags.dart';
@@ -30,7 +30,7 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
         load: (_) => Api().loadSidebar(),
         builder: (context, stats, _) {
           return CustomScrollView(
-            physics: ClampingScrollPhysics(),
+            physics: const ClampingScrollPhysics(),
             slivers: <Widget>[
               SliverToBoxAdapter(
                 child: Column(children: <Widget>[
@@ -147,8 +147,10 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
       Container(
         padding: _defaultPadding.copyWith(top: 10, bottom: 10),
         alignment: Alignment.centerLeft,
-        child: Text(title,
-            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
+        child: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+        ),
       ),
       Padding(padding: _defaultPadding, child: Divider(height: 0))
     ];

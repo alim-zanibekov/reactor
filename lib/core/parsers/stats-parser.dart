@@ -121,13 +121,8 @@ class StatsParser {
   }
 
   StatsUser _parseUser(Element element) {
-    final username = element
-        .querySelector('a')
-        ?.text
-        ?.trim();
-    final rating = _getNumber(element
-        .querySelector('.weekrating')
-        ?.text);
+    final username = element.querySelector('a')?.text?.trim();
+    final rating = _getNumber(element.querySelector('.weekrating')?.text);
 
     return StatsUser(
       username: username,

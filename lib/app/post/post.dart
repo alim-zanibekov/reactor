@@ -6,8 +6,8 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../core/api/api.dart';
 import '../../core/auth/auth.dart';
-import '../../core/common/types.dart';
-import '../../core/content/types/module.dart';
+import '../../core/common/pair.dart';
+import '../../core/parsers/types/module.dart';
 import '../../core/widgets/fade-icon.dart';
 import '../comments/comment-answer.dart';
 import '../comments/comments.dart';
@@ -64,7 +64,10 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
 
   Color _getColor(int commentId) {
     if (commentId == widget.commentId) {
-      return Theme.of(context).accentColor.withOpacity(0.2);
+      return Theme
+          .of(context)
+          .accentColor
+          .withOpacity(0.2);
     }
     return null;
   }
@@ -74,19 +77,21 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
     AppFuturePageState appFuturePageState = _pageKey.currentState;
     appFuturePageState?.reload(withoutIndicator: true);
   }
-
   Widget _list() {
     List<Widget> children = [];
+    List<AppComment> comments;
     if (_post?.comments == null) {
       children.add(SizedBox(
-        height: MediaQuery.of(context).size.height,
+        height: MediaQuery
+            .of(context)
+            .size
+            .height,
         child: FadeIcon(
           key: ObjectKey(_post.dateTime),
           icon: Icon(Icons.speaker_notes, color: Colors.grey[500], size: 44),
         ),
       ));
     } else {
-      List<AppComment> comments;
       comments = AppComments.getCommentsList(
         comments: _post.comments,
         showAnswer: true,
@@ -112,19 +117,20 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
       ];
     }
 
+    int initialScrollIndex;
+
     if (needScroll) {
       needScroll = false;
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        int i = (children as List<AppComment>)
-            .indexWhere((element) => element.comment.id == widget.commentId);
-        _itemScrollController.jumpTo(index: i + 1);
-      });
+      int i = comments.indexWhere((element) =>
+      element.comment.id == widget.commentId);
+      initialScrollIndex = i + 1;
     }
 
     return ScrollablePositionedList.builder(
-      physics: ClampingScrollPhysics(),
+      physics: const ClampingScrollPhysics(),
       itemCount: children.length + 1,
-      initialScrollIndex: widget.scrollToComments ? 1 : 0,
+      initialScrollIndex: initialScrollIndex ??
+          (widget.scrollToComments ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == 0) {
           return AppPostContent(
@@ -272,8 +278,13 @@ class _AppPostContentState extends State<AppPostContent>
 
   @override
   Widget build(BuildContext context) {
-    _width = MediaQuery.of(context).size.width;
-    _isDark = Theme.of(context).brightness == Brightness.dark;
+    _width = MediaQuery
+        .of(context)
+        .size
+        .width;
+    _isDark = Theme
+        .of(context)
+        .brightness == Brightness.dark;
 
     return Column(children: <Widget>[
       Column(
@@ -282,7 +293,7 @@ class _AppPostContentState extends State<AppPostContent>
         children: <Widget>[
           getPostTopControls(),
           getPostTags(),
-          if (!_post.censored && !_post.hidden)
+          if (!_post.censored && !_post.hidden && !_post.unsafe)
             AnimatedContainer(
               duration: widget.collapseDuration,
               curve: widget.collapseCurve,
@@ -295,21 +306,20 @@ class _AppPostContentState extends State<AppPostContent>
               ),
             )
           else
-            if (_post.censored)
+            if (_post.censored || _post.unsafe)
               Container(
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(10),
                 height: 100,
                 color: _isDark ? Colors.black26 : Colors.grey[200],
-                child: Wrap(
-                  spacing: 5,
-                  alignment: WrapAlignment.center,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  direction: Axis.vertical,
-                  children: const <Widget>[
-                    Icon(Icons.pan_tool),
+                child: Column(
+                  children: <Widget>[
+                    const Icon(Icons.pan_tool),
+                    const SizedBox(height: 10),
                     Text(
-                      'Контент запрещен на территории РФ',
+                      _post.censored
+                          ? 'Контент запрещен на территории РФ'
+                          : 'Контент только для авторизованных пользователей',
                       textScaleFactor: 1.2,
                       textAlign: TextAlign.center,
                     ),
@@ -341,7 +351,8 @@ class _AppPostContentState extends State<AppPostContent>
                           Center(
                             child: SizedBox(
                               child: CircularProgressIndicator(
-                                  strokeWidth: 1.5),
+                                strokeWidth: 1.5,
+                              ),
                               height: 16,
                               width: 16,
                             ),
@@ -367,7 +378,8 @@ class _AppPostContentState extends State<AppPostContent>
     }
 
     bool hasUndefinedSizeImages = _post.content.any(
-        (e) => e is ContentUnitImage && (e.width == null || e.height == null));
+            (e) =>
+        e is ContentUnitImage && (e.width == null || e.height == null));
 
     if (_realPostHeight - _postMaxHeight > 300 || hasUndefinedSizeImages) {
       _currentMaxHeight = _postMaxHeight;
@@ -562,7 +574,8 @@ class _AppPostContentState extends State<AppPostContent>
         Icons.more_vert,
         color: _isDark ? Colors.grey[300] : Colors.black38,
       ),
-      itemBuilder: (context) => const [
+      itemBuilder: (context) =>
+      const [
         PopupMenuItem(
           value: 0,
           child: Text('Скопировать ссылку'),
@@ -575,6 +588,9 @@ class _AppPostContentState extends State<AppPostContent>
       onSelected: (selected) {
         if (selected == 0) {
           Clipboard.setData(ClipboardData(text: _post.link));
+          Scaffold.of(context).showSnackBar(
+            const SnackBar(content: Text('Скопировано')),
+          );
         } else {
           ChromeSafariBrowser().open(url: _post.link);
         }

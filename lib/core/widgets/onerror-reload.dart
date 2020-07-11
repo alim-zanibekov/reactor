@@ -8,18 +8,18 @@ class AppOnErrorReload extends StatelessWidget {
   final Widget button;
   final Icon icon;
 
-  const AppOnErrorReload(
-      {Key key,
-      this.text,
-      this.icon = const Icon(
-        Icons.error_outline,
-        color: Color(0xFFFF8A80),
-        size: 44,
-      ),
-      this.onReloadPressed,
-      this.hasMaxWidth = true,
-      this.button})
-      : super(key: key);
+  const AppOnErrorReload({
+    Key key,
+    this.text,
+    this.icon = const Icon(
+      Icons.error_outline,
+      color: Color(0xFFFF8A80),
+      size: 44,
+    ),
+    this.onReloadPressed,
+    this.hasMaxWidth = true,
+    this.button,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-import '../../core/content/types/module.dart';
+import '../../core/parsers/types/module.dart';
 import '../common/open.dart';
 
 class AppUserRating extends StatelessWidget {

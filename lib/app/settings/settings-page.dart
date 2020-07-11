@@ -27,71 +27,72 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
   }
 
   void _handleTheme(AppTheme value) async {
-    setState(() {
-      _theme = value;
-    });
+    setState(() => _theme = value);
     await _preferences.setTheme(value);
     App.appTheme.add(value);
   }
 
   void _handlePostType(AppPostsType value) async {
-    setState(() {
-      _postsType = value;
-    });
+    setState(() => _postsType = value);
     await _preferences.setDefaultPostType(value);
   }
 
   @override
   Widget build(BuildContext context) {
+    final padding =
+        const EdgeInsets.symmetric(horizontal: 5.0).copyWith(left: 20);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Настройки'),
-      ),
+      appBar: AppBar(title: const Text('Настройки')),
       body: ListView(
-        physics: ClampingScrollPhysics(),
+        physics: const ClampingScrollPhysics(),
         children: <Widget>[
-          ListTile(
-            title: const Text('Открывать по умолчанию'),
-          ),
+          const ListTile(title: Text('Открывать по умолчанию')),
           LabeledRadio<AppPostsType>(
             label: 'Новое',
-            padding: EdgeInsets.symmetric(horizontal: 5.0).copyWith(left: 20),
+            padding: padding,
             value: AppPostsType.NEW,
             groupValue: _postsType,
             onChanged: _handlePostType,
           ),
           LabeledRadio<AppPostsType>(
             label: 'Хорошее',
-            padding: EdgeInsets.symmetric(horizontal: 5.0).copyWith(left: 20),
+            padding: padding,
             value: AppPostsType.GOOD,
             groupValue: _postsType,
             onChanged: _handlePostType,
           ),
           LabeledRadio<AppPostsType>(
             label: 'Лучшее',
-            padding: EdgeInsets.symmetric(horizontal: 5.0).copyWith(left: 20),
+            padding: padding,
             value: AppPostsType.BEST,
             groupValue: _postsType,
             onChanged: _handlePostType,
           ),
-          const ListTile(title: const Text('Тема')),
+          LabeledRadio<AppPostsType>(
+            label: 'Бездна',
+            padding: padding,
+            value: AppPostsType.ALL,
+            groupValue: _postsType,
+            onChanged: _handlePostType,
+          ),
+          const ListTile(title: Text('Тема')),
           LabeledRadio<AppTheme>(
             label: 'Автоматически',
-            padding: EdgeInsets.symmetric(horizontal: 5.0).copyWith(left: 20),
+            padding: padding,
             value: AppTheme.AUTO,
             groupValue: _theme,
             onChanged: _handleTheme,
           ),
           LabeledRadio<AppTheme>(
             label: 'Темная',
-            padding: EdgeInsets.symmetric(horizontal: 5.0).copyWith(left: 20),
+            padding: padding,
             value: AppTheme.DARK,
             groupValue: _theme,
             onChanged: _handleTheme,
           ),
           LabeledRadio<AppTheme>(
             label: 'Светлая',
-            padding: EdgeInsets.symmetric(horizontal: 5.0).copyWith(left: 20),
+            padding: padding,
             value: AppTheme.LIGHT,
             groupValue: _theme,
             onChanged: _handleTheme,
@@ -101,9 +102,7 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
             value: _sfw,
             activeColor: Theme.of(context).accentColor,
             onChanged: (bool sfw) async {
-              setState(() {
-                _sfw = sfw;
-              });
+              setState(() => _sfw = sfw);
               await _preferences.setSFW(sfw);
             },
           ),
@@ -120,9 +119,7 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
                 ),
               );
               _sendErrorStatistics = true;
-//            setState(() {
-//              _sendErrorStatistics = sendErrorStatistics;
-//            });
+//            setState(() => _sendErrorStatistics = sendErrorStatistics);
 //            await _preferences.setSendErrorStatistics(sendErrorStatistics);
             },
           )
@@ -169,7 +166,7 @@ class LabeledRadio<T> extends StatelessWidget {
               },
             ),
           ),
-          Text(label, style: TextStyle(fontSize: 12)),
+          Text(label, style: const TextStyle(fontSize: 12)),
         ]),
       ),
     );

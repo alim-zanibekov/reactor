@@ -4,7 +4,7 @@ import 'count-formatter.dart';
 
 class DateTimeFormatter {
   final DateTime dateTime;
-  final String _ago = 'назад';
+  static final String _ago = 'назад';
   static final _formatSeconds =
       CountFormatter(one: 'сукунду', two: 'секунды', few: 'секунд');
   static final _formatMinutes =
@@ -16,19 +16,23 @@ class DateTimeFormatter {
 
   DateTimeFormatter({@required this.dateTime});
 
-  String withHourPrecision() {
+  String format() {
+    return formatDateTime(dateTime);
+  }
+
+  static String formatDateTime(DateTime dateTime) {
     final now = DateTime.now();
     final duration = now.difference(dateTime);
     int diff = duration.inSeconds;
-    if (diff < 60) {
+    if (duration.inSeconds < 60) {
       return '$diff ${_formatSeconds.format(diff)} $_ago';
     }
     diff = duration.inMinutes;
-    if (diff < 60) {
+    if (duration.inMinutes < 60) {
       return '$diff ${_formatMinutes.format(diff)} $_ago';
     }
     diff = duration.inHours;
-    if (diff < 24) {
+    if (duration.inHours < 24) {
       return '$diff ${_formatHours.format(diff)} $_ago';
     }
     diff = duration.inDays;

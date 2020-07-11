@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 
 import '../auth/auth.dart';
-import '../common/types.dart';
-import '../content/content-parser.dart';
-import '../content/stats-parser.dart';
-import '../content/tag-parser.dart';
-import '../content/types/module.dart';
-import '../content/user-parser.dart';
+import '../common/pair.dart';
 import '../http/session.dart';
+import '../parsers/content-parser.dart';
+import '../parsers/stats-parser.dart';
+import '../parsers/tag-parser.dart';
+import '../parsers/types/module.dart';
+import '../parsers/user-parser.dart';
 import 'types.dart';
 
 class Api {
@@ -81,6 +81,12 @@ class Api {
 
   Future<ContentPage<Post>> _loadPage(String url) async {
     final res = await _session.get(url);
+    if (res.headers != null &&
+        !(res.headers[HttpHeaders.contentTypeHeader]?.first
+                ?.contains('text/html') ??
+            false)) {
+      return ContentPage.empty<Post>();
+    }
     final page = _contentParser.parsePage(res.data);
     if (_auth.authorized && !page.authorized) {
       _auth.logout();

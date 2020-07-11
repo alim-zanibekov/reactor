@@ -39,8 +39,8 @@ class _AppSoundCloudPlayerState extends State<AppSoundCloudPlayer> {
         }
       });
     }
-    url =
-        'https://w.soundcloud.com/player/?url=${Uri.encodeQueryComponent(widget.url)}';
+    url = 'https://w.soundcloud.com/player/'
+        '?url=${Uri.encodeQueryComponent(widget.url)}';
   }
 
   Widget getVideo(BuildContext context) {
@@ -51,13 +51,15 @@ class _AppSoundCloudPlayerState extends State<AppSoundCloudPlayer> {
           initialOptions: inAppWebViewDefaultOptions(),
           onProgressChanged: (controller, _) {
             controller.injectCSSCode(
-                source:
-                    '.mobilePrestitial, .soundHeader__actions, .cookiePolicy { display: none!important;}');
+              source: '.mobilePrestitial, .soundHeader__actions,'
+                  ' .cookiePolicy { display: none!important;}',
+            );
           },
           onLoadStop: (controller, _) {
             controller.evaluateJavascript(
-                source:
-                    'setTimeout(() => document.querySelector(".mobilePrestitial__link").click(), 1000)');
+              source: 'setTimeout(() => document.querySelector('
+                  '".mobilePrestitial__link").click(), 1000)',
+            );
           },
           shouldOverrideUrlLoading: (controller, request) async {
             canLaunch(request.url)

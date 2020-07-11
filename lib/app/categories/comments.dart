@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/content/types/module.dart';
+import '../../core/parsers/types/module.dart';
 import '../common/open.dart';
 
 class AppCategoriesComments extends StatelessWidget {
@@ -17,9 +17,11 @@ class AppCategoriesComments extends StatelessWidget {
   }
 
   Widget _children(context, StatsComment comment, int index) {
+    final boldTextStyle = const TextStyle(fontWeight: FontWeight.w500);
     return Material(
       child: InkWell(
-        onTap: () => openPostComment(context, comment.postId, comment.id),
+        onTap: () =>
+            openPostById(context, comment.postId, commentId: comment.id),
         child: Container(
           padding: const EdgeInsets.only(left: 4, right: 8, top: 8, bottom: 8),
           height: 40,
@@ -28,16 +30,10 @@ class AppCategoriesComments extends StatelessWidget {
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               SizedBox(
-                child: Text(
-                  '#' + index.toString(),
-                  style: TextStyle(fontWeight: FontWeight.w500),
-                ),
+                child: Text('#' + index.toString(), style: boldTextStyle),
               ),
               SizedBox(
-                child: Text(
-                  '  +${comment.rating}',
-                  style: TextStyle(fontWeight: FontWeight.w500),
-                ),
+                child: Text('  +${comment.rating}', style: boldTextStyle),
               ),
               SizedBox(
                 child: Text(' от ${comment.username}'),
@@ -49,7 +45,9 @@ class AppCategoriesComments extends StatelessWidget {
                 child: OutlineButton(
                   highlightedBorderColor: Theme.of(context).accentColor,
                   onPressed: () {
-                    openUser(context, comment.username, comment.userLink);
+                    if (comment.username != null) {
+                      openUser(context, comment.username, comment.userLink);
+                    }
                   },
                   child: Text(
                     comment.username,

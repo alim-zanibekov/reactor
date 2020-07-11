@@ -55,12 +55,14 @@ class _AppCoubPlayerState extends State<AppCoubPlayer> {
           initialOptions: inAppWebViewDefaultOptions(),
           onProgressChanged: (controller, _) {
             controller.injectCSSCode(
-                source:
-                    '.viewer__pause__share { display: none!important;} .viewer__click { opacity: 0!important; }');
+              source: '.viewer__pause__share { display: none!important; }'
+                  ' .viewer__click { opacity: 0!important; }',
+            );
           },
           onLoadStop: (InAppWebViewController controller, String url) {
             controller.evaluateJavascript(
-                source: 'document.querySelector(".viewer__click").click()');
+              source: 'document.querySelector(".viewer__click").click()',
+            );
           },
           shouldOverrideUrlLoading: (controller, request) async {
             canLaunch(request.url)

@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
-import '../common/types.dart';
+import '../common/pair.dart';
 import '../common/value-updater.dart';
 
 class MatrixGestureDetectorDetails {
@@ -14,13 +14,13 @@ class MatrixGestureDetectorDetails {
   final double scale;
   final VelocityTracker _velocityTracker;
 
-  const MatrixGestureDetectorDetails(
-      {this.position,
-      this.scale,
-      velocityTracker,
-      this.translateMatrix,
-      this.scaleMatrix})
-      : this._velocityTracker = velocityTracker;
+  const MatrixGestureDetectorDetails({
+    this.position,
+    this.scale,
+    velocityTracker,
+    this.translateMatrix,
+    this.scaleMatrix,
+  }) : this._velocityTracker = velocityTracker;
 
   VelocityEstimate get velocityEstimate =>
       _velocityTracker.getVelocityEstimate();
@@ -36,14 +36,14 @@ class MatrixGestureDetector extends StatefulWidget {
   final GestureDetectorCallback onEnd;
   final GestureDetectorCallback onDoubleTap;
 
-  const MatrixGestureDetector(
-      {Key key,
-      @required this.child,
-      this.onStart,
-      this.onUpdate,
-      this.onEnd,
-      this.onDoubleTap})
-      : super(key: key);
+  const MatrixGestureDetector({
+    Key key,
+    @required this.child,
+    this.onStart,
+    this.onUpdate,
+    this.onEnd,
+    this.onDoubleTap,
+  }) : super(key: key);
 
   static Matrix4 translateMatrix(Offset translation) {
     final dx = translation.dx;

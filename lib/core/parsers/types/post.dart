@@ -54,7 +54,8 @@ class ExtendedTag extends IconTag {
   final double commonRating;
   final int subscribersDeltaCount;
 
-  ExtendedTag(String value, {
+  ExtendedTag(
+    String value, {
     String icon,
     this.count,
     this.subscribersCount,
@@ -64,12 +65,12 @@ class ExtendedTag extends IconTag {
     prefix,
     link,
   }) : super(
-    value,
-    icon: icon,
-    isMain: isMain,
-    prefix: prefix,
-    link: link,
-  );
+          value,
+          icon: icon,
+          isMain: isMain,
+          prefix: prefix,
+          link: link,
+        );
 }
 
 class PageInfo extends ExtendedTag {
@@ -111,6 +112,16 @@ class ContentPage<T> {
     this.isLast,
     this.authorized,
   });
+
+  static empty<T>() {
+    return ContentPage<T>(
+      id: 0,
+      content: [],
+      isLast: true,
+      authorized: true,
+      pageInfo: null,
+    );
+  }
 }
 
 class Post {
@@ -121,6 +132,7 @@ class Post {
   final DateTime dateTime;
   final PostComment bestComment;
   final bool censored;
+  final bool unsafe;
   final bool hidden;
 
   int commentsCount;
@@ -148,6 +160,7 @@ class Post {
     this.dateTime,
     this.hidden,
     this.canVote,
+    this.unsafe,
     this.commentsCount,
     this.favorite = false,
     this.votedDown = false,

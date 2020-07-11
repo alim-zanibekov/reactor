@@ -46,6 +46,8 @@ class AppFuturePageState<T> extends State<AppFuturePage<T>> {
       _error = true;
       _loading = false;
       if (mounted) setState(() {});
+      print(err);
+      print(stack);
     });
   }
 

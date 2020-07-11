@@ -2,9 +2,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/common/metadata.dart';
+import '../../core/common/pair.dart';
 import '../../core/common/retry-network-image.dart';
-import '../../core/common/types.dart';
-import '../../core/content/types/module.dart';
+import '../../core/parsers/types/module.dart';
 import '../../core/widgets/safe-image.dart';
 import '../../variables.dart';
 import '../common/open.dart';
@@ -56,7 +56,7 @@ class _AppContentState extends State<AppContent> {
           if (entry.prettyImageLink != null) {
             _imagesForGallery.add(AppNetworkImageWithRetry(
               entry.value,
-              headers: REACTOR_HEADERS,
+              headers: Headers.reactorHeaders,
             ));
           } else {
             _imagesForGallery.add(_images[i]);
@@ -77,7 +77,7 @@ class _AppContentState extends State<AppContent> {
       if (entry is ContentUnitImage) {
         final imageProvider = AppNetworkImageWithRetry(
           entry.value,
-          headers: REACTOR_HEADERS,
+          headers: Headers.reactorHeaders,
         );
 
         if (entry.width == null || entry.height == null) {

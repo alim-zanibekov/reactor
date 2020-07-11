@@ -4,7 +4,7 @@ import '../../app/comments/comment-answer.dart';
 import '../../core/api/api.dart';
 import '../../core/api/types.dart';
 import '../../core/auth/auth.dart';
-import '../../core/content/types/module.dart';
+import '../../core/parsers/types/module.dart';
 import '../content/content.dart';
 import '../user/user-short.dart';
 
@@ -262,19 +262,21 @@ class _AppCommentState extends State<AppComment> {
                   color: isDark ? Colors.white38 : Colors.black12,
                 ),
               ),
-            Container(
+            Padding(
               child: comment,
-              margin: EdgeInsets.only(left: 15.0 * depth),
+              padding: EdgeInsets.only(left: 15.0 * depth),
             )
           ]),
         if (_auth.authorized && widget.showAnswer && _showAnswer)
           AppCommentAnswer(
             key: ValueKey(widget.comment.id.toString() + 'answer'),
             onSend: () {
+              _showAnswer = false;
               if (widget.onSend != null) {
                 widget.onSend();
+              } else {
+                setState(() {});
               }
-              _showAnswer = false;
             },
             comment: widget.comment,
           )
@@ -372,9 +374,7 @@ class _AppCommentsState extends State<AppComments> {
     }
 
     return Container(
-      child: Column(children: <Widget>[
-        ..._children,
-      ]),
+      child: Column(children: _children),
     );
   }
 }

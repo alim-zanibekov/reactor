@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/content/types/module.dart';
+import '../../core/parsers/types/module.dart';
 import '../common/open.dart';
 
 class AppCategoriesUsers extends StatelessWidget {
@@ -17,38 +17,36 @@ class AppCategoriesUsers extends StatelessWidget {
   }
 
   Widget _children(context, StatsUser user, int index) {
+    final boldTextStyle = const TextStyle(fontWeight: FontWeight.w500);
     return Material(
       child: InkWell(
-        onTap: () => openUser(context, user.username, user.link),
+        onTap: () {
+          if (user.username != null) {
+            openUser(context, user.username, user.link);
+          }
+        },
         child: Container(
           padding: const EdgeInsets.only(left: 4, right: 8, top: 8, bottom: 8),
           height: 40,
           alignment: Alignment.center,
-          child: Row(children: <Widget>[
-            SizedBox(
-              child: Text(
-                '#' + index.toString(),
-                style: const TextStyle(fontWeight: FontWeight.w500),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              SizedBox(
+                child: Text('#' + index.toString(), style: boldTextStyle),
               ),
-            ),
-            SizedBox(
-              child: Text(
-                '  ${user.username}',
-                style: const TextStyle(fontWeight: FontWeight.w500),
+              SizedBox(
+                child: Text('  ${user.username}', style: boldTextStyle),
               ),
-            ),
-            const Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(left: 5, right: 10),
-                child: CustomPaint(
-                  painter: DashedLinePainter(),
+              const Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 5, right: 10),
+                  child: CustomPaint(painter: DashedLinePainter()),
                 ),
               ),
-            ),
-            SizedBox(
-              child: Text('+${user.ratingDelta}'),
-            ),
-          ], mainAxisSize: MainAxisSize.max),
+              SizedBox(child: Text('+${user.ratingDelta}')),
+            ],
+          ),
         ),
       ),
     );

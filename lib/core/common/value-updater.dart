@@ -13,4 +13,7 @@ class ValueUpdater<T> {
   }
 
   T check(T newValue) => onUpdate(value, newValue);
+
+  @override
+  String toString() => '$runtimeType(value: $value, lastResult: $lastResult)';
 }

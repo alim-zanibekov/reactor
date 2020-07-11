@@ -1,9 +1,9 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as parser;
 
-import '../../core/content/tag-parser.dart';
-import '../common/types.dart';
-import 'types/module.dart';
+import './types/module.dart';
+import '../common/pair.dart';
+import 'tag-parser.dart';
 
 class ContentParser {
   Post parsePost(int id, String c) {
@@ -50,6 +50,11 @@ class ContentParser {
         (footer.querySelector('.hidden_link a')?.attributes ?? {})['href']
             ?.contains('delete');
 
+    final unsafe = contentBlock?.children?.length == 1 &&
+        ((contentBlock.children[0]?.attributes ?? {})['src']
+                ?.contains('unsafe') ??
+            false);
+
     return Post(
       id: id,
       censored: censored,
@@ -64,6 +69,7 @@ class ContentParser {
       votedDown: votedDown,
       canVote: canVote,
       dateTime: dateTime,
+      unsafe: unsafe,
       commentsCount: commentsCount,
       bestComment: bestComment,
     );
@@ -90,9 +96,8 @@ class ContentParser {
           .querySelectorAll('.postContainer')
           .map((e) {
         final id = int.tryParse(
-            e.attributes['id'].replaceAll('postContainer', '')) ??
-            0;
-        return _parse(id, e, false);
+            e.attributes['id'].replaceAll('postContainer', ''));
+        return _parse(id ?? 0, e, false);
       })
           .where((element) => element != null)
           .toList(),
@@ -331,10 +336,14 @@ class ContentParser {
       final srcMp4 = src.indexWhere((e) => e.toLowerCase().endsWith('mp4'));
 
       return ContentUnitGif(
-          srcMp4 != -1 ? src[srcMp4] : src[srcWebm], width, height);
+        srcMp4 != -1 ? src[srcMp4] : src[srcWebm],
+        width,
+        height,
+      );
     } else if (youTubeVideo != null) {
       return ContentUnitYouTubeVideo(
-          youtubeRegex.firstMatch(youTubeVideo.attributes['src']).group(1));
+        youtubeRegex.firstMatch(youTubeVideo.attributes['src']).group(1),
+      );
     } else if (coub) {
       return (ContentUnitCoubVideo(iFrame.attributes['src']));
     } else if (vimeo) {
@@ -549,6 +558,6 @@ class ContentParser {
     'h3',
     'h4',
     'h5',
-    'h6'
+    'h6',
   ];
 }

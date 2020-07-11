@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reactor/core/widgets/fade-icon.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 import 'onerror-reload.dart';
@@ -12,38 +13,29 @@ class AppSafeImage extends StatefulWidget {
   final bool showAnimation;
   final Color background;
 
-  AppSafeImage(
-      {Key key,
-      this.imageProvider,
-      this.fit = BoxFit.contain,
-      this.onInfo,
-      this.showAnimation = true,
-      this.background})
-      : super(key: key);
+  const AppSafeImage({
+    Key key,
+    this.imageProvider,
+    this.fit = BoxFit.contain,
+    this.onInfo,
+    this.showAnimation = true,
+    this.background,
+  }) : super(key: key);
 
   @override
   _AppSafeImageState createState() => _AppSafeImageState();
 }
 
-class _AppSafeImageState extends State<AppSafeImage>
-    with TickerProviderStateMixin {
+class _AppSafeImageState extends State<AppSafeImage> {
   final _fadeInDuration = Duration(milliseconds: 200);
   bool _error = false;
-  bool _animate = false;
   bool _loaded = false;
+  bool _animate;
   AnimationController _controller;
-  Animation<double> _animation;
 
   @override
   void initState() {
-    if (widget.showAnimation) {
-      _controller = AnimationController(
-          duration: const Duration(milliseconds: 500), vsync: this)
-        ..repeat(reverse: true, min: 0.5, max: 1);
-      _animation =
-          CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
-      _animate = true;
-    }
+    _animate = widget.showAnimation;
     _load();
     super.initState();
   }
@@ -107,23 +99,29 @@ class _AppSafeImageState extends State<AppSafeImage>
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color =
+        widget.background ?? (isDark ? Colors.black26 : Colors.grey[200]);
 
     return ColoredBox(
-      color: widget.background ?? (isDark ? Colors.black26 : Colors.grey[200]),
+      color: color,
       child: Stack(children: <Widget>[
         if (_animate)
-          Center(
-            child: FadeTransition(
-              opacity: _animation,
-              child: Icon(Icons.image, color: Colors.grey[500], size: 44),
+          FadeIcon(
+            color: color,
+            icon: Icon(Icons.image, color: Colors.grey[500], size: 44),
+          ),
+        AnimatedOpacity(
+          opacity: _animate ? 0 : 1,
+          duration: _fadeInDuration,
+          curve: Curves.easeIn,
+          child: ColoredBox(
+            color: Colors.white,
+            child: Image(
+              fit: widget.fit,
+              image: widget.imageProvider,
             ),
           ),
-        FadeInImage(
-          fit: widget.fit,
-          fadeInDuration: _fadeInDuration,
-          placeholder: placeholder,
-          image: widget.imageProvider,
-        ),
+        )
       ], fit: StackFit.expand),
     );
   }

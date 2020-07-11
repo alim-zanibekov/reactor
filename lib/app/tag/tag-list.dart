@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../core/content/types/module.dart';
+import '../../core/content/tag-loader.dart';
+import '../../core/parsers/types/module.dart';
 import '../../core/widgets/onerror-reload.dart';
 import '../common/future-page.dart';
 import '../common/open.dart';
 import '../tag/tag-header.dart';
-import '../tag/tag-loader.dart';
 import '../tag/tag.dart';
 
 class AppTagList extends StatefulWidget {
@@ -167,7 +167,7 @@ class _AppTagListState extends State<AppTagList>
         return ListView.builder(
           key: widget.pageStorageKey,
           controller: _scrollController,
-          physics: ClampingScrollPhysics(),
+          physics: const ClampingScrollPhysics(),
           itemBuilder: (ctx, i) => _itemBuilder(ctx, i, hasError),
           itemCount: _tags.length + (_showHeader ? 2 : 1),
         );

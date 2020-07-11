@@ -46,8 +46,8 @@ class _AppYouTubePlayerState extends State<AppYouTubePlayer>
         }
       });
     }
-    _url =
-        'https://www.youtube.com/embed/${widget.videoId}?autoplay=0&html5=True&rel=0&showinfo=0&playsinline=1&controls=0';
+    _url = 'https://www.youtube.com/embed/${widget.videoId}?autoplay=0'
+        '&html5=True&rel=0&showinfo=0&playsinline=1&controls=0';
     super.initState();
   }
 
@@ -130,7 +130,9 @@ String _initPlayerCSS = '''
   .ytp-bezel-text-hide, .ytp-watermark, .ytp-large-play-button { 
     display: none!important; 
   }
-  video::-webkit-media-controls-overlay-play-button, video::-webkit-media-controls-panel, video::-webkit-media-controls {
+  video::-webkit-media-controls-overlay-play-button,
+  video::-webkit-media-controls-panel,
+  video::-webkit-media-controls {
       display: flex!important;
   }
   .html5-video-player, video {
@@ -144,18 +146,22 @@ String _initPlayerCSS = '''
 ''';
 
 String _initPlayerJS = '''(function() {
-  document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2).click();
+  document.elementFromPoint(
+    window.innerWidth / 2,
+    window.innerHeight / 2
+  ).click();
   
   const video = document.querySelector('video');
   const player = document.querySelector('.html5-video-player');
   const buttons = document.querySelector('.ytp-chrome-top-buttons');
   const replayBtn = document.querySelector('.ytp-replay-button');
- 
+  
   buttons.parentNode.removeChild(buttons);
   
   const replay = document.createElement('button');
-  replay.style = 'display: none; top: 50vh; height: 36px; margin-top: -18px; z-index: 10000;' + 
-  'position: absolute; background: transparent; border: 0; left: 50vw; margin-left: -18px;';
+  replay.style = 'display: none; top: 50vh; height: 36px; margin-top: -18px;' +
+    'z-index: 10000; position: absolute; background: transparent; border: 0;' + 
+    'left: 50vw; margin-left: -18px;';
   replay.innerHTML = '<div class="ytp-icon ytp-icon-replay"></div>';
   
   setTimeout(function () {
@@ -189,7 +195,8 @@ String _initPlayerJS = '''(function() {
     } catch(e) {}
     observer.observe(player, { attributes: true });
   }
-  document.querySelector('.ytp-chrome-top').innerHTML = document.querySelector('.ytp-chrome-top').innerHTML;
+  document.querySelector('.ytp-chrome-top').innerHTML = 
+    document.querySelector('.ytp-chrome-top').innerHTML;
   
   const observer = new MutationObserver(callback);
   observer.observe(player, { attributes: true });

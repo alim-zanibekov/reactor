@@ -4,7 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/api/api.dart';
-import '../../core/content/types/module.dart';
+import '../../core/parsers/types/module.dart';
 
 class AppCommentAnswer extends StatefulWidget {
   final PostComment comment;
@@ -80,8 +80,9 @@ class _AppCommentAnswerState extends State<AppCommentAnswer> {
               hintText: 'Напишите комментарий...',
               contentPadding: EdgeInsets.all(15),
               border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                  borderSide: BorderSide(color: Colors.blue, width: 1)),
+                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                borderSide: BorderSide(color: Colors.blue, width: 1),
+              ),
             ),
           ),
         ),
@@ -92,9 +93,7 @@ class _AppCommentAnswerState extends State<AppCommentAnswer> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 10, right: 5),
                 child: Text(
-                  _file?.path
-                      ?.split('/')
-                      ?.last ?? '',
+                  _file?.path?.split('/')?.last ?? '',
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -103,11 +102,7 @@ class _AppCommentAnswerState extends State<AppCommentAnswer> {
               Padding(
                 padding: const EdgeInsets.only(right: 5),
                 child: InkWell(
-                  onTap: () {
-                    setState(() {
-                      _file = null;
-                    });
-                  },
+                  onTap: () => setState(() => _file = null),
                   child: Icon(Icons.delete_outline, size: 18),
                 ),
               ),
@@ -128,15 +123,15 @@ class _AppCommentAnswerState extends State<AppCommentAnswer> {
                 ),
               ),
             ),
-            SizedBox(width: 20),
+            const SizedBox(width: 20),
             Container(
               height: 25,
-              padding: EdgeInsets.only(right: 10),
+              padding: const EdgeInsets.only(right: 10),
               child: OutlineButton(
                 highlightedBorderColor: Theme
                     .of(context)
                     .accentColor,
-                padding: EdgeInsets.all(3.0),
+                padding: const EdgeInsets.all(3.0),
                 onPressed: () {
                   if (_loading) return;
                   _sendAnswer();

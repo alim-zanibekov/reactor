@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/content/types/module.dart';
+import '../../core/parsers/types/module.dart';
 
 class AppUserStats extends StatelessWidget {
   final UserStats stats;

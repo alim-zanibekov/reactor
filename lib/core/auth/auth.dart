@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:html/parser.dart' as parser;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../common/types.dart';
+import '../common/pair.dart';
 import '../external/sentry.dart';
 import '../http/session.dart';
 import 'types.dart';

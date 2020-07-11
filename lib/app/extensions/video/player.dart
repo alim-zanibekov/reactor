@@ -87,7 +87,7 @@ class _AppVideoPlayerState extends State<AppVideoPlayer> {
     if (mounted) {
       _controller = VideoPlayerController.network(
         widget.url,
-        httpHeaders: REACTOR_VIDEO_HEADERS,
+        httpHeaders: Headers.videoHeaders,
         maxCacheSize: 200 << 20,
         maxFileSize: 10 << 20,
       )

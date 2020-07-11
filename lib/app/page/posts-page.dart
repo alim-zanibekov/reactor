@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../core/api/types.dart';
-import '../../core/content/types/module.dart';
+import '../../core/content/post-loader.dart';
+import '../../core/content/tag-loader.dart';
+import '../../core/parsers/types/module.dart';
 import '../../core/preferences/preferences.dart';
 import '../common/tabs-wrapper.dart';
 import '../post/post-list.dart';
-import '../post/post-loader.dart';
 import '../tag/tag-list.dart';
-import '../tag/tag-loader.dart';
 
 class AppPage extends StatefulWidget {
   final Tag tag;

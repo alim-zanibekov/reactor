@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reactor/core/common/retry-network-image.dart';
 import 'package:reactor/core/widgets/fade-icon.dart';
 import 'package:transparent_image/transparent_image.dart';
 
@@ -30,12 +31,18 @@ class _AppSafeImageState extends State<AppSafeImage> {
   final _fadeInDuration = Duration(milliseconds: 200);
   bool _error = false;
   bool _loaded = false;
-  bool _animate;
+  bool _animate = false;
+  bool _withoutFades = false;
+  bool _mayBeTransparent = false;
   AnimationController _controller;
 
   @override
   void initState() {
     _animate = widget.showAnimation;
+    if (widget.imageProvider is AppNetworkImageWithRetry) {
+      final url = (widget.imageProvider as AppNetworkImageWithRetry).url;
+      _mayBeTransparent = url.endsWith('png') || url.endsWith('gif');
+    }
     _load();
     super.initState();
   }
@@ -65,6 +72,13 @@ class _AppSafeImageState extends State<AppSafeImage> {
       });
       await widget.imageProvider.evict();
     }
+
+    if (widget.imageProvider is AppNetworkImageWithRetry && _animate) {
+      _withoutFades = _animate =
+          !(await (widget.imageProvider as AppNetworkImageWithRetry)
+              .existInCache());
+    }
+
     widget.imageProvider
         .resolve(ImageConfiguration())
         .addListener(ImageStreamListener((imageInfo, bool _) async {
@@ -72,8 +86,10 @@ class _AppSafeImageState extends State<AppSafeImage> {
             _loaded = true;
             widget.onInfo(imageInfo);
           }
-          await Future.delayed(_fadeInDuration);
-          _animate = false;
+          if (_animate) {
+            await Future.delayed(_fadeInDuration);
+            _animate = false;
+          }
           if (mounted) {
             setState(() {});
           }
@@ -84,6 +100,10 @@ class _AppSafeImageState extends State<AppSafeImage> {
             setState(() {});
           }
         }));
+
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -110,18 +130,27 @@ class _AppSafeImageState extends State<AppSafeImage> {
             color: color,
             icon: Icon(Icons.image, color: Colors.grey[500], size: 44),
           ),
-        AnimatedOpacity(
-          opacity: _animate ? 0 : 1,
-          duration: _fadeInDuration,
-          curve: Curves.easeIn,
-          child: ColoredBox(
-            color: Colors.white,
+        if (_mayBeTransparent && _withoutFades)
+          ColoredBox(
+            color: _loaded ? Colors.white : Colors.transparent,
             child: Image(
               fit: widget.fit,
               image: widget.imageProvider,
             ),
-          ),
-        )
+          )
+        else
+          AnimatedOpacity(
+            opacity: _animate ? 0 : 1,
+            duration: _fadeInDuration,
+            curve: Curves.easeIn,
+            child: ColoredBox(
+              color: Colors.white,
+              child: Image(
+                fit: widget.fit,
+                image: widget.imageProvider,
+              ),
+            ),
+          )
       ], fit: StackFit.expand),
     );
   }

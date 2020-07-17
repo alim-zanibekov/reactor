@@ -38,8 +38,9 @@ class LinkParser {
     if (_postLinkRegex.hasMatch(link)) {
       final match = _postLinkRegex.firstMatch(link);
       final postId = int.tryParse(match.group(1));
-      final commentId =
-          match.groupCount > 2 ? int.tryParse(match.group(3)) : null;
+      final commentId = match.groupCount > 2 && match.group(3) != null
+          ? int.tryParse(match.group(3))
+          : null;
       return PostLink(postId, commentId);
     } else if (_tagLinkRegex.hasMatch(link)) {
       final match = _tagLinkRegex.firstMatch(link);

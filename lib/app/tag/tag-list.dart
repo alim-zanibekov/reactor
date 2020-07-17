@@ -114,9 +114,7 @@ class _AppTagListState extends State<AppTagList>
       }
 
       AppFuturePageState appFuturePageState = _pageKey.currentState;
-      if (!(appFuturePageState?.loading ?? true)) {
-        appFuturePageState?.reload(withoutIndicator: true);
-      }
+      appFuturePageState?.reload(withoutIndicator: true);
 
       return const SizedBox(
         height: 50,

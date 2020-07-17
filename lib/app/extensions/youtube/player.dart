@@ -138,10 +138,10 @@ String _initPlayerCSS = '''
   .html5-video-player, video {
     left: 0!important;
     top: 0!important;
-    minHeight:  100vh!important;
-    maxHeight: 100vh!important;
-    minWidth: 100vh!important;
-    maxWidth: 100vw!important;
+    min-height:  100vh!important;
+    max-height: 100vh!important;
+    min-width: 100vw!important;
+    max-width: 100vw!important;
   }
 ''';
 

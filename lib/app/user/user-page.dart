@@ -72,32 +72,28 @@ class _AppUserPageState extends State<AppUserPage>
       title: widget.username,
       actions: <Widget>[
         Builder(
-          builder: (context) =>
-              PopupMenuButton(
-                offset: const Offset(0, 100),
-                icon: const Icon(Icons.more_vert),
-                tooltip: 'Меню профиля',
-                onSelected: (selected) {
-                  if (selected == 0) {
-                    Clipboard.setData(
-                        ClipboardData(
-                            text: 'http://joyreactor.cc/user/$_link'));
-                    Scaffold.of(context).showSnackBar(
-                      const SnackBar(content: Text('Скопировано')),
-                    );
-                  } else {
-                    Auth().logout();
-                    AppPages.appBottomBarPage.add(AppBottomBarPage.PROFILE);
-                  }
-                },
-                itemBuilder: (context) =>
-                [
-                  if (widget.main)
-                    const PopupMenuItem(child: Text('Выход'), value: 0),
-                  const PopupMenuItem(
-                      child: Text('Скопировать ссылку'), value: 0),
-                ],
-              ),
+          builder: (context) => PopupMenuButton(
+            offset: const Offset(0, 100),
+            icon: const Icon(Icons.more_vert),
+            tooltip: 'Меню профиля',
+            onSelected: (selected) {
+              if (selected == 0) {
+                Clipboard.setData(
+                    ClipboardData(text: 'http://joyreactor.cc/user/$_link'));
+                Scaffold.of(context).showSnackBar(
+                  const SnackBar(content: Text('Скопировано')),
+                );
+              } else {
+                Auth().logout();
+                AppPages.appBottomBarPage.add(AppBottomBarPage.PROFILE);
+              }
+            },
+            itemBuilder: (context) => [
+              if (widget.main)
+                const PopupMenuItem(child: Text('Выход'), value: 0),
+              const PopupMenuItem(child: Text('Скопировать ссылку'), value: 0),
+            ],
+          ),
         )
       ],
       builder:
@@ -196,6 +192,7 @@ class _AppUserLoaderState extends State<_AppUserLoader>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     return AppFuturePage<UserFull>(
       key: _pageKey,
       load: (_) => Api().loadUserPage(widget.link),

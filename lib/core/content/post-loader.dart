@@ -110,7 +110,7 @@ class PostLoader {
           break;
         }
         await Future.delayed(
-          Duration(milliseconds: 2500 + (i * 500 > 3000 ? 3000 : i * 500)),
+          Duration(milliseconds: i * 400 > 2500 ? 2500 : i * 400),
         );
 
         final page = await _loaderNext(id);

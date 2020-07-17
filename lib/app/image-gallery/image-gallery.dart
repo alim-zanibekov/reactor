@@ -424,8 +424,7 @@ class MatrixScaleTranslate4Tween extends Tween<Matrix4> {
   MatrixScaleTranslate4Tween({
     Matrix4 begin,
     Matrix4 end,
-  })
-      : assert(begin != null),
+  })  : assert(begin != null),
         assert(end != null),
         super(begin: begin, end: end);
   static final vector.Quaternion rotationTrash = vector.Quaternion.identity();

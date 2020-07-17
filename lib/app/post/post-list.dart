@@ -218,9 +218,7 @@ class _AppPostListState extends State<AppPostList>
       }
 
       AppFuturePageState appFuturePageState = _pageKey.currentState;
-      if (!(appFuturePageState?.loading ?? true)) {
-        appFuturePageState?.reload(withoutIndicator: true);
-      }
+      appFuturePageState?.reload(withoutIndicator: true);
 
       return const SizedBox(
         height: 50,

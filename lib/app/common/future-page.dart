@@ -24,6 +24,7 @@ class AppFuturePageState<T> extends State<AppFuturePage<T>> {
   bool _error = false;
   bool _loading = true;
   bool _fromUser = true;
+  bool _lock = false;
 
   bool get loading => _loading;
 
@@ -35,16 +36,19 @@ class AppFuturePageState<T> extends State<AppFuturePage<T>> {
     super.initState();
   }
 
-  Future<dynamic> _load([fromUser = false]) {
+  Future<dynamic> _load([fromUser = false]) async {
+    if (_lock) return;
+
+    _lock = true;
     _error = false;
     if (!widget.customError) _loading = true;
     return widget.load(fromUser).then((v) {
       _value = v;
-      _loading = false;
+      _lock = _loading = false;
       if (mounted) setState(() {});
     }).catchError((err, stack) {
       _error = true;
-      _loading = false;
+      _lock = _loading = false;
       if (mounted) setState(() {});
       print(err);
       print(stack);

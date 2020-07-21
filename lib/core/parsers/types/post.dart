@@ -5,6 +5,32 @@ abstract class HasChildren<T> {
   List<T> children;
 }
 
+class QuizAnswer {
+  final int id;
+  final String text;
+  final double percent;
+  final int count;
+
+  const QuizAnswer({
+    this.text,
+    this.count,
+    this.percent,
+    this.id,
+  });
+}
+
+class Quiz {
+  final bool voted;
+  final String title;
+  final List<QuizAnswer> answers;
+
+  const Quiz({
+    this.title,
+    this.voted,
+    this.answers,
+  });
+}
+
 class Tag {
   static final _extractTag3LDomainRegex =
       RegExp(r'https?:\/\/(.*?)\.reactor\.');
@@ -81,12 +107,12 @@ class PageInfo extends ExtendedTag {
   final String bg;
 
   PageInfo({
-    icon,
+    String icon,
     this.tagId,
     this.bg,
-    count,
-    subscribersCount,
-    commonRating,
+    int count,
+    int subscribersCount,
+    double commonRating,
     this.blocked = false,
     this.subscribed = false,
   }) : super(
@@ -144,13 +170,13 @@ class Post {
   List<PostComment> comments;
   double height;
   bool expanded = false;
+  Quiz quiz;
 
   get link {
     return 'http://joyreactor.cc/post/$id';
   }
 
-  Post({
-    this.id,
+  Post({this.id,
     this.tags,
     this.content,
     this.rating,
@@ -166,7 +192,7 @@ class Post {
     this.votedDown = false,
     this.votedUp = false,
     this.censored,
-  });
+    this.quiz});
 }
 
 class PostComment implements HasChildren<PostComment> {

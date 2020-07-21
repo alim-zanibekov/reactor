@@ -156,9 +156,7 @@ class LabeledRadio<T> extends StatelessWidget {
           SizedBox(
             height: 35,
             child: Radio<T>(
-              activeColor: Theme
-                  .of(context)
-                  .accentColor,
+              activeColor: Theme.of(context).accentColor,
               groupValue: groupValue,
               value: value,
               onChanged: (T newValue) {

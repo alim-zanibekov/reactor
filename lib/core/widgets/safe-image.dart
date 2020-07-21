@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:reactor/core/common/retry-network-image.dart';
-import 'package:reactor/core/widgets/fade-icon.dart';
 import 'package:transparent_image/transparent_image.dart';
 
+import '../common/retry-network-image.dart';
+import '../widgets/fade-icon.dart';
 import 'onerror-reload.dart';
 
 final placeholder = MemoryImage(kTransparentImage);
@@ -74,9 +74,9 @@ class _AppSafeImageState extends State<AppSafeImage> {
     }
 
     if (widget.imageProvider is AppNetworkImageWithRetry && _animate) {
-      _withoutFades = _animate =
-          !(await (widget.imageProvider as AppNetworkImageWithRetry)
-              .existInCache());
+      _animate = !(await (widget.imageProvider as AppNetworkImageWithRetry)
+          .existInCache());
+      _withoutFades = !_animate;
     }
 
     widget.imageProvider
@@ -122,6 +122,9 @@ class _AppSafeImageState extends State<AppSafeImage> {
     final color =
         widget.background ?? (isDark ? Colors.black26 : Colors.grey[200]);
 
+    final bgColor =
+        _loaded && !_mayBeTransparent ? Colors.white : Colors.transparent;
+
     return ColoredBox(
       color: color,
       child: Stack(children: <Widget>[
@@ -130,9 +133,9 @@ class _AppSafeImageState extends State<AppSafeImage> {
             color: color,
             icon: Icon(Icons.image, color: Colors.grey[500], size: 44),
           ),
-        if (_mayBeTransparent && _withoutFades)
+        if (_withoutFades)
           ColoredBox(
-            color: _loaded ? Colors.white : Colors.transparent,
+            color: bgColor,
             child: Image(
               fit: widget.fit,
               image: widget.imageProvider,
@@ -144,7 +147,7 @@ class _AppSafeImageState extends State<AppSafeImage> {
             duration: _fadeInDuration,
             curve: Curves.easeIn,
             child: ColoredBox(
-              color: Colors.white,
+              color: bgColor,
               child: Image(
                 fit: widget.fit,
                 image: widget.imageProvider,

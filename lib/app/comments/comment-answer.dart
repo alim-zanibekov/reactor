@@ -128,9 +128,7 @@ class _AppCommentAnswerState extends State<AppCommentAnswer> {
               height: 25,
               padding: const EdgeInsets.only(right: 10),
               child: OutlineButton(
-                highlightedBorderColor: Theme
-                    .of(context)
-                    .accentColor,
+                highlightedBorderColor: Theme.of(context).accentColor,
                 padding: const EdgeInsets.all(3.0),
                 onPressed: () {
                   if (_loading) return;

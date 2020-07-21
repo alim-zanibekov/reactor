@@ -5,7 +5,10 @@ import 'package:dio/dio.dart';
 import '../auth/auth.dart';
 import '../common/pair.dart';
 import '../http/session.dart';
+import '../parsers/comments-parser.dart';
 import '../parsers/content-parser.dart';
+import '../parsers/posts-parser.dart';
+import '../parsers/quiz-parser.dart';
 import '../parsers/stats-parser.dart';
 import '../parsers/tag-parser.dart';
 import '../parsers/types/module.dart';
@@ -14,7 +17,10 @@ import 'types.dart';
 
 class Api {
   static final _api = Api._internal();
+  static final _postsParser = PostsParser();
+  static final _commentsParser = CommentsParser();
   static final _contentParser = ContentParser();
+  static final _quizParser = QuizParser();
   static final _tagParser = TagParser();
   static final _userParser = UserParser();
   static final _sidebarParser = StatsParser();
@@ -71,7 +77,7 @@ class Api {
   Future<Post> loadPost(int id) async {
     final res =
         await _session.get('http://${_prefix}reactor.cc/post/${id.toString()}');
-    return _contentParser.parsePost(id, res.data);
+    return _postsParser.parsePost(id, res.data);
   }
 
   Future<UserFull> loadUserPage(String link) async {
@@ -87,7 +93,7 @@ class Api {
             false)) {
       return ContentPage.empty<Post>();
     }
-    final page = _contentParser.parsePage(res.data);
+    final page = _postsParser.parsePage(res.data);
     if (_auth.authorized && !page.authorized) {
       _auth.logout();
     }
@@ -138,7 +144,7 @@ class Api {
   Future<List<PostComment>> loadComments(int id) async {
     final res =
         await _session.get('http://${_prefix}reactor.cc/post/comments/$id');
-    return _contentParser.parseComments(res.data, id);
+    return _commentsParser.parseComments(res.data, id);
   }
 
   Future<void> setFavorite(int postId, bool state) {
@@ -175,7 +181,7 @@ class Api {
   Future<Post> loadPostContent(int id) async {
     final res = await _session.get(
         'http://${_prefix}reactor.cc/hidden/delete/$id?token=${_session.apiToken}');
-    return _contentParser.parseInner(id, res.data);
+    return _postsParser.parseInner(id, res.data);
   }
 
   Future<ContentPage<ExtendedTag>> loadMainTag(
@@ -225,7 +231,14 @@ class Api {
 
   Future<Response> deleteComment(int commentId) {
     return _session.get(
-      'http://joyreactor.cc/post_comment/delete/$commentId?token=${_session.apiToken}',
+      'http://joyreactor.cc/post_comment/delete/$commentId?token=${_session
+          .apiToken}',
     );
+  }
+
+  Future<Quiz> voteQuiz(int quizId) async {
+    final res = await _session.get(
+        'http://joyreactor.cc/poll/vote/$quizId?token=${_session.apiToken}');
+    return _quizParser.parseQuizResponse(res.data);
   }
 }

@@ -2,6 +2,7 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart' as parser;
 
 import 'types/module.dart';
+import 'utils.dart';
 
 class TagParser {
   ContentPage<ExtendedTag> parsePage(String c) {
@@ -37,10 +38,10 @@ class TagParser {
 
     final nameSplit = tagLink?.text?.split('(') ?? [];
     final name = nameSplit[0]?.trim();
-    final count = _getNumberInt(nameSplit[1]) ?? 0;
+    final count = Utils.getNumberInt(nameSplit[1]) ?? 0;
     final smalls = element.querySelectorAll('.blog_list_name small');
-    final commonRating = _getNumberDouble(smalls[0]?.text?.split('/')[0]);
-    final subscribersCount = _getNumberInt(smalls[1]?.text);
+    final commonRating = Utils.getNumberDouble(smalls[0]?.text?.split('/')[0]);
+    final subscribersCount = Utils.getNumberInt(smalls[1]?.text);
 
     return ExtendedTag(
       name,
@@ -61,38 +62,36 @@ class TagParser {
     final infoMain = blogHeader.querySelectorAll('#blogSubscribers > span');
     final fav = blogHeader.querySelector('#blogFavroiteLinks');
     var image =
-        (blogHeader.querySelector('.blog_avatar')?.attributes ?? {})['src'];
+    (blogHeader
+        .querySelector('.blog_avatar')
+        ?.attributes ?? {})['src'];
 
     if (image != null && image is String && image.startsWith('/'))
       image = 'http://joyreactor.cc$image';
 
-    final tagIdStr = (fav?.querySelector('a')?.attributes ?? {})['href'];
+    final tagIdStr = (fav
+        ?.querySelector('a')
+        ?.attributes ?? {})['href'];
 
     int tagId;
-    if (tagIdStr != null && extractTagIdRegex.hasMatch(tagIdStr)) {
-      tagId = int.tryParse(extractTagIdRegex.firstMatch(tagIdStr).group(1));
+    if (tagIdStr != null && _extractTagIdRegex.hasMatch(tagIdStr)) {
+      tagId = int.tryParse(_extractTagIdRegex.firstMatch(tagIdStr).group(1));
     }
 
     return PageInfo(
       icon: image,
       tagId: tagId,
-      bg: (tagArticle.querySelector('#contentInnerHeader')?.attributes ??
+      bg: (tagArticle
+          .querySelector('#contentInnerHeader')
+          ?.attributes ??
           {})['src'],
-      subscribersCount: _getNumberInt(infoMain[0]?.text),
-      count: _getNumberInt(infoMain[1]?.text) ?? 0,
-      commonRating: _getNumberDouble(infoMain[2]?.text),
+      subscribersCount: Utils.getNumberInt(infoMain[0]?.text),
+      count: Utils.getNumberInt(infoMain[1]?.text) ?? 0,
+      commonRating: Utils.getNumberDouble(infoMain[2]?.text),
       subscribed: fav?.querySelector('.remove_from_fav') != null,
       blocked: fav?.querySelector('.remove_from_unpopular') != null,
     );
   }
 
-  static double _getNumberDouble(String str) =>
-      str != null ? double.tryParse(str.replaceAll(numberRegex, '')) : null;
-
-  static int _getNumberInt(String str) =>
-      str != null ? int.tryParse(str.replaceAll(numberRegex, '')) : null;
-
-  static final numberRegex = RegExp(r'[^\-0-9\.]');
-
-  static final extractTagIdRegex = RegExp(r'\/favorite/[^\/]+\/([0-9]+)');
+  static final _extractTagIdRegex = RegExp(r'\/favorite/[^\/]+\/([0-9]+)');
 }

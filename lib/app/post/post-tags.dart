@@ -49,18 +49,17 @@ class _AppPostTagsState extends State<AppPostTags> {
       alignment: WrapAlignment.start,
       children: <Widget>[
         ..._tags.map(
-              (e) =>
-              Material(
-                type: MaterialType.transparency,
-                child: InkWell(
-                  splashColor: Colors.black12,
-                  borderRadius: BorderRadius.circular(50),
-                  onTap: () {
-                    widget.openTag(e);
-                  },
-                  child: _getChip(e.value),
-                ),
-              ),
+          (e) => Material(
+            type: MaterialType.transparency,
+            child: InkWell(
+              splashColor: Colors.black12,
+              borderRadius: BorderRadius.circular(50),
+              onTap: () {
+                widget.openTag(e);
+              },
+              child: _getChip(e.value),
+            ),
+          ),
         ),
         if (!_opened)
           Material(

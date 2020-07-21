@@ -2,6 +2,7 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart' as parser;
 
 import 'types/module.dart';
+import 'utils.dart';
 
 class StatsParser {
   Stats parse(String c) {
@@ -54,7 +55,7 @@ class StatsParser {
   ExtendedTag _parseTag(Element element) {
     final tagImg = element.querySelector('img');
     final infoBlock = element.querySelector('small');
-    final subscribersDeltaCount = _getNumber(infoBlock?.text);
+    final subscribersDeltaCount = Utils.getNumberInt(infoBlock?.text);
     final link = element.querySelector('a');
     final isDelta = infoBlock?.text?.contains('+');
     var icon = (tagImg?.attributes ?? {})['src'];
@@ -66,8 +67,8 @@ class StatsParser {
       prefix: Tag.parsePrefix((link?.attributes ?? {})['href']),
       link: Tag.parseLink((link?.attributes ?? {})['href']),
       icon: icon,
-      subscribersCount: !isDelta ? subscribersDeltaCount.toInt() : null,
-      subscribersDeltaCount: isDelta ? subscribersDeltaCount.toInt() : null,
+      subscribersCount: !isDelta ? subscribersDeltaCount : null,
+      subscribersDeltaCount: isDelta ? subscribersDeltaCount : null,
     );
   }
 
@@ -97,9 +98,9 @@ class StatsParser {
         if (e.localName == 'div') {
           final href =
               (e.querySelector('a')?.attributes ?? {})['href']?.split('#');
-          final id = _getNumber(href?.last).toInt();
-          final postId = _getNumber(href?.first).toInt();
-          final rating = _getNumber(element.nodes[i + 1]?.text);
+          final id = Utils.getNumberInt(href?.last).toInt();
+          final postId = Utils.getNumberInt(href?.first).toInt();
+          final rating = Utils.getNumberDouble(element.nodes[i + 1]?.text);
           final linkElement =
               (element.nodes[i + 2] as Element)?.querySelector('a');
           final username = linkElement?.text?.trim();
@@ -121,17 +122,20 @@ class StatsParser {
   }
 
   StatsUser _parseUser(Element element) {
-    final username = element.querySelector('a')?.text?.trim();
-    final rating = _getNumber(element.querySelector('.weekrating')?.text);
+    final username = element
+        .querySelector('a')
+        ?.text
+        ?.trim();
+    final rating =
+    Utils.getNumberDouble(element
+        .querySelector('.weekrating')
+        ?.text);
 
     return StatsUser(
       username: username,
       ratingDelta: rating,
     );
   }
-
-  double _getNumber(String str) =>
-      str != null ? double.tryParse(str.replaceAll(numberRegex, '')) : null;
 
   static Element getBlockByName(List<Element> elements, String header) {
     try {

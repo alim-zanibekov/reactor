@@ -72,9 +72,7 @@ class _AppAuthPageState extends State<AppAuthPage> {
                 Container(
                   width: double.infinity,
                   child: OutlineButton(
-                    highlightedBorderColor: Theme
-                        .of(context)
-                        .accentColor,
+                    highlightedBorderColor: Theme.of(context).accentColor,
                     padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                     onPressed: () async {
                       if (_formKey.currentState.validate()) {

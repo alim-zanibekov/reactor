@@ -18,12 +18,14 @@ class AppContent extends StatefulWidget {
   final List<ContentUnit> content;
   final void Function(List<Pair<double, Size>>) onLoad;
   final bool noHorizontalPadding;
+  final List<Widget> children;
 
   const AppContent({
     Key key,
     this.content,
     this.onLoad,
     this.noHorizontalPadding = false,
+    this.children,
   }) : super(key: key);
 
   @override
@@ -34,8 +36,8 @@ class _AppContentState extends State<AppContent> {
   static final _defaultPadding =
       EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0);
   List<Future<OEmbedMetadata>> _futures = [];
-  List<ImageProvider> _images = [];
-  List<ImageProvider> _imagesForGallery;
+  List<AppNetworkImageWithRetry> _images = [];
+  List<AppNetworkImageWithRetry> _imagesForGallery = [];
   List<ContentUnitImage> _undefinedSizeImages;
   int _undefinedSizeImagesCount;
 
@@ -47,27 +49,23 @@ class _AppContentState extends State<AppContent> {
     super.initState();
   }
 
-  _fillGalleryImages() {
-    if (_imagesForGallery == null) {
-      _imagesForGallery = [];
-      int i = 0;
-      for (final entry in widget.content) {
-        if (entry is ContentUnitImage) {
-          if (entry.prettyImageLink != null) {
-            _imagesForGallery.add(AppNetworkImageWithRetry(
-              entry.value,
-              headers: Headers.reactorHeaders,
-            ));
-          } else {
-            _imagesForGallery.add(_images[i]);
-          }
-          i++;
-        }
+  _fillGalleryImage(index) {
+    if (index != null) {
+      List<ContentUnitImage> images = widget.content
+          .where((element) => element is ContentUnitImage)
+          .toList()
+          .cast();
+      if (images[index].prettyImageLink != null &&
+          _imagesForGallery[index].url != images[index].prettyImageLink) {
+        _imagesForGallery[index] = AppNetworkImageWithRetry(
+          images[index].prettyImageLink,
+          headers: Headers.reactorHeaders,
+        );
       }
     }
   }
 
-  _getFutures() {
+  _getFutures() async {
     _images = [];
     _futures = [];
     _undefinedSizeImagesCount = 0;
@@ -110,16 +108,19 @@ class _AppContentState extends State<AppContent> {
       if (_filteredFutures.isNotEmpty) {
         Future.wait(_filteredFutures).then((value) => widget.onLoad(value
             .map(
-              (e) => Pair(
+              (e) =>
+              Pair(
                 16.0 / 9.0,
                 Size(e.width.toDouble(), e.height.toDouble()),
               ),
-            )
+        )
             .toList()));
       } else {
         widget.onLoad([]);
       }
     }
+
+    _imagesForGallery = List.from(_images);
   }
 
   void _onImageInfo(ImageInfo imageInfo, ContentUnitImage image) {
@@ -185,8 +186,11 @@ class _AppContentState extends State<AppContent> {
               : dPadding,
           width: (entry.width ?? 150) < 150 ? entry.width : null,
           child: GestureDetector(
+            onLongPress: () {
+              _fillGalleryImage(currentImageIndex);
+              openImage(context, _imagesForGallery, currentImageIndex);
+            },
             onTap: () {
-              _fillGalleryImages();
               openImage(context, _imagesForGallery, currentImageIndex);
             },
             child: AspectRatio(
@@ -271,9 +275,7 @@ class _AppContentState extends State<AppContent> {
       textStack.clear();
     }
 
-    return Wrap(children: <Widget>[
-      ...newChildren,
-    ]);
+    return Wrap(children: <Widget>[...newChildren, ...(widget.children ?? [])]);
   }
 
   Widget _textArrayToRichText(

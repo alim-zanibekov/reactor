@@ -14,6 +14,7 @@ import '../comments/comments.dart';
 import '../common/future-page.dart';
 import '../common/open.dart';
 import '../content/content.dart';
+import '../extensions/quiz/quiz.dart';
 import '../user/user-short.dart';
 import 'post-controls.dart';
 import 'post-tags.dart';
@@ -64,10 +65,7 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
 
   Color _getColor(int commentId) {
     if (commentId == widget.commentId) {
-      return Theme
-          .of(context)
-          .accentColor
-          .withOpacity(0.2);
+      return Theme.of(context).accentColor.withOpacity(0.2);
     }
     return null;
   }
@@ -77,6 +75,7 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
     AppFuturePageState appFuturePageState = _pageKey.currentState;
     appFuturePageState?.reload(withoutIndicator: true);
   }
+
   Widget _list() {
     List<Widget> children = [];
     List<AppComment> comments;
@@ -121,16 +120,16 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
 
     if (needScroll) {
       needScroll = false;
-      int i = comments.indexWhere((element) =>
-      element.comment.id == widget.commentId);
+      int i = comments
+          .indexWhere((element) => element.comment.id == widget.commentId);
       initialScrollIndex = i + 1;
     }
 
     return ScrollablePositionedList.builder(
       physics: const ClampingScrollPhysics(),
       itemCount: children.length + 1,
-      initialScrollIndex: initialScrollIndex ??
-          (widget.scrollToComments ? 1 : 0),
+      initialScrollIndex:
+      initialScrollIndex ?? (widget.scrollToComments ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == 0) {
           return AppPostContent(
@@ -303,6 +302,21 @@ class _AppPostContentState extends State<AppPostContent>
                 key: ObjectKey(_post),
                 content: _post.content,
                 onLoad: _onLoad,
+                children: _post.quiz != null
+                    ? <Widget>[
+                  Container(
+                    color: _isDark ? Colors.black26 : Colors.grey[300],
+                    height: 1,
+                  ),
+                  AppQuiz(
+                    quiz: _post.quiz,
+                    quizUpdated: (quiz) {
+                      _post.quiz = quiz;
+                      if (mounted) setState(() => null);
+                    },
+                  )
+                ]
+                    : null,
               ),
             )
           else

@@ -13,11 +13,11 @@ InAppWebViewGroupOptions inAppWebViewDefaultOptions() =>
         useShouldOverrideUrlLoading: true,
         verticalScrollBarEnabled: false,
         javaScriptEnabled: true,
-        supportZoom: false
+        supportZoom: false,
       ),
       android: AndroidInAppWebViewOptions(
         allowContentAccess: true,
         supportMultipleWindows: false,
-        allowFileAccess: true
+        allowFileAccess: true,
       ),
     );

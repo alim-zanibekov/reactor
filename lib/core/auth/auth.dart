@@ -10,12 +10,11 @@ import '../external/sentry.dart';
 import '../http/session.dart';
 import 'types.dart';
 
-StreamController<bool> _authState = StreamController<bool>.broadcast();
-
 class Auth {
   static final Auth _auth = Auth._internal();
   static final Session _session = Session();
   static final SentryReporter _sentryReporter = SentryReporter();
+  static final _authState = StreamController<bool>.broadcast();
 
   factory Auth() {
     return _auth;

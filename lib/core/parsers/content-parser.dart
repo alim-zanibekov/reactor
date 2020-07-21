@@ -3,310 +3,11 @@ import 'package:html/parser.dart' as parser;
 
 import './types/module.dart';
 import '../common/pair.dart';
-import 'tag-parser.dart';
 
 class ContentParser {
-  Post parsePost(int id, String c) {
-    final parsedPage = parser.parse(c);
-    return _parse(id, parsedPage.querySelector('.postContainer'), true);
-  }
-
-  Post parseInner(int id, String c) {
-    final parsedPage = parser.parse(c);
-    return _parse(id, parsedPage.body, false);
-  }
-
-  Post _parse(int id, Element parsedPage, bool parseComments) {
-    final tags = _parseTags(parsedPage);
-    final contentBlock = parsedPage.querySelector('.post_content');
-    List<ContentUnit> content = [];
-    bool censored = false;
-    if (contentBlock == null) {
-      censored = _isCensored(parsedPage);
-    } else {
-      content = _parseContent(contentBlock);
-    }
-    final footer = parsedPage.querySelector('.ufoot');
-
-    final ratingContainer = footer.querySelector('.post_rating');
-
-    final rating = _parseRating(ratingContainer);
-    final votedUp =
-        ratingContainer.querySelector('.vote-minus.vote-change') != null;
-    final votedDown =
-        ratingContainer.querySelector('.vote-plus.vote-change') != null;
-    final canVote = ratingContainer.querySelector('.vote-plus') != null;
-    final comments = parseComments ? _parseComments(parsedPage, id) : null;
-    final bestComment = _parseBestCommentElement(parsedPage, id);
-    final user = _parseUser(parsedPage);
-    final dateTime = _parseDate(parsedPage);
-    final favorite = _parseFavorite(parsedPage);
-    final commentsCount = int.parse(parsedPage
-        .querySelector('.toggleComments')
-        .text
-        .replaceAll(RegExp(r'[^0-9]+'), ''));
-
-    final hidden =
-        (footer.querySelector('.hidden_link a')?.attributes ?? {})['href']
-            ?.contains('delete');
-
-    final unsafe = contentBlock?.children?.length == 1 &&
-        ((contentBlock.children[0]?.attributes ?? {})['src']
-                ?.contains('unsafe') ??
-            false);
-
-    return Post(
-      id: id,
-      censored: censored,
-      tags: tags,
-      content: content,
-      rating: rating,
-      favorite: favorite,
-      comments: comments,
-      user: user,
-      hidden: hidden ?? false,
-      votedUp: votedUp,
-      votedDown: votedDown,
-      canVote: canVote,
-      dateTime: dateTime,
-      unsafe: unsafe,
-      commentsCount: commentsCount,
-      bestComment: bestComment,
-    );
-  }
-
-  ContentPage<Post> parsePage(String c) {
-    final parsedPage = parser.parse(c);
-    final current = parsedPage.querySelector('.pagination_expanded .current');
-    final pageId = current != null
-        ? int.tryParse(
-              parsedPage.querySelector('.pagination_expanded .current')?.text,
-            ) ??
-            0
-        : 0;
-
-    final pageInfo =
-        TagParser.parsePageInfo(parsedPage.getElementById('tagArticle'));
-
-    return ContentPage<Post>(
-      authorized: parsedPage.querySelector('#topbar .login #settings') != null,
-      pageInfo: pageInfo,
-      isLast: pageId <= 1,
-      content: parsedPage
-          .querySelectorAll('.postContainer')
-          .map((e) {
-        final id = int.tryParse(
-            e.attributes['id'].replaceAll('postContainer', ''));
-        return _parse(id ?? 0, e, false);
-      })
-          .where((element) => element != null)
-          .toList(),
-      id: pageId,
-    );
-  }
-
   List<ContentUnit> parseContent(String c) {
     final parsedPage = parser.parse(c);
-    return _parseContent(parsedPage.body);
-  }
-
-  List<PostComment> parseComments(String c, int postId) {
-    final parsedPage = parser.parse(c);
-    return _parseCommentsElement(
-        parsedPage.querySelector('.comment_list_post'), postId);
-  }
-
-  bool _isCensored(Element parsedPage) {
-    final img = parsedPage.querySelector('.post_top > img');
-    return img != null && img.attributes['alt'] == 'Censorship';
-  }
-
-  List<Tag> _parseTags(Element parsedPage) {
-    final tags = parsedPage.querySelectorAll('.taglist a');
-    return tags.map((tag) {
-      final attributes = tag?.attributes ?? {};
-
-      final value = tag.text;
-      return Tag(
-        value,
-        isMain: Tag.parseIsMain(attributes['href']),
-        prefix: Tag.parsePrefix(attributes['href']),
-        link: Tag.parseLink(attributes['href']),
-      );
-    }).toList();
-  }
-
-  UserShort _parseUser(Element parsedPage) {
-    final nick = parsedPage.querySelector('.uhead_nick');
-    final img = nick?.querySelector('img');
-    final avatar = img.attributes['src'];
-    final username = img.attributes['alt'];
-    final userLink =
-        (nick?.querySelector('a')?.attributes ?? {})['href']?.split('/')?.last;
-    return UserShort(avatar: avatar, username: username, link: userLink);
-  }
-
-  bool _parseFavorite(Element parsedPage) {
-    final favorite = parsedPage.querySelector('.favorite_link');
-    if (favorite != null) {
-      return favorite.classes.contains('favorite');
-    }
-    return false;
-  }
-
-  DateTime _parseDate(Element parsedPage) {
-    final date = parsedPage.querySelector('.date > span');
-    final timestamp = int.parse(date.attributes['data-time']);
-    return DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
-  }
-
-  double _parseRating(Element ratingContainer) {
-    if (ratingContainer != null) {
-      final text = ratingContainer.text.trim();
-      return text == '--' ? null : double.tryParse(text);
-    }
-    return null;
-  }
-
-  List<PostComment> _parseComments(Element parsedPage, int postId) {
-    final commentsContainer =
-        parsedPage.querySelector('.ufoot .comment_list_post');
-    return _parseCommentsElement(commentsContainer, postId);
-  }
-
-  PostComment _parseBestCommentElement(Element parsedPage, int postId) {
-    final commentsContainer =
-        parsedPage.querySelector('.post_top .post_comment_list');
-    if (commentsContainer != null) {
-      final comments = commentsContainer.children;
-      final parent = CommentParent();
-      HasChildren last = parent;
-      int i = 0;
-      if (comments.isNotEmpty) {
-        comments[0].firstChild.remove();
-        comments.forEach((element) {
-          final comment = _parseBestComment(element, i++, postId);
-          last.children.add(comment);
-          last = comment;
-        });
-        return parent.children[0];
-      }
-    }
-    return null;
-  }
-
-  List<PostComment> _parseCommentsElement(
-      Element commentsContainer, int postId) {
-    PostComment last;
-    final parent = CommentParent();
-    List<HasChildren> stack = [parent];
-    List<Pair<int, Element>> elementsStack =
-        commentsContainer.children.reversed.map((e) => Pair(0, e)).toList();
-    while (elementsStack.isNotEmpty) {
-      final pair = elementsStack.removeLast();
-      final child = pair.right;
-      if (pair.left != stack.length - 1) {
-        while (stack.length > 0 && stack.length - 1 != pair.left) {
-          stack.removeLast();
-        }
-      }
-
-      if (child.classes.contains('comment')) {
-        final comment = _parseComment(child, pair.left, postId);
-        last = comment;
-        stack.last.children.add(comment);
-      } else if (child.classes.contains('comment_list') &&
-          child.children.isNotEmpty) {
-        elementsStack
-            .addAll(child.children.reversed.map((e) => Pair(stack.length, e)));
-        stack.add(last);
-      }
-    }
-
-    return parent.children;
-  }
-
-  PostComment _parseComment(Element element, int depth, int postId) {
-    final time = DateTime.fromMillisecondsSinceEpoch(
-        int.parse(element.attributes['timestamp']) * 1000);
-    final bottom = element.querySelector('.comments_bottom');
-    final avatarElement = bottom.querySelector('.avatar');
-    final id = int.parse(element.attributes['id'].replaceFirst('comment', ''));
-    final creatorId = int.parse(element?.attributes['userid']);
-    final ratingText = bottom.querySelector('.comment_rating')?.text;
-    final avatar = avatarElement?.attributes['src'];
-    final username = avatarElement?.attributes['alt'];
-    final hidden = element.querySelector('.comment_show') != null;
-    final usernameElement = bottom.querySelector('.comment_username');
-    final userLink =
-        (usernameElement?.attributes ?? {})['href']?.split('/')?.last;
-
-    final votedUp = bottom.querySelector('.vote-minus.vote-change') != null;
-    final votedDown = bottom.querySelector('.vote-plus.vote-change') != null;
-    final canVote = bottom.querySelector('.vote-plus') != null;
-
-    return PostComment(
-      id: id,
-      postId: postId,
-      votedUp: votedUp ?? false,
-      votedDown: votedDown ?? false,
-      canVote: canVote ?? false,
-      time: time,
-      rating: double.tryParse(ratingText?.trim() ?? ''),
-      hidden: hidden,
-      user: UserShort(
-        id: creatorId,
-        avatar: avatar,
-        username: username,
-        link: userLink,
-      ),
-      content: !hidden ? _parseContent(element.querySelector('.txt')) : null,
-      depth: depth,
-    );
-  }
-
-  PostComment _parseBestComment(Element element, int depth, int postId) {
-    final bottom = element.querySelector('.comments_bottom');
-    final avatarElement = bottom.querySelector('.avatar');
-    final timestampString = bottom
-        .querySelector('.comment_date')
-        ?.children[0]
-        ?.attributes['data-time'];
-    final time = timestampString != null
-        ? DateTime.fromMillisecondsSinceEpoch(int.parse(timestampString) * 1000)
-        : DateTime.now();
-    final id = int.parse(
-        (element.querySelector('.comment_link')?.attributes ?? {})['href']
-                ?.split('#comment')
-                ?.last ??
-            '');
-    final creatorId = null;
-    final ratingText = bottom.querySelector('.post_rating')?.text?.trim();
-    final avatar = avatarElement?.attributes['src'];
-    final username = avatarElement?.attributes['alt'];
-    final hidden = element.querySelector('.comment_show') != null;
-    final usernameElement = bottom.querySelector('.comment_username');
-    final userLink =
-        (usernameElement?.attributes ?? {})['href']?.split('/')?.last;
-
-    return PostComment(
-      id: id,
-      time: time,
-      postId: postId,
-      votedUp: false,
-      votedDown: false,
-      canVote: false,
-      rating: double.tryParse(ratingText?.replaceAll('+', '')?.trim() ?? ''),
-      hidden: hidden,
-      user: UserShort(
-        id: creatorId,
-        avatar: avatar,
-        username: username,
-        link: userLink,
-      ),
-      content: !hidden ? _parseContent(element) : null,
-      depth: depth,
-    );
+    return parse(parsedPage.body);
   }
 
   ContentUnit _parseImage(Element element) {
@@ -342,7 +43,7 @@ class ContentParser {
       );
     } else if (youTubeVideo != null) {
       return ContentUnitYouTubeVideo(
-        youtubeRegex.firstMatch(youTubeVideo.attributes['src']).group(1),
+        _youtubeRegex.firstMatch(youTubeVideo.attributes['src']).group(1),
       );
     } else if (coub) {
       return (ContentUnitCoubVideo(iFrame.attributes['src']));
@@ -356,13 +57,8 @@ class ContentParser {
       if (height == null || width == null) {
         width = height = null;
       }
-      return ContentUnitImage(
-        image.attributes['src'],
-        width,
-        height,
-        prettyImageLink:
-        prettyPhoto != null ? prettyPhoto.attributes['href'] : null,
-      );
+      return ContentUnitImage(image.attributes['src'], width, height,
+          prettyImageLink: (prettyPhoto?.attributes ?? {})['href']);
     }
     return null;
   }
@@ -387,7 +83,7 @@ class ContentParser {
     }
   }
 
-  List<ContentUnit> _parseContent(Element content) {
+  List<ContentUnit> parse(Element content) {
     List<ContentUnit> result = [];
     List<Pair<int, Object>> nodes = content.nodes.reversed
         .map<Pair<int, Object>>((e) => Pair(0, e))
@@ -417,6 +113,7 @@ class ContentParser {
         Element element = node;
         if (element.classes.contains('comments_bottom') ||
             element.classes.contains('mainheader') ||
+            element.classes.contains('post_poll_holder') ||
             element.classes.contains('blog_results')) {
           continue;
         }
@@ -488,9 +185,9 @@ class ContentParser {
         final style = _extractStyles(styles.map((e) => e.right).toList());
 
         if (link != null) {
-          if (redirectRegex.hasMatch(link)) {
+          if (_redirectRegex.hasMatch(link)) {
             link = Uri.decodeQueryComponent(
-                redirectRegex.firstMatch(link).group(1));
+                _redirectRegex.firstMatch(link).group(1));
           }
           result.add(ContentUnitLink(
             text,
@@ -512,7 +209,8 @@ class ContentParser {
       bool res = e is! ContentUnitBreak ||
           (e is ContentUnitBreak &&
                   (e.value == ContentBreak.BLOCK_BREAK &&
-                      prev.value != e.value) ||
+                      prev.value != e.value &&
+                      prev.value != ContentBreak.LINEBREAK) ||
               e.value == ContentBreak.LINEBREAK);
       prev = e;
       return res;
@@ -540,16 +238,15 @@ class ContentParser {
     return answer;
   }
 
-  static final youtubeRegex = RegExp(
+  static final _youtubeRegex = RegExp(
     r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})',
     caseSensitive: false,
   );
 
-  static final redirectRegex = RegExp(
+  static final _redirectRegex = RegExp(
     r'(?:https?)?:?\/\/(?:joy|[^\/\.]+\.)?reactor.cc\/redirect\?url=([^\&]+)',
     caseSensitive: false,
   );
-
   static const List<String> BLOCK_NODES = [
     'p',
     'div',

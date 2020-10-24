@@ -5,14 +5,14 @@ import 'package:package_info/package_info.dart';
 import 'package:sentry/sentry.dart';
 
 class SentryReporter {
-  static final SentryReporter _sentryReporter = SentryReporter.internal();
+  static final SentryReporter _sentryReporter = SentryReporter._internal();
   static final DateTime _startTime = DateTime.now();
 
   factory SentryReporter() {
     return _sentryReporter;
   }
 
-  SentryReporter.internal();
+  SentryReporter._internal();
 
   final SentryClient _sentry = SentryClient(
     dsn:
@@ -26,6 +26,7 @@ class SentryReporter {
   Future init() async {
     final deviceInfo = DeviceInfoPlugin();
     final packageInfo = await PackageInfo.fromPlatform();
+
     String appHash;
     Device device;
     if (Platform.isAndroid) {

@@ -116,12 +116,12 @@ class PageInfo extends ExtendedTag {
     this.blocked = false,
     this.subscribed = false,
   }) : super(
-    null,
-    icon: icon,
-    count: count,
-    subscribersCount: subscribersCount,
-    commonRating: commonRating,
-  );
+          null,
+          icon: icon,
+          count: count,
+          subscribersCount: subscribersCount,
+          commonRating: commonRating,
+        );
 }
 
 class ContentPage<T> {
@@ -176,7 +176,8 @@ class Post {
     return 'http://joyreactor.cc/post/$id';
   }
 
-  Post({this.id,
+  Post({
+    this.id,
     this.tags,
     this.content,
     this.rating,
@@ -192,7 +193,8 @@ class Post {
     this.votedDown = false,
     this.votedUp = false,
     this.censored,
-    this.quiz});
+    this.quiz,
+  });
 }
 
 class PostComment implements HasChildren<PostComment> {

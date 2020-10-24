@@ -106,6 +106,24 @@ class _AppSafeImageState extends State<AppSafeImage> {
     }
   }
 
+  Widget buildImage(Color bgColor, Color outerBgColor) {
+    return Container(
+      decoration: BoxDecoration(
+        color: bgColor,
+        border: Border.symmetric(
+          vertical: BorderSide(
+            width: 0,
+            color: Colors.black,
+          ),
+        ),
+      ),
+      child: Image(
+        fit: widget.fit,
+        image: widget.imageProvider,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_error) {
@@ -134,25 +152,13 @@ class _AppSafeImageState extends State<AppSafeImage> {
             icon: Icon(Icons.image, color: Colors.grey[500], size: 44),
           ),
         if (_withoutFades)
-          ColoredBox(
-            color: bgColor,
-            child: Image(
-              fit: widget.fit,
-              image: widget.imageProvider,
-            ),
-          )
+          buildImage(bgColor, color)
         else
           AnimatedOpacity(
             opacity: _animate ? 0 : 1,
             duration: _fadeInDuration,
             curve: Curves.easeIn,
-            child: ColoredBox(
-              color: bgColor,
-              child: Image(
-                fit: widget.fit,
-                image: widget.imageProvider,
-              ),
-            ),
+            child: buildImage(bgColor, color),
           )
       ], fit: StackFit.expand),
     );

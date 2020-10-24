@@ -30,8 +30,10 @@ class ContentUnitImage extends ContentUnit<String> {
 class ContentUnitGif extends ContentUnit<String> {
   double width;
   double height;
+  String gifUrl;
 
-  ContentUnitGif(String value, this.width, this.height) : super(value);
+  ContentUnitGif(String value, this.width, this.height, {this.gifUrl})
+      : super(value);
 }
 
 class ContentUnitYouTubeVideo extends ContentUnit<String> {

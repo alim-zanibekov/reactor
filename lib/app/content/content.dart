@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../core/common/metadata.dart';
 import '../../core/common/pair.dart';
 import '../../core/common/retry-network-image.dart';
+import '../../core/common/save-file.dart';
 import '../../core/parsers/types/module.dart';
 import '../../core/widgets/safe-image.dart';
 import '../../variables.dart';
@@ -107,13 +108,10 @@ class _AppContentState extends State<AppContent> {
     if (widget.onLoad != null && _undefinedSizeImages.isEmpty) {
       if (_filteredFutures.isNotEmpty) {
         Future.wait(_filteredFutures).then((value) => widget.onLoad(value
-            .map(
-              (e) =>
-              Pair(
-                16.0 / 9.0,
-                Size(e.width.toDouble(), e.height.toDouble()),
-              ),
-        )
+            .map((e) => Pair(
+                  16.0 / 9.0,
+                  Size(e.width.toDouble(), e.height.toDouble()),
+                ))
             .toList()));
       } else {
         widget.onLoad([]);
@@ -179,41 +177,19 @@ class _AppContentState extends State<AppContent> {
       }
 
       if (entry is ContentUnitImage) {
-        final currentImageIndex = imagesIndex;
         newChildren.add(Container(
           margin: (entry.width ?? 150) >= 150
               ? dPadding.copyWith(left: 0, right: 0)
               : dPadding,
           width: (entry.width ?? 150) < 150 ? entry.width : null,
-          child: GestureDetector(
-            onLongPress: () {
-              _fillGalleryImage(currentImageIndex);
-              openImage(context, _imagesForGallery, currentImageIndex);
-            },
-            onTap: () {
-              openImage(context, _imagesForGallery, currentImageIndex);
-            },
-            child: AspectRatio(
-              aspectRatio: (entry.width != null && entry.height != null)
-                  ? entry.width / entry.height
-                  : 9.0 / 16.0,
-              child: AppSafeImage(
-                imageProvider: _images[currentImageIndex],
-                onInfo: (e) => _onImageInfo(e, entry),
-              ),
-            ),
-          ),
+          child: _buildImage(entry, context, imagesIndex),
         ));
-
         imagesIndex++;
       }
       if (entry is ContentUnitGif) {
         newChildren.add(Padding(
           padding: dPadding.copyWith(left: 0, right: 0),
-          child: AppVideoPlayer(
-              key: ObjectKey(entry),
-              aspectRatio: entry.width / entry.height,
-              url: entry.value),
+          child: _buildGif(entry, context),
         ));
       }
       if (entry is ContentUnitYouTubeVideo) {
@@ -276,6 +252,99 @@ class _AppContentState extends State<AppContent> {
     }
 
     return Wrap(children: <Widget>[...newChildren, ...(widget.children ?? [])]);
+  }
+
+  Widget _buildGif(ContentUnitGif entry, BuildContext context) {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+    Offset pos = Offset.zero;
+    return GestureDetector(
+      onLongPress: () {
+        showMenu(
+          position: RelativeRect.fromRect(
+              pos & Size(40, 40), // smaller rect, the touch area
+              Offset.zero & overlay.size // Bigger rect, the entire screen
+              ),
+          context: context,
+          items: [
+            if (entry.gifUrl != null)
+              PopupMenuItem(
+                child: Text("Скачать как гиф"),
+                value: 1,
+              ),
+            PopupMenuItem(
+              child: Text("Скачать как видео"),
+              value: 2,
+            ),
+          ],
+          elevation: 8.0,
+        ).then<void>((dynamic delta) async {
+          if (delta != null) {
+            final url = (delta == 1) ? entry.gifUrl : entry.value;
+            SaveFile.downloadAndSave(context, url);
+          }
+        });
+      },
+      onTapDown: (TapDownDetails e) {
+        pos = e.globalPosition;
+      },
+      child: AppVideoPlayer(
+        key: ObjectKey(entry),
+        aspectRatio: entry.width / entry.height,
+        url: entry.value,
+      ),
+    );
+  }
+
+  Widget _buildImage(ContentUnitImage image, BuildContext context, int index) {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+    Offset pos = Offset.zero;
+    return GestureDetector(
+      onLongPress: () {
+        showMenu(
+          position: RelativeRect.fromRect(
+            pos & Size(40, 40), // smaller rect, the touch area
+            Offset.zero & overlay.size, // Bigger rect, the entire screen
+          ),
+          context: context,
+          items: [
+            PopupMenuItem(
+              child: Text("Открыть в хорошем качестве"),
+              value: 1,
+            ),
+            PopupMenuItem(
+              child: Text("Скачать"),
+              value: 2,
+            ),
+          ],
+          elevation: 8.0,
+        ).then<void>((dynamic delta) {
+          if (delta == 1) {
+            _fillGalleryImage(index);
+            openImage(context, _imagesForGallery, index);
+          } else if (delta == 2) {
+            SaveFile.downloadAndSave(
+              context,
+              image.prettyImageLink ?? image.value,
+            );
+          }
+        });
+      },
+      onTapDown: (TapDownDetails e) {
+        pos = e.globalPosition;
+      },
+      onTap: () {
+        openImage(context, _imagesForGallery, index);
+      },
+      child: AspectRatio(
+        aspectRatio: (image.width != null && image.height != null)
+            ? image.width / image.height
+            : 9.0 / 16.0,
+        child: AppSafeImage(
+          imageProvider: _images[index],
+          onInfo: (e) => _onImageInfo(e, image),
+        ),
+      ),
+    );
   }
 
   Widget _textArrayToRichText(

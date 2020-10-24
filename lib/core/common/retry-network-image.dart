@@ -20,8 +20,12 @@ class AppNetworkImageWithRetry extends AdvancedNetworkImage {
   static DiskCache _diskCache;
 
   @override
-  Future<bool> evict({ImageCache cache,
-    ImageConfiguration configuration = ImageConfiguration.empty}) async {
+  Future<bool> evict({
+    ImageCache cache,
+    ImageConfiguration configuration = ImageConfiguration.empty,
+    bool memory = true,
+    bool disk = false,
+  }) async {
     return DiskCache().evict(this.url.hashCode.toString());
   }
 

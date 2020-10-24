@@ -67,11 +67,10 @@ class _AppPostTagsState extends State<AppPostTags> {
             child: InkWell(
               splashColor: Colors.black12,
               borderRadius: BorderRadius.circular(50),
-              onTap: () =>
-                  setState(() {
-                    _opened = true;
-                    _tags = widget.tags;
-                  }),
+              onTap: () => setState(() {
+                _opened = true;
+                _tags = widget.tags;
+              }),
               child: _getChip('...'),
             ),
           ),

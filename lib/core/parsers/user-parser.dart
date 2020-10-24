@@ -71,15 +71,15 @@ class UserParser {
     final profileBlock = StatsParser.getBlockByName(sidebarBlocks, 'Профиль');
     final profileText = profileBlock?.text ?? '';
     final bestPostCount =
-    int.tryParse(_bestCountRegex.firstMatch(profileText)?.group(1) ?? '');
+        int.tryParse(_bestCountRegex.firstMatch(profileText)?.group(1) ?? '');
     final goodPostCount =
-    int.tryParse(_goodCountRegex.firstMatch(profileText)?.group(1) ?? '');
+        int.tryParse(_goodCountRegex.firstMatch(profileText)?.group(1) ?? '');
     final postCount =
-    int.tryParse(_postsCountRegex.firstMatch(profileText)?.group(1) ?? '');
+        int.tryParse(_postsCountRegex.firstMatch(profileText)?.group(1) ?? '');
     final commentsCount = int.tryParse(
         _commentsCountRegex.firstMatch(profileText)?.group(1) ?? '');
     final daysCount =
-    int.tryParse(_daysCountRegex.firstMatch(profileText)?.group(1) ?? '');
+        int.tryParse(_daysCountRegex.firstMatch(profileText)?.group(1) ?? '');
     final lastEnterArr = _lastEnterRegex.firstMatch(profileText)?.group(1);
     DateTime lastEnter;
     if (lastEnterArr != null) {

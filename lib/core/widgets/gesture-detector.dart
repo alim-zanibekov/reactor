@@ -98,7 +98,7 @@ class _MatrixGestureDetectorState extends State<MatrixGestureDetector> {
     _translationUpdater.value = details.localFocalPoint;
     _scaleUpdater.value = 1.0;
 
-    _velocityTracker = VelocityTracker();
+    _velocityTracker = VelocityTracker.withKind(PointerDeviceKind.touch);
     if (widget.onStart != null) {
       widget.onStart(MatrixGestureDetectorDetails(
         position: details.localFocalPoint,

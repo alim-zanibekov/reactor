@@ -6,7 +6,7 @@ import '../../core/parsers/link-parser.dart';
 import '../../core/parsers/types/module.dart';
 import '../image-gallery/image-gallery.dart';
 import '../page/posts-page.dart';
-import '../post/post.dart';
+import '../post/post-page.dart';
 import '../user/user-page.dart';
 
 final _duration = const Duration(milliseconds: 200);

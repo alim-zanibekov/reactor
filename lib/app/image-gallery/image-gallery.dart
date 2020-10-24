@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
 import '../../core/common/retry-network-image.dart';
-import '../../core/common/save-image.dart';
+import '../../core/common/save-file.dart';
 import '../../core/common/value-updater.dart';
 import '../../core/widgets/gesture-detector.dart';
 import '../../core/widgets/safe-image.dart';
@@ -298,7 +298,7 @@ class _ImageGalleryState extends State<ImageGallery>
         final url =
             (_activeImage.imageProvider as AppNetworkImageWithRetry).url;
         try {
-          await SaveImage.saveImage(url, rawBytes);
+          await SaveFile.save(url, rawBytes);
           Scaffold.of(context).showSnackBar(
             const SnackBar(content: Text('Сохранено')),
           );

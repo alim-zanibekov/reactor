@@ -17,7 +17,7 @@ class Session {
   bool _sfw = false;
 
   Dio _dio;
-  Map<String, dynamic> headers;
+  Map<String, dynamic> _headers;
 
   void setToken(String token) {
     _authToken = token;
@@ -45,9 +45,9 @@ class Session {
       cookie += (_authToken != null ? ';' : '') + 'sfw=1';
     }
     if (cookie.length > 0) {
-      headers = {HttpHeaders.cookieHeader: cookie};
+      _headers = {HttpHeaders.cookieHeader: cookie};
     } else {
-      headers = null;
+      _headers = null;
     }
   }
 
@@ -56,7 +56,7 @@ class Session {
   }
 
   Future<Response> get(String url) async {
-    final res = await _dio.get(url, options: Options(headers: headers));
+    final res = await _dio.get(url, options: Options(headers: _headers));
     if (url.contains('reactor.cc') &&
         res.data is String &&
         _authToken != null) {
@@ -84,7 +84,7 @@ class Session {
         validateStatus: (status) {
           return status < 400;
         },
-        headers: headers,
+        headers: _headers,
       ),
     );
   }

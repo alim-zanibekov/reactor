@@ -32,19 +32,26 @@ class AppComment extends StatefulWidget {
   _AppCommentState createState() => _AppCommentState();
 }
 
-class _AppCommentState extends State<AppComment> {
+class _AppCommentState extends State<AppComment>
+    with SingleTickerProviderStateMixin {
   static final _auth = Auth();
   bool _loading = false;
   Widget content;
   bool _showAnswer = false;
+  AnimationController _controller;
+  Animation<double> _heightFactor;
 
   @override
   void initState() {
     super.initState();
+    _controller =
+        AnimationController(duration: Duration(milliseconds: 150), vsync: this);
+    _heightFactor = _controller.drive(CurveTween(curve: Curves.easeIn));
   }
 
   @override
   void dispose() {
+    _controller.dispose();
     super.dispose();
   }
 
@@ -125,6 +132,11 @@ class _AppCommentState extends State<AppComment> {
               setState(() {
                 _showAnswer = !_showAnswer;
               });
+              if (_showAnswer) {
+                _controller.forward();
+              } else {
+                _controller.reverse();
+              }
             },
             child: const Text(
               'Ответить',
@@ -267,18 +279,30 @@ class _AppCommentState extends State<AppComment> {
               padding: EdgeInsets.only(left: 15.0 * depth),
             )
           ]),
-        if (_auth.authorized && widget.showAnswer && _showAnswer)
-          AppCommentAnswer(
-            key: ValueKey(widget.comment.id.toString() + 'answer'),
-            onSend: () {
-              _showAnswer = false;
-              if (widget.onSend != null) {
-                widget.onSend();
-              } else {
-                setState(() {});
-              }
+        if (_auth.authorized && widget.showAnswer)
+          AnimatedBuilder(
+            animation: _controller.view,
+            builder: (context, child) {
+              return ClipRect(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  heightFactor: _heightFactor.value,
+                  child: child,
+                ),
+              );
             },
-            comment: widget.comment,
+            child: AppCommentAnswer(
+              key: ValueKey(widget.comment.id.toString() + 'answer'),
+              onSend: () {
+                _showAnswer = false;
+                if (widget.onSend != null) {
+                  widget.onSend();
+                } else {
+                  setState(() {});
+                }
+              },
+              comment: widget.comment,
+            ),
           )
       ],
     );

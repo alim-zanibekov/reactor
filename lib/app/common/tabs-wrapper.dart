@@ -42,6 +42,7 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
   double _appBarHeight = 100;
   double _minAppBarHeight = 48;
   double _maxAppBarHeight = 100;
+  double _statusBarHeight = 0;
   TabController _tabController;
   List<_ReloadNotifier> _reloadNotifiers;
 
@@ -93,28 +94,39 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      initialIndex: widget.initialIndex ?? 0,
-      length: widget.tabs.length,
-      child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(_appBarHeight),
-          child: buildAppBar(context),
-        ),
-        body: TabBarView(
-          controller: _tabController,
-          children: widget.tabs
-              .asMap()
-              .map((index, e) => MapEntry(
-                    index,
-                    widget.builder(
-                        context, index, _scrollUpdate, _reloadNotifiers[index]),
-                  ))
-              .values
-              .toList(),
-        ),
-      ),
-    );
+    if (_statusBarHeight == 0) {
+      final double statusBarHeight = MediaQuery.of(context).padding.top;
+      _statusBarHeight = statusBarHeight;
+    }
+
+    return new Container(
+        padding: new EdgeInsets.only(top: _statusBarHeight),
+        color: Theme.of(context).primaryColor,
+        child: DefaultTabController(
+          initialIndex: widget.initialIndex ?? 0,
+          length: widget.tabs.length,
+          child: Scaffold(
+            primary: false,
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(_appBarHeight),
+              child: buildAppBar(context),
+            ),
+            body: TabBarView(
+              controller: _tabController,
+              children: widget.tabs
+                  .asMap()
+                  .map((index, e) => MapEntry(
+                        index,
+                        widget.builder(context, index, _scrollUpdate,
+                            _reloadNotifiers[index]),
+                      ))
+                  .values
+                  .toList(),
+            ),
+          ),
+        ));
+
+//    return ;
   }
 
   AppBar buildAppBar(BuildContext context) {
@@ -130,10 +142,11 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
     );
 
     Widget leading;
+    final offset = Offset(0, (_appBarHeight - _maxAppBarHeight) * 1.5);
 
     if (Navigator.canPop(context) && !widget.main) {
       leading = Transform.translate(
-        offset: Offset(0, -(_maxAppBarHeight - _appBarHeight) * 1.5),
+        offset: offset,
         child: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
@@ -142,15 +155,16 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
     }
 
     return AppBar(
+      primary: false,
       automaticallyImplyLeading: false,
       leading: leading,
       title: Transform.translate(
-        offset: Offset(0, -(_maxAppBarHeight - _appBarHeight) * 1.5),
+        offset: offset,
         child: Text(widget.title ?? ''),
       ),
       actions: <Widget>[
         Transform.translate(
-          offset: Offset(0, -(_maxAppBarHeight - _appBarHeight) * 1.5),
+          offset: offset,
           child: Row(children: <Widget>[
             reloadButton,
             if (widget.actions != null) ...widget.actions.map((e) => e)

@@ -30,6 +30,7 @@ class ContentParser {
     final prettyPhoto = element.querySelector('.prettyPhotoLink');
 
     if (gif.isNotEmpty) {
+      final href = element.querySelector('.video_gif_source');
       final width = double.parse(gif.first.parentNode.attributes['width']);
       final height = double.parse(gif.first.parentNode.attributes['height']);
       final src = gif.map((e) => e.attributes['src']).toList();
@@ -37,10 +38,8 @@ class ContentParser {
       final srcMp4 = src.indexWhere((e) => e.toLowerCase().endsWith('mp4'));
 
       return ContentUnitGif(
-        srcMp4 != -1 ? src[srcMp4] : src[srcWebm],
-        width,
-        height,
-      );
+          srcMp4 != -1 ? src[srcMp4] : src[srcWebm], width, height,
+          gifUrl: href?.attributes['href']);
     } else if (youTubeVideo != null) {
       return ContentUnitYouTubeVideo(
         _youtubeRegex.firstMatch(youTubeVideo.attributes['src']).group(1),

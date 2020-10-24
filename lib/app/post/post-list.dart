@@ -16,13 +16,13 @@ class AppPostList extends StatefulWidget {
   final PostLoader loader;
   final ChangeNotifier reloadNotifier;
 
-  AppPostList(
-      {Key key,
-      @required this.loader,
-      this.reloadNotifier,
-      this.pageStorageKey,
-      this.onScrollChange})
-      : super(key: key);
+  AppPostList({
+    Key key,
+    @required this.loader,
+    this.reloadNotifier,
+    this.pageStorageKey,
+    this.onScrollChange,
+  }) : super(key: key);
 
   @override
   _AppPostListState createState() => _AppPostListState();

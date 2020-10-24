@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 
@@ -26,6 +27,7 @@ class Api {
   static final _sidebarParser = StatsParser();
   static final _session = Session();
   static final _auth = Auth();
+  static final _dio = Dio();
   String _prefix = 'joy';
 
   factory Api() {
@@ -231,8 +233,7 @@ class Api {
 
   Future<Response> deleteComment(int commentId) {
     return _session.get(
-      'http://joyreactor.cc/post_comment/delete/$commentId?token=${_session
-          .apiToken}',
+      'http://joyreactor.cc/post_comment/delete/$commentId?token=${_session.apiToken}',
     );
   }
 
@@ -240,5 +241,21 @@ class Api {
     final res = await _session.get(
         'http://joyreactor.cc/poll/vote/$quizId?token=${_session.apiToken}');
     return _quizParser.parseQuizResponse(res.data);
+  }
+
+  Future<Uint8List> downloadFile(
+    String url, {
+    ProgressCallback onReceiveProgress,
+    Map<String, dynamic> headers,
+  }) async {
+    final res = await _dio.get<Uint8List>(
+      url,
+      options: Options(
+        headers: headers,
+        responseType: ResponseType.bytes,
+      ),
+      onReceiveProgress: onReceiveProgress,
+    );
+    return res.data;
   }
 }

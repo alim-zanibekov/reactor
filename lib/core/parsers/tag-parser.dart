@@ -62,16 +62,12 @@ class TagParser {
     final infoMain = blogHeader.querySelectorAll('#blogSubscribers > span');
     final fav = blogHeader.querySelector('#blogFavroiteLinks');
     var image =
-    (blogHeader
-        .querySelector('.blog_avatar')
-        ?.attributes ?? {})['src'];
+        (blogHeader.querySelector('.blog_avatar')?.attributes ?? {})['src'];
 
     if (image != null && image is String && image.startsWith('/'))
       image = 'http://joyreactor.cc$image';
 
-    final tagIdStr = (fav
-        ?.querySelector('a')
-        ?.attributes ?? {})['href'];
+    final tagIdStr = (fav?.querySelector('a')?.attributes ?? {})['href'];
 
     int tagId;
     if (tagIdStr != null && _extractTagIdRegex.hasMatch(tagIdStr)) {
@@ -81,9 +77,7 @@ class TagParser {
     return PageInfo(
       icon: image,
       tagId: tagId,
-      bg: (tagArticle
-          .querySelector('#contentInnerHeader')
-          ?.attributes ??
+      bg: (tagArticle.querySelector('#contentInnerHeader')?.attributes ??
           {})['src'],
       subscribersCount: Utils.getNumberInt(infoMain[0]?.text),
       count: Utils.getNumberInt(infoMain[1]?.text) ?? 0,

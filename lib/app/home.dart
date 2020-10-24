@@ -39,10 +39,10 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
   static Future<String> _initUniLink() =>
       getInitialLink().catchError((e, stack) => null);
 
-  final double _bottomBarMaxHeight = 45.0;
+  final double _bottomBarMaxHeight = 54.0;
   final _auth = Auth();
 
-  double _bottomBarHeight = 45.0;
+  double _bottomBarHeight = 54.0;
   List<StreamSubscription> _subscriptions;
   int _currentIndex = 0;
   AnimationController _animationController;
@@ -135,6 +135,8 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
               maxHeight: _bottomBarMaxHeight,
               child: BottomNavigationBar(
                 currentIndex: _currentIndex,
+                showSelectedLabels: false,
+                showUnselectedLabels: false,
                 onTap: (index) {
                   if (_currentIndex != index) {
                     pageController.jumpToPage(index);
@@ -151,19 +153,19 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
                 items: const <BottomNavigationBarItem>[
                   BottomNavigationBarItem(
                     icon: Icon(Icons.view_stream),
-                    title: SizedBox.shrink(),
+                    label: 'Лента',
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.category),
-                    title: SizedBox.shrink(),
+                    label: 'Разное',
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.portrait),
-                    title: SizedBox.shrink(),
+                    label: 'Аккаунт',
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.settings),
-                    title: SizedBox.shrink(),
+                    label: 'Настройки',
                   ),
                 ],
               ),

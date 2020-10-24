@@ -113,8 +113,11 @@ class _AppCommentAnswerState extends State<AppCommentAnswer> {
                 onPressed: () async {
                   if (_loading) return;
 
-                  _file = await FilePicker.getFile(type: FileType.image);
-
+                  final result = await FilePicker.platform
+                      .pickFiles(type: FileType.image, allowMultiple: false);
+                  if (result != null) {
+                    _file = File(result.files.single.path);
+                  }
                   setState(() {});
                 },
                 child: const Text(

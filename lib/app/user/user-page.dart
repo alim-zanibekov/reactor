@@ -116,7 +116,7 @@ class _AppUserPageState extends State<AppUserPage>
         if (index == 2)
           return AppPostList(
               pageStorageKey:
-              PageStorageKey<String>(widget.username + index.toString()),
+                  PageStorageKey<String>(widget.username + index.toString()),
               onScrollChange: onScrollChange,
               reloadNotifier: onReloadPress,
               loader: _loaderUserFavorite);

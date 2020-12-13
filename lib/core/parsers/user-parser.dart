@@ -123,23 +123,22 @@ class UserParser {
 
   List<UserTag> _parseWeightedTags(Element element) =>
       (element?.querySelectorAll('a') ?? [])
-          .map((e) =>
-          UserTag(
-            e.text?.trim(),
-            weight: -Utils.getNumberDouble(e?.attributes['style']),
-            isMain: Tag.parseIsMain((e.attributes ?? {})['href']),
-            prefix: Tag.parsePrefix((e.attributes ?? {})['href']),
-            link: Tag.parseLink((e.attributes ?? {})['href']),
-          ))
+          .map((e) => UserTag(
+                e.text?.trim(),
+                weight: -Utils.getNumberDouble(e?.attributes['style']),
+                isMain: Tag.parseIsMain((e.attributes ?? {})['href']),
+                prefix: Tag.parsePrefix((e.attributes ?? {})['href']),
+                link: Tag.parseLink((e.attributes ?? {})['href']),
+              ))
           .toList();
 
   static final _postsCountRegex = RegExp(r'Постов:\s+([0-9]+)', unicode: true);
   static final _bestCountRegex = RegExp(r'лучших:\s+([0-9]+)', unicode: true);
   static final _goodCountRegex = RegExp(r'хороших:\s+([0-9]+)', unicode: true);
   static final _commentsCountRegex =
-  RegExp(r'Комментариев:\s+([0-9]+)', unicode: true);
+      RegExp(r'Комментариев:\s+([0-9]+)', unicode: true);
   static final _lastEnterRegex =
-  RegExp(r'Последний раз заходил:\s+([0-9\-]+)', unicode: true);
+      RegExp(r'Последний раз заходил:\s+([0-9\-]+)', unicode: true);
   static final _daysCountRegex =
-  RegExp(r'Дней подряд:\s+([0-9]+)', unicode: true);
+      RegExp(r'Дней подряд:\s+([0-9]+)', unicode: true);
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:reactor/app/common/open.dart';
 
 import '../../core/content/tag-loader.dart';
 import '../../core/parsers/types/module.dart';
 import '../common/loader-list.dart';
+import '../common/open.dart';
 import '../tag/tag.dart';
 
 class AppTagList extends StatelessWidget {
@@ -35,7 +35,7 @@ class AppTagList extends StatelessWidget {
             },
             child: Padding(
               padding:
-              const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
+                  const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 8),
               child: AppTag(size: 70, tag: element),
             ),
           ),

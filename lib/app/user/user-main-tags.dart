@@ -73,6 +73,9 @@ class AppUserMainTags extends StatelessWidget {
     ]);
   }
 
-  String _toRating(double rating) =>
-      rating == null ? '––' : rating > 0 ? '+$rating' : '$rating';
+  String _toRating(double rating) => rating == null
+      ? '––'
+      : rating > 0
+          ? '+$rating'
+          : '$rating';
 }

@@ -136,31 +136,30 @@ class _AppPostContentState extends State<AppPostContent>
                 onLoad: _onLoad,
                 children: _post.quiz != null
                     ? <Widget>[
-                  Container(
-                    color: _isDark ? Colors.black26 : Colors.grey[300],
-                    height: 1,
-                  ),
-                  AppQuiz(
-                    quiz: _post.quiz,
-                    quizUpdated: (quiz) {
-                      _post.quiz = quiz;
-                      if (mounted) setState(() => null);
-                    },
-                  )
-                ]
+                        Container(
+                          color: _isDark ? Colors.black26 : Colors.grey[300],
+                          height: 1,
+                        ),
+                        AppQuiz(
+                          quiz: _post.quiz,
+                          quizUpdated: (quiz) {
+                            _post.quiz = quiz;
+                            if (mounted) setState(() => null);
+                          },
+                        )
+                      ]
                     : null,
               ),
             )
+          else if (_post.censored || _post.unsafe)
+            PostUnavailable(
+              isDark: _isDark,
+              text: _post.censored
+                  ? 'Контент запрещен на территории РФ'
+                  : 'Контент только для авторизованных пользователей',
+            )
           else
-            if (_post.censored || _post.unsafe)
-              PostUnavailable(
-                isDark: _isDark,
-                text: _post.censored
-                    ? 'Контент запрещен на территории РФ'
-                    : 'Контент только для авторизованных пользователей',
-              )
-            else
-              PostHiddenContent(loadContent: widget.loadContent),
+            PostHiddenContent(loadContent: widget.loadContent),
           if (_currentMaxHeight != null || _post.expanded)
             PostExpandCollapseButton(
               key: ObjectKey(_post.expanded),

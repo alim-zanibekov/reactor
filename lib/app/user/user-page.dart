@@ -106,40 +106,38 @@ class _AppUserPageState extends State<AppUserPage>
       ],
       builder:
           (BuildContext context, int index, onScrollChange, onReloadPress) {
-            if (index == 0)
-              return _AppUserLoader(
-                  key: PageStorageKey<String>(
-                      widget.username + index.toString()),
-                  username: widget.username,
-                  link: _link,
-                  reloadNotifier: onReloadPress,
-                  onScrollChange: onScrollChange);
-            if (index == 1)
-              return AppUserCommentsPage(
-                  key: PageStorageKey<String>(
-                      widget.username + index.toString()),
-                  username: widget.username,
-                  reloadNotifier: onReloadPress,
-                  onScrollChange: onScrollChange);
-            if (index == 2)
-              return AppPostList(
-                  pageStorageKey:
+        if (index == 0)
+          return _AppUserLoader(
+              key: PageStorageKey<String>(widget.username + index.toString()),
+              username: widget.username,
+              link: _link,
+              reloadNotifier: onReloadPress,
+              onScrollChange: onScrollChange);
+        if (index == 1)
+          return AppUserCommentsPage(
+              key: PageStorageKey<String>(widget.username + index.toString()),
+              username: widget.username,
+              reloadNotifier: onReloadPress,
+              onScrollChange: onScrollChange);
+        if (index == 2)
+          return AppPostList(
+              pageStorageKey:
                   PageStorageKey<String>(widget.username + index.toString()),
-                  onScrollChange: onScrollChange,
-                  reloadNotifier: onReloadPress,
-                  loader: _loaderUserPosts);
+              onScrollChange: onScrollChange,
+              reloadNotifier: onReloadPress,
+              loader: _loaderUserPosts);
 
-            if (index == 3)
-              return AppPostList(
-                  pageStorageKey:
+        if (index == 3)
+          return AppPostList(
+              pageStorageKey:
                   PageStorageKey<String>(widget.username + index.toString()),
-                  onScrollChange: onScrollChange,
-                  reloadNotifier: onReloadPress,
-                  loader: _loaderUserFavorite);
+              onScrollChange: onScrollChange,
+              reloadNotifier: onReloadPress,
+              loader: _loaderUserFavorite);
 
         return AppPostList(
             pageStorageKey:
-            PageStorageKey<String>(widget.username + index.toString()),
+                PageStorageKey<String>(widget.username + index.toString()),
             onScrollChange: onScrollChange,
             reloadNotifier: onReloadPress,
             loader: _loaderUserSubs);

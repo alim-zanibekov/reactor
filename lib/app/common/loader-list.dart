@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:reactor/core/content/loader.dart';
 
 import '../../core/content/loader.dart';
 import '../../core/widgets/onerror-reload.dart';

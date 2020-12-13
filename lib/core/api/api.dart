@@ -3,11 +3,10 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:reactor/core/external/error-reporter.dart';
-import 'package:reactor/core/parsers/user-comments-parser.dart';
 
 import '../auth/auth.dart';
 import '../common/pair.dart';
+import '../external/error-reporter.dart';
 import '../http/session.dart';
 import '../parsers/comments-parser.dart';
 import '../parsers/content-parser.dart';
@@ -16,6 +15,7 @@ import '../parsers/quiz-parser.dart';
 import '../parsers/stats-parser.dart';
 import '../parsers/tag-parser.dart';
 import '../parsers/types/module.dart';
+import '../parsers/user-comments-parser.dart';
 import '../parsers/user-parser.dart';
 import 'types.dart';
 
@@ -82,7 +82,7 @@ class Api {
 
   Future<Post> loadPost(int id) async {
     final res =
-    await _session.get('http://${_prefix}reactor.cc/post/${id.toString()}');
+        await _session.get('http://${_prefix}reactor.cc/post/${id.toString()}');
     return _postsParser.parsePost(id, res.data);
   }
 
@@ -117,12 +117,15 @@ class Api {
         'http://${_prefix}reactor.cc${_postTypeToString(type)}/$pageId',
       );
 
-  Future<ContentPage<Post>> loadTag(String tag, PostListType type) => _loadPage(
-      'http://${_prefix}reactor.cc/tag/$tag${_postTypeToString(type)}');
-
-  Future<ContentPage<Post>> loadTagByPageId(String tag, int pageId, PostListType type) =>
+  Future<ContentPage<Post>> loadTag(String tag, PostListType type) =>
       _loadPage(
-        'http://${_prefix}reactor.cc/tag/$tag${_postTypeToString(type)}/$pageId',
+          'http://${_prefix}reactor.cc/tag/$tag${_postTypeToString(type)}');
+
+  Future<ContentPage<Post>> loadTagByPageId(String tag, int pageId,
+      PostListType type) =>
+      _loadPage(
+        'http://${_prefix}reactor.cc/tag/$tag${_postTypeToString(
+            type)}/$pageId',
       );
 
   Future<ContentPage<Post>> loadUser(String username) =>
@@ -183,16 +186,21 @@ class Api {
 
   Future<void> setTagBlock(int id, bool state) async {
     return _session.get(
-        'http://${_prefix}reactor.cc/favorite/${state ? 'create' : 'delete'}Blog/$id${state ? '/-1' : ''}?token=${_session.apiToken}');
+        'http://${_prefix}reactor.cc/favorite/${state
+            ? 'create'
+            : 'delete'}Blog/$id${state ? '/-1' : ''}?token=${_session
+            .apiToken}');
   }
 
   Future<Post> loadPostContent(int id) async {
     final res = await _session.get(
-        'http://${_prefix}reactor.cc/hidden/delete/$id?token=${_session.apiToken}');
+        'http://${_prefix}reactor.cc/hidden/delete/$id?token=${_session
+            .apiToken}');
     return _postsParser.parseInner(id, res.data);
   }
 
-  Future<ContentPage<ExtendedTag>> loadMainTag(String tag, TagListType type) async {
+  Future<ContentPage<ExtendedTag>> loadMainTag(String tag,
+      TagListType type) async {
     final res = await _session
         .get('http://${_prefix}reactor.cc/tag/$tag${_tagTypeToString(type)}');
     return _tagParser.parsePage(res.data);
@@ -250,7 +258,8 @@ class Api {
 
   Future<Response> deleteComment(int commentId) {
     return _session.get(
-      'http://joyreactor.cc/post_comment/delete/$commentId?token=${_session.apiToken}',
+      'http://joyreactor.cc/post_comment/delete/$commentId?token=${_session
+          .apiToken}',
     );
   }
 

@@ -106,15 +106,13 @@ class _AppContentState extends State<AppContent> {
 
     if (widget.onLoad != null && _undefinedSizeImages.isEmpty) {
       if (_filteredFutures.isNotEmpty) {
-        Future.wait(_filteredFutures).then((value) =>
-            widget.onLoad(
+        Future.wait(_filteredFutures).then((value) => widget.onLoad(
               value
                   .where((element) => element != null)
-                  .map((e) =>
-                  Pair(
-                    16.0 / 9.0,
-                    Size(e.width.toDouble(), e.height.toDouble()),
-                  ))
+                  .map((e) => Pair(
+                        16.0 / 9.0,
+                        Size(e.width.toDouble(), e.height.toDouble()),
+                      ))
                   .toList(),
             ));
       } else {

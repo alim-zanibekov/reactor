@@ -85,21 +85,20 @@ class _AppContentState extends State<AppContent> {
         }
 
         _images.add(imageProvider);
-      }
-      if (entry is ContentUnitYouTubeVideo) {
-        final futureMetadata =
-            entry.metadata == null ? entry.loadMetadata() : null;
-        _futures.add(futureMetadata);
-      }
-      if (entry is ContentUnitCoubVideo) {
-        final futureMetadata =
-            entry.metadata == null ? entry.loadMetadata() : null;
-        _futures.add(futureMetadata);
-      }
-      if (entry is ContentUnitVimeoVideo) {
-        final futureMetadata =
-            entry.metadata == null ? entry.loadMetadata() : null;
-        _futures.add(futureMetadata);
+      } else {
+        if (entry is ContentUnitYouTubeVideo) {
+          final futureMetadata =
+              entry.metadata == null ? entry.loadMetadata() : null;
+          _futures.add(futureMetadata);
+        } else if (entry is ContentUnitCoubVideo) {
+          final futureMetadata =
+              entry.metadata == null ? entry.loadMetadata() : null;
+          _futures.add(futureMetadata);
+        } else if (entry is ContentUnitVimeoVideo) {
+          final futureMetadata =
+              entry.metadata == null ? entry.loadMetadata() : null;
+          _futures.add(futureMetadata);
+        }
       }
     }
 
@@ -107,12 +106,17 @@ class _AppContentState extends State<AppContent> {
 
     if (widget.onLoad != null && _undefinedSizeImages.isEmpty) {
       if (_filteredFutures.isNotEmpty) {
-        Future.wait(_filteredFutures).then((value) => widget.onLoad(value
-            .map((e) => Pair(
-                  16.0 / 9.0,
-                  Size(e.width.toDouble(), e.height.toDouble()),
-                ))
-            .toList()));
+        Future.wait(_filteredFutures).then((value) =>
+            widget.onLoad(
+              value
+                  .where((element) => element != null)
+                  .map((e) =>
+                  Pair(
+                    16.0 / 9.0,
+                    Size(e.width.toDouble(), e.height.toDouble()),
+                  ))
+                  .toList(),
+            ));
       } else {
         widget.onLoad([]);
       }

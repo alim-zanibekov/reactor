@@ -5,6 +5,7 @@ import '../../core/api/api.dart';
 import '../../core/api/types.dart';
 import '../../core/auth/auth.dart';
 import '../../core/parsers/types/module.dart';
+import '../common/open.dart';
 import '../content/content.dart';
 import '../user/user-short.dart';
 
@@ -13,6 +14,7 @@ class AppComment extends StatefulWidget {
   final int depth;
   final Color color;
   final bool showAnswer;
+  final bool showGoToPost;
   final Function onSend;
   final Function onDelete;
   final Function scrollToParent;
@@ -23,6 +25,7 @@ class AppComment extends StatefulWidget {
     @required this.comment,
     this.onSend,
     this.showAnswer = false,
+    this.showGoToPost = false,
     this.color,
     this.onDelete,
     this.scrollToParent,
@@ -122,6 +125,22 @@ class _AppCommentState extends State<AppComment>
 
   Widget _controls() {
     return Row(children: <Widget>[
+      if (widget.showGoToPost && widget.comment.postId != null)
+        SizedBox(
+          height: 25,
+          width: 60,
+          child: FlatButton(
+            padding: EdgeInsets.symmetric(vertical: 3.0),
+            onPressed: () {
+              openPostById(context, widget.comment.postId,
+                  commentId: widget.comment.id);
+            },
+            child: const Text(
+              'Перейти',
+              style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
+            ),
+          ),
+        ),
       if (widget.onSend != null)
         SizedBox(
           height: 25,

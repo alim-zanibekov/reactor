@@ -9,6 +9,7 @@ import '../core/auth/auth.dart';
 import 'auth/auth.dart';
 import 'categories/categories-page.dart';
 import 'common/open.dart';
+import 'common/page-wrapper.dart';
 import 'page/posts-page.dart';
 import 'settings/settings-page.dart';
 import 'user/user-page.dart';
@@ -113,14 +114,16 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
         controller: pageController,
         physics: NeverScrollableScrollPhysics(),
         children: <Widget>[
-          const AppPage(main: true),
+          const PageWrapper(child: AppPage(main: true)),
           const AppCategoriesPage(key: PageStorageKey('common')),
           !_authorized || _auth.username == null
               ? const AppAuthPage()
-              : AppUserPage(
-                  username: _auth.username,
-                  link: null,
-                  main: true,
+              : PageWrapper(
+                  child: AppUserPage(
+                    username: _auth.username,
+                    link: null,
+                    main: true,
+                  ),
                 ),
           const AppSettingsPage()
         ],

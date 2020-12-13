@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/common/metadata.dart';
+import '../../../core/external/error-reporter.dart';
 import '../../../core/widgets/onerror-reload.dart';
 import '../common/options.dart';
 import '../common/video-thumbnail.dart';
@@ -44,29 +46,42 @@ class _AppYouTubePlayerState extends State<AppYouTubePlayer>
         if (mounted) {
           setState(() {});
         }
+      }).catchError((dynamic error, StackTrace stackTrace) {
+        ErrorReporter.reportError(error, stackTrace);
       });
     }
     _url = 'https://www.youtube.com/embed/${widget.videoId}?autoplay=0'
-        '&html5=True&rel=0&showinfo=0&playsinline=1&controls=0';
+        '&html5=True&rel=0&showinfo=0&playsinline=1&controls=1';
+
     super.initState();
   }
 
   @override
   bool get wantKeepAlive => _wantKeepAlive;
 
-  Widget getVideo() {
+  String _generatePage() {
+    return '''<!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1"/>
+      </head>
+      <body style="margin: 0">
+          <iframe type="text/html" style="width: 100vw; height: calc(100vw / $_aspectRatio)"
+                  src="https://www.youtube.com/embed" frameborder="0" allowfullscreen/>
+      </body>
+      </html>
+    ''';
+  }
+
+  Widget getVideo(BuildContext context) {
     return InAppWebView(
       key: ValueKey(_url),
-      initialUrl: _url,
+      initialData: InAppWebViewInitialData(
+        data: _generatePage(),
+      ),
       initialOptions: inAppWebViewDefaultOptions(),
       onWebViewCreated: (InAppWebViewController controller) {
         _webView = controller;
-      },
-      onProgressChanged: (controller, _) {
-        controller.injectCSSCode(source: _initPlayerCSS);
-      },
-      onLoadStop: (InAppWebViewController controller, String url) {
-        controller.evaluateJavascript(source: _initPlayerJS);
       },
       onEnterFullscreen: (_) {
         _wantKeepAlive = true;
@@ -78,14 +93,39 @@ class _AppYouTubePlayerState extends State<AppYouTubePlayer>
       },
       shouldOverrideUrlLoading: (controller, request) async {
         _webView.evaluateJavascript(
-            source: 'document.querySelector("video").pause()');
+            source:
+                'document.querySelector(\'iframe\')).contentWindow.postMessage({ type: \'pause\'}, \'*\');');
 
         canLaunch(request.url)
             .then((value) => value ? launch(request.url) : null);
 
         return ShouldOverrideUrlLoadingAction.CANCEL;
       },
-      onLoadError: (InAppWebViewController controller, String url, err1, err2) {
+      androidShouldInterceptRequest: (controller, request) async {
+        if (request.url == 'https://www.youtube.com/embed') {
+          return WebResourceResponse(
+            contentEncoding: 'utf-8',
+            contentType: "text/html",
+            data: Uint8List.fromList('''<!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+            </head>
+            <body style="margin: 0">
+                <iframe type="text/html" style="width: 100vw; height: 100vh"
+                        src="$_url" frameborder="0" allowfullscreen onload="fixYouTubePlayer()"></iframe>
+                <script>$_initPlayerJS</script>
+            </body>
+            </html>
+            '''
+                .codeUnits),
+            statusCode: 200,
+            reasonPhrase: 'OK',
+          );
+        }
+        return null;
+      },
+      onLoadError: (controller, String url, err1, err2) {
         _error = true;
         if (mounted) {
           setState(() {});
@@ -114,7 +154,7 @@ class _AppYouTubePlayerState extends State<AppYouTubePlayer>
     if (_webViewShow) {
       return AspectRatio(
         aspectRatio: _aspectRatio,
-        child: getVideo(),
+        child: getVideo(context),
       );
     }
     return VideoThumbnail(
@@ -126,39 +166,35 @@ class _AppYouTubePlayerState extends State<AppYouTubePlayer>
   }
 }
 
-String _initPlayerCSS = '''
-  .ytp-bezel-text-hide, .ytp-watermark, .ytp-large-play-button { 
-    display: none!important; 
-  }
-  video::-webkit-media-controls-overlay-play-button,
-  video::-webkit-media-controls-panel,
-  video::-webkit-media-controls {
-      display: flex!important;
-  }
-  .html5-video-player, video {
-    left: 0!important;
-    top: 0!important;
-    min-height:  100vh!important;
-    max-height: 100vh!important;
-    min-width: 100vw!important;
-    max-width: 100vw!important;
-  }
-''';
+String _initPlayerJS = '''function fixYouTubePlayer() {
+  const doc = document.querySelector('iframe').contentWindow.document;
+  const style = doc.createElement('style');
+  style.type = 'text/css';
+  style.appendChild(document.createTextNode(`
+    .ytp-bezel-text-hide, .ytp-watermark, .ytp-large-play-button { 
+      display: none!important; 
+    }
+    .html5-video-player, video {
+      left: 0!important;
+      top: 0!important;
+      min-height:  100vh!important;
+      max-height: 100vh!important;
+      min-width: 100vw!important;
+      max-width: 100vw!important;
+    }
+  `));
+  doc.head.appendChild(style);
 
-String _initPlayerJS = '''(function() {
-  document.elementFromPoint(
-    window.innerWidth / 2,
-    window.innerHeight / 2
-  ).click();
+  doc.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2).click();
   
-  const video = document.querySelector('video');
-  const player = document.querySelector('.html5-video-player');
-  const buttons = document.querySelector('.ytp-chrome-top-buttons');
-  const replayBtn = document.querySelector('.ytp-replay-button');
+  const video = doc.querySelector('video');
+  const player = doc.querySelector('.html5-video-player');
+  const buttons = doc.querySelector('.ytp-chrome-top-buttons');
+  const replayBtn = doc.querySelector('.ytp-replay-button');
   
   buttons.parentNode.removeChild(buttons);
   
-  const replay = document.createElement('button');
+  const replay = doc.createElement('button');
   replay.style = 'display: none; top: 50vh; height: 36px; margin-top: -18px;' +
     'z-index: 10000; position: absolute; background: transparent; border: 0;' + 
     'left: 50vw; margin-left: -18px;';
@@ -181,24 +217,28 @@ String _initPlayerJS = '''(function() {
   
   player.appendChild(replay);
   
-  document.body.style.display = 'flex';
-  document.body.style.alignItems = 'center';
-  document.body.style.justifyContent = 'center';
+  doc.body.style.display = 'flex';
+  doc.body.style.alignItems = 'center';
+  doc.body.style.justifyContent = 'center';
   
   const callback = function(mutationsList, observer) {
     observer.disconnect();
     player.classList.remove('ytp-big-mode');
     try {
-      player.removeChild(document.querySelector('.videowall-endscreen'));
-      player.removeChild(document.querySelector('.ytp-upnext'));
-      player.removeChild(document.querySelector('.ytp-pause-overlay'));
+      player.removeChild(doc.querySelector('.videowall-endscreen'));
+      player.removeChild(doc.querySelector('.ytp-upnext'));
+      player.removeChild(doc.querySelector('.ytp-pause-overlay'));
     } catch(e) {}
     observer.observe(player, { attributes: true });
   }
-  document.querySelector('.ytp-chrome-top').innerHTML = 
-    document.querySelector('.ytp-chrome-top').innerHTML;
+  doc.querySelector('.ytp-chrome-top').innerHTML = 
+    doc.querySelector('.ytp-chrome-top').innerHTML;
   
   const observer = new MutationObserver(callback);
   observer.observe(player, { attributes: true });
-})()
+  
+  window.addEventListener('message', function (e) {
+    video.pause();
+  });
+}
 ''';

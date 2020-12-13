@@ -151,28 +151,36 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Пост'),
-      ),
-      body: AppFuturePage(
-        key: _pageKey,
-        load: (fromUser) async {
-          if (fromUser) {
-            _post = await Api().loadPost(widget.postId ?? widget.post.id);
-            return;
-          }
-          if (_post == null) {
-            if (widget.postId == null) {
-              _post = widget.post;
-            } else {
-              _post = await Api().loadPost(widget.postId ?? widget.post.id);
-            }
-          }
-          if (_post.comments == null) {
-            _post.comments = await Api().loadComments(_post.id);
-          }
-        },
-        builder: (context, value, hasError) => _list(),
+      body: Column(
+        children: [
+          AppBar(
+            primary: false,
+            title: const Text('Пост'),
+          ),
+          Expanded(
+            child: AppFuturePage(
+              key: _pageKey,
+              load: (fromUser) async {
+                if (fromUser) {
+                  _post = await Api().loadPost(widget.postId ?? widget.post.id);
+                  return;
+                }
+                if (_post == null) {
+                  if (widget.postId == null) {
+                    _post = widget.post;
+                  } else {
+                    _post =
+                        await Api().loadPost(widget.postId ?? widget.post.id);
+                  }
+                }
+                if (_post.comments == null) {
+                  _post.comments = await Api().loadComments(_post.id);
+                }
+              },
+              builder: (context, value, hasError) => _list(),
+            ),
+          ),
+        ],
       ),
     );
   }

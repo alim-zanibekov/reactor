@@ -8,6 +8,7 @@ import '../image-gallery/image-gallery.dart';
 import '../page/posts-page.dart';
 import '../post/post-page.dart';
 import '../user/user-page.dart';
+import 'page-wrapper.dart';
 
 final _duration = const Duration(milliseconds: 200);
 
@@ -18,8 +19,10 @@ openTag(BuildContext context, Tag tag, {bool animate = true}) {
       duration: animate ? _duration : Duration.zero,
       curve: Curves.easeInOut,
       type: PageTransitionType.rightToLeft,
-      child: AppPage(
-        tag: tag,
+      child: PageWrapper(
+        child: AppPage(
+          tag: tag,
+        ),
       ),
     ),
   );
@@ -33,10 +36,12 @@ openPost(BuildContext context, Post post, Function loadContent,
       duration: _duration,
       curve: Curves.easeInOut,
       type: PageTransitionType.rightToLeft,
-      child: AppOnePostPage(
-        post: post,
-        scrollToComments: scrollToComments,
-        loadContent: loadContent,
+      child: PageWrapper(
+        child: AppOnePostPage(
+          post: post,
+          scrollToComments: scrollToComments,
+          loadContent: loadContent,
+        ),
       ),
     ),
   );
@@ -50,9 +55,11 @@ openPostById(BuildContext context, int postId,
       duration: animate ? _duration : Duration.zero,
       curve: Curves.easeInOut,
       type: PageTransitionType.rightToLeft,
-      child: AppOnePostPage(
-        postId: postId,
-        commentId: commentId,
+      child: PageWrapper(
+        child: AppOnePostPage(
+          postId: postId,
+          commentId: commentId,
+        ),
       ),
     ),
   );
@@ -79,15 +86,16 @@ openUser(BuildContext context, String username, String link,
   Navigator.push(
     context,
     PageTransition(
-      duration: animate ? _duration : Duration.zero,
-      curve: Curves.easeInOut,
-      type: PageTransitionType.rightToLeft,
-      child: AppUserPage(
-        username: username,
-        link: link,
-        main: false,
-      ),
-    ),
+        duration: animate ? _duration : Duration.zero,
+        curve: Curves.easeInOut,
+        type: PageTransitionType.rightToLeft,
+        child: PageWrapper(
+          child: AppUserPage(
+            username: username,
+            link: link,
+            main: false,
+          ),
+        )),
   );
 }
 

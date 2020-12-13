@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:reactor/core/external/error-reporter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/common/metadata.dart';
+import '../../../core/external/error-reporter.dart';
 import '../../../core/widgets/onerror-reload.dart';
 import '../common/options.dart';
 import '../common/video-thumbnail.dart';
@@ -45,6 +47,8 @@ class _AppVimeoPlayerState extends State<AppVimeoPlayer>
         if (mounted) {
           setState(() {});
         }
+      }).catchError((dynamic error, StackTrace stackTrace) {
+        ErrorReporter.reportError(error, stackTrace);
       });
     }
     _url = 'https://player.vimeo.com/video/${widget.videoId}';

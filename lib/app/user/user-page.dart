@@ -11,6 +11,7 @@ import '../common/tabs-wrapper.dart';
 import '../home.dart';
 import '../post/post-list.dart';
 import 'user-awards.dart';
+import 'user-comments-page.dart';
 import 'user-main-tags.dart';
 import 'user-rating.dart';
 import 'user-short.dart';
@@ -68,7 +69,13 @@ class _AppUserPageState extends State<AppUserPage>
   Widget build(BuildContext context) {
     super.build(context);
     return AppTabsWrapper(
-      tabs: ['Профиль', 'Посты', 'Закладки', if (widget.main) 'Подписки'],
+      tabs: [
+        'Профиль',
+        'Комментарии',
+        'Посты',
+        'Закладки',
+        if (widget.main) 'Подписки'
+      ],
       title: widget.username,
       actions: <Widget>[
         Builder(
@@ -79,7 +86,8 @@ class _AppUserPageState extends State<AppUserPage>
             onSelected: (selected) {
               if (selected == 0) {
                 Clipboard.setData(
-                    ClipboardData(text: 'http://joyreactor.cc/user/$_link'));
+                  ClipboardData(text: 'http://joyreactor.cc/user/$_link'),
+                );
                 Scaffold.of(context).showSnackBar(
                   const SnackBar(content: Text('Скопировано')),
                 );
@@ -98,28 +106,36 @@ class _AppUserPageState extends State<AppUserPage>
       ],
       builder:
           (BuildContext context, int index, onScrollChange, onReloadPress) {
-        if (index == 0)
-          return _AppUserLoader(
-              key: PageStorageKey<String>(widget.username + index.toString()),
-              username: widget.username,
-              link: _link,
-              reloadNotifier: onReloadPress,
-              onScrollChange: onScrollChange);
-        if (index == 1)
-          return AppPostList(
-              pageStorageKey:
+            if (index == 0)
+              return _AppUserLoader(
+                  key: PageStorageKey<String>(
+                      widget.username + index.toString()),
+                  username: widget.username,
+                  link: _link,
+                  reloadNotifier: onReloadPress,
+                  onScrollChange: onScrollChange);
+            if (index == 1)
+              return AppUserCommentsPage(
+                  key: PageStorageKey<String>(
+                      widget.username + index.toString()),
+                  username: widget.username,
+                  reloadNotifier: onReloadPress,
+                  onScrollChange: onScrollChange);
+            if (index == 2)
+              return AppPostList(
+                  pageStorageKey:
                   PageStorageKey<String>(widget.username + index.toString()),
-              onScrollChange: onScrollChange,
-              reloadNotifier: onReloadPress,
-              loader: _loaderUserPosts);
+                  onScrollChange: onScrollChange,
+                  reloadNotifier: onReloadPress,
+                  loader: _loaderUserPosts);
 
-        if (index == 2)
-          return AppPostList(
-              pageStorageKey:
+            if (index == 3)
+              return AppPostList(
+                  pageStorageKey:
                   PageStorageKey<String>(widget.username + index.toString()),
-              onScrollChange: onScrollChange,
-              reloadNotifier: onReloadPress,
-              loader: _loaderUserFavorite);
+                  onScrollChange: onScrollChange,
+                  reloadNotifier: onReloadPress,
+                  loader: _loaderUserFavorite);
 
         return AppPostList(
             pageStorageKey:

@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/common/metadata.dart';
+import '../../../core/external/error-reporter.dart';
 import '../../../core/widgets/onerror-reload.dart';
 import '../common/options.dart';
 import '../common/video-thumbnail.dart';
@@ -42,6 +43,8 @@ class _AppCoubPlayerState extends State<AppCoubPlayer> {
         if (mounted) {
           setState(() {});
         }
+      }).catchError((dynamic error, StackTrace stackTrace) {
+        ErrorReporter.reportError(error, stackTrace);
       });
     }
     url = 'https://coub.com/embed/${widget.videoId}';

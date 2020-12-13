@@ -21,6 +21,10 @@ class CommentsParser {
         parsedPage.querySelector('.comment_list_post'), postId);
   }
 
+  PostComment parseComment(Element element, int postId) {
+    return _parseComment(element, 0, postId);
+  }
+
   PostComment parseBestCommentElement(Element parsedPage, int postId) {
     final commentsContainer =
         parsedPage.querySelector('.post_top .post_comment_list');

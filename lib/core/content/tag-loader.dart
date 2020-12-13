@@ -1,8 +1,9 @@
 import '../api/api.dart';
 import '../api/types.dart';
 import '../parsers/types/module.dart';
+import 'loader.dart';
 
-class TagLoader {
+class TagLoader extends Loader<ExtendedTag> {
   final _api;
   final String path;
   final TagListType tagListType;
@@ -20,16 +21,22 @@ class TagLoader {
     return (_pages.last?.isLast ?? false) || _complete;
   }
 
-  List<ExtendedTag> get tags {
+  List<ExtendedTag> get elements {
     return _tags;
   }
 
-  ContentPage get firstPage => _pages.first;
+  ContentPage<ExtendedTag> get firstPage => _pages.first;
 
   bool _complete = false;
 
-  destroy() {
+  void destroy() {
     _complete = true;
+  }
+
+  void reset() {
+    _pages.clear();
+    _tags.clear();
+    _complete = false;
   }
 
   Future<List<ExtendedTag>> load() async {
@@ -37,12 +44,6 @@ class TagLoader {
     _pages.add(page);
     _tags.addAll(page.content);
     return page.content;
-  }
-
-  void reset() {
-    _pages.clear();
-    _tags.clear();
-    _complete = false;
   }
 
   Future<List<ExtendedTag>> loadNext() async {

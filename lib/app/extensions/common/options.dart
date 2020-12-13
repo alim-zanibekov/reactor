@@ -7,7 +7,6 @@ InAppWebViewGroupOptions inAppWebViewDefaultOptions() =>
       crossPlatform: InAppWebViewOptions(
         debuggingEnabled: isInDebugMode,
         mediaPlaybackRequiresUserGesture: false,
-        javaScriptCanOpenWindowsAutomatically: false,
         horizontalScrollBarEnabled: false,
         transparentBackground: true,
         useShouldOverrideUrlLoading: true,
@@ -16,8 +15,10 @@ InAppWebViewGroupOptions inAppWebViewDefaultOptions() =>
         supportZoom: false,
       ),
       android: AndroidInAppWebViewOptions(
+        useShouldInterceptRequest: true,
         allowContentAccess: true,
         supportMultipleWindows: false,
-        allowFileAccess: true,
+        allowFileAccess: false,
+        geolocationEnabled: false,
       ),
     );

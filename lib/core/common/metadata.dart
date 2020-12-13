@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 
 class OEmbedMetadata {
@@ -33,30 +35,36 @@ class OEmbedMetadata {
   });
 
   static Future<OEmbedMetadata> loadYouTube(String videoId) async {
-    final result = await Dio().get(
+    final dynamic result = await Dio().get(
         'https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=$videoId&format=json');
     return _load(result.data);
   }
 
   static Future<OEmbedMetadata> loadCoub(String videoId) async {
-    final result = await Dio().get(
+    final dynamic result = await Dio().get(
         'http://coub.com/api/oembed.json?url=http://coub.com/view/$videoId');
     return _load(result.data);
   }
 
   static Future<OEmbedMetadata> loadVimeo(String videoId) async {
-    final result = await Dio().get(
+    final dynamic result = await Dio().get(
         'https://vimeo.com/api/oembed.json?url=https://vimeo.com/video/$videoId');
     return _load(result.data);
   }
 
   static Future<OEmbedMetadata> loadSoundCloud(String url) async {
-    final result = await Dio().get(
+    final dynamic result = await Dio().get(
         'https://soundcloud.com/oembed?format=json&url=${Uri.encodeQueryComponent(url)}');
     return _load(result.data);
   }
 
-  static _load(Map<String, dynamic> metadata) {
+  static _load(dynamic _metadata) {
+    Map<String, dynamic> metadata;
+    if (_metadata is Map<String, dynamic>) {
+      metadata = _metadata;
+    } else if (_metadata is String) {
+      metadata = json.decode(_metadata);
+    }
     return OEmbedMetadata(
       authorName: metadata['author_name'],
       providerName: metadata['provider_name'],

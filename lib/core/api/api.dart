@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:reactor/core/external/error-reporter.dart';
+import 'package:reactor/core/parsers/user-comments-parser.dart';
 
 import '../auth/auth.dart';
 import '../common/pair.dart';
@@ -25,6 +28,7 @@ class Api {
   static final _tagParser = TagParser();
   static final _userParser = UserParser();
   static final _sidebarParser = StatsParser();
+  static final _userCommentsParser = UserCommentsParser();
   static final _session = Session();
   static final _auth = Auth();
   static final _dio = Dio();
@@ -78,7 +82,7 @@ class Api {
 
   Future<Post> loadPost(int id) async {
     final res =
-        await _session.get('http://${_prefix}reactor.cc/post/${id.toString()}');
+    await _session.get('http://${_prefix}reactor.cc/post/${id.toString()}');
     return _postsParser.parsePost(id, res.data);
   }
 
@@ -91,8 +95,11 @@ class Api {
     final res = await _session.get(url);
     if (res.headers != null &&
         !(res.headers[HttpHeaders.contentTypeHeader]?.first
-                ?.contains('text/html') ??
+            ?.contains('text/html') ??
             false)) {
+      final err =
+          UnimplementedError('url: $url; headers: ${jsonEncode(res.headers)}');
+      ErrorReporter.reportError(err, err.stackTrace);
       return ContentPage.empty<Post>();
     }
     final page = _postsParser.parsePage(res.data);
@@ -113,8 +120,7 @@ class Api {
   Future<ContentPage<Post>> loadTag(String tag, PostListType type) => _loadPage(
       'http://${_prefix}reactor.cc/tag/$tag${_postTypeToString(type)}');
 
-  Future<ContentPage<Post>> loadTagByPageId(
-          String tag, int pageId, PostListType type) =>
+  Future<ContentPage<Post>> loadTagByPageId(String tag, int pageId, PostListType type) =>
       _loadPage(
         'http://${_prefix}reactor.cc/tag/$tag${_postTypeToString(type)}/$pageId',
       );
@@ -139,13 +145,13 @@ class Api {
 
   Future<List<ContentUnit>> loadComment(int id) async {
     final res =
-        await _session.get('http://${_prefix}reactor.cc/post/comment/$id');
+    await _session.get('http://${_prefix}reactor.cc/post/comment/$id');
     return _contentParser.parseContent(res.data);
   }
 
   Future<List<PostComment>> loadComments(int id) async {
     final res =
-        await _session.get('http://${_prefix}reactor.cc/post/comments/$id');
+    await _session.get('http://${_prefix}reactor.cc/post/comments/$id');
     return _commentsParser.parseComments(res.data, id);
   }
 
@@ -186,18 +192,30 @@ class Api {
     return _postsParser.parseInner(id, res.data);
   }
 
-  Future<ContentPage<ExtendedTag>> loadMainTag(
-      String tag, TagListType type) async {
+  Future<ContentPage<ExtendedTag>> loadMainTag(String tag, TagListType type) async {
     final res = await _session
         .get('http://${_prefix}reactor.cc/tag/$tag${_tagTypeToString(type)}');
     return _tagParser.parsePage(res.data);
   }
 
-  Future<ContentPage<ExtendedTag>> loadMainTagByPageId(
-      int id, String tag, TagListType type) async {
+  Future<ContentPage<ExtendedTag>> loadMainTagByPageId(int id, String tag,
+      TagListType type) async {
     final res = await _session.get(
         'http://${_prefix}reactor.cc/tag/$tag${_tagTypeToString(type)}/$id');
     return _tagParser.parsePage(res.data);
+  }
+
+  Future<ContentPage<PostComment>> loadUserComments(String username) async {
+    final res = await _session
+        .get('http://${_prefix}reactor.cc/user/$username/comments');
+    return _userCommentsParser.parsePage(res.data);
+  }
+
+  Future<ContentPage<PostComment>> loadUserCommentsByPageId(int id,
+      String username) async {
+    final res = await _session
+        .get('http://${_prefix}reactor.cc/user/$username/comments/$id');
+    return _userCommentsParser.parsePage(res.data);
   }
 
   Future<Stats> loadSidebar() async {
@@ -205,15 +223,14 @@ class Api {
     return _sidebarParser.parse(res.data);
   }
 
-  Future<void> createComment(
-    int postId,
-    int parentId,
-    String text,
-    File picture, {
-    ProgressCallback onSendProgress,
-  }) async {
+  Future<void> createComment(int postId,
+      int parentId,
+      String text,
+      File picture, {
+        ProgressCallback onSendProgress,
+      }) async {
     final file =
-        picture != null ? (await MultipartFile.fromFile(picture.path)) : null;
+    picture != null ? (await MultipartFile.fromFile(picture.path)) : null;
 
     final formData = FormData.fromMap({
       'parent_id': parentId,
@@ -243,8 +260,7 @@ class Api {
     return _quizParser.parseQuizResponse(res.data);
   }
 
-  Future<Uint8List> downloadFile(
-    String url, {
+  Future<Uint8List> downloadFile(String url, {
     ProgressCallback onReceiveProgress,
     Map<String, dynamic> headers,
   }) async {

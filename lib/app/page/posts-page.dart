@@ -119,6 +119,7 @@ class _AppPageTagsState extends State<AppPage> {
         return AppTagList(
           pageStorageKey: PageStorageKey<String>(_title + index.toString()),
           onScrollChange: onScrollChange,
+          reloadNotifier: onReloadPress,
           loader: _tagLoaders[index],
         );
       },

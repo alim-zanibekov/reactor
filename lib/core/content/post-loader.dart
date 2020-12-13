@@ -1,8 +1,9 @@
 import '../api/api.dart';
 import '../api/types.dart';
 import '../parsers/types/module.dart';
+import 'loader.dart';
 
-class PostLoader {
+class PostLoader extends Loader<Post> {
   static const maxLoads = 20;
   final Api _api;
   final String path;
@@ -29,16 +30,24 @@ class PostLoader {
 
   ContentPage<Post> get firstPage => _pages.first;
 
+  List<Post> get elements {
+    return _posts;
+  }
+
   bool _complete = false;
   bool _destroyed = false;
 
-  destroy() {
+  void destroy() {
     _destroyed = true;
     _complete = true;
   }
 
-  get posts {
-    return _posts;
+  void reset() {
+    _loadCount = 0;
+    _complete = false;
+    _pages.clear();
+    _posts.clear();
+    _postIds.clear();
   }
 
   Future<ContentPage<Post>> _loader() {
@@ -79,14 +88,6 @@ class PostLoader {
     }
     _loadCount += 1;
     return List.of(page.content);
-  }
-
-  void reset() {
-    _loadCount = 0;
-    _complete = false;
-    _pages.clear();
-    _posts.clear();
-    _postIds.clear();
   }
 
   Future<List<Post>> loadNext() async {

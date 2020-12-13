@@ -264,7 +264,7 @@ class _AppPostListState extends State<AppPostList>
           _postWidgets.addAll(
               create.map((e) => _getAppPostContent(index++, e)).toList());
 
-          _posts = widget.loader.posts;
+          _posts = widget.loader.elements;
           _showHeader = widget.loader?.firstPage?.pageInfo != null;
         },
         builder: (context, _, bool hasError) {

@@ -7,6 +7,7 @@ import 'package:flutter_user_agent/flutter_user_agent.dart';
 
 import 'app/home.dart';
 import 'core/auth/auth.dart';
+import 'core/common/in-app-notifications-manager.dart';
 import 'core/common/retry-network-image.dart';
 import 'core/external/error-reporter.dart';
 import 'core/external/sentry.dart';
@@ -45,12 +46,12 @@ void main() {
             SentryReporter().init(),
             FlutterUserAgent.init(),
           ]),
-          builder: (context, future) {
-            if (future.data != null) {
-              return StreamBuilder(
-                stream: _appTheme.stream,
-                builder: (_, theme) => App(theme: Preferences().theme),
-              );
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              ErrorReporter.reportError(snapshot.error, null);
+              print(snapshot.error);
+            } else {
+              return App();
             }
             return Container(color: Color.fromRGBO(51, 51, 51, 1));
           },
@@ -60,18 +61,34 @@ void main() {
   }, ErrorReporter.reportError);
 }
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   static StreamSink<AppTheme> get appTheme => _appTheme;
 
-  final AppTheme theme;
+  const App({Key key}) : super(key: key);
 
-  const App({Key key, this.theme}) : super(key: key);
+  @override
+  _AppState createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  AppTheme _theme = Preferences().theme;
+  StreamSubscription<String> _notificationsSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _appTheme.stream.listen((event) {
+      setState(() {
+        _theme = Preferences().theme;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     ThemeMode themeMode;
-    if (theme != AppTheme.AUTO) {
-      themeMode = theme == AppTheme.DARK ? ThemeMode.dark : ThemeMode.light;
+    if (_theme != AppTheme.AUTO) {
+      themeMode = _theme == AppTheme.DARK ? ThemeMode.dark : ThemeMode.light;
     }
     Headers.updateUserAgent(FlutterUserAgent.webViewUserAgent);
 
@@ -90,7 +107,16 @@ class App extends StatelessWidget {
       },
       home: Scaffold(
         body: DoubleBackToCloseApp(
-          child: AppPages(),
+          child: Builder(builder: (context) {
+            if (_notificationsSubscription != null) {
+              _notificationsSubscription.cancel();
+            }
+            _notificationsSubscription =
+                InAppNotificationsManager.messages$.listen((String text) {
+              Scaffold.of(context).showSnackBar(SnackBar(content: Text(text)));
+            });
+            return AppPages();
+          }),
           snackBar: const SnackBar(
             content: Text('Нажмите еще раз, чтобы выйти'),
           ),

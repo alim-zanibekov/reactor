@@ -23,7 +23,7 @@ class _AppAuthPageState extends State<AppAuthPage> {
   Widget build(BuildContext context) {
     final style = DefaultTextStyle.of(context).style;
     return Scaffold(
-      appBar: AppBar(primary: false, title: const Text('Аворизация')),
+      appBar: AppBar(title: const Text('Аворизация')),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(36.0),

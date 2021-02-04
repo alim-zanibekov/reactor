@@ -30,6 +30,10 @@ class Auth {
 
   String get username => _username;
 
+  Stream<bool> get authorized$ {
+    return _authState.stream;
+  }
+
   Future init() {
     return SharedPreferences.getInstance().then((prefs) {
       if (prefs.getBool('auth') ?? false) {
@@ -40,10 +44,6 @@ class Auth {
         _authorized = true;
       }
     });
-  }
-
-  Stream<bool> get authorized$ {
-    return _authState.stream;
   }
 
   Future<Pair<String, String>> _getCSRFAndToken() async {

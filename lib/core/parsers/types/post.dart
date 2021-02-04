@@ -130,6 +130,7 @@ class ContentPage<T> {
   final PageInfo pageInfo;
   final bool isLast;
   final bool authorized;
+  final bool reversedPagination;
 
   ContentPage({
     this.id,
@@ -137,6 +138,7 @@ class ContentPage<T> {
     this.pageInfo,
     this.isLast,
     this.authorized,
+    this.reversedPagination,
   });
 
   static empty<T>() {

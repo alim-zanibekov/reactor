@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../http/session.dart';
@@ -17,6 +19,9 @@ class Preferences {
   AppPostsType _postsType;
   bool _sfw;
   bool _sendErrorStatistics;
+  bool _gifAutoPlay;
+  List<String> _hostList;
+  String _host;
 
   Preferences._internal();
 
@@ -31,6 +36,18 @@ class Preferences {
             prefs.getBool('send-error-statistics') ?? true;
         _sendErrorStatistics = sendErrorStatistics;
 
+        final gifAutoPlay = prefs.getBool('gif-auto-play') ?? false;
+        _gifAutoPlay = gifAutoPlay;
+
+        final hostListRaw = prefs.getString('host-list');
+        final hostList = hostListRaw != null
+            ? jsonDecode(hostListRaw)
+            : ['old.reactor.cc', 'joyreactor.cc', 'reactor.cc'];
+        _hostList = hostList;
+
+        final host = prefs.getString('host') ?? _hostList[0];
+        _host = host;
+
         _session.setSFW(_sfw);
       });
 
@@ -41,6 +58,12 @@ class Preferences {
   bool get sfw => _sfw;
 
   bool get sendErrorStatistics => _sendErrorStatistics;
+
+  bool get gifAutoPlay => _gifAutoPlay;
+
+  String get host => _host;
+
+  List<String> get hostList => _hostList;
 
   setTheme(AppTheme theme) async {
     final prefs = await SharedPreferences.getInstance();
@@ -65,5 +88,23 @@ class Preferences {
     final prefs = await SharedPreferences.getInstance();
     prefs.setBool('send-error-statistics', state);
     _sendErrorStatistics = state;
+  }
+
+  setGifAutoPlay(bool state) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('gif-auto-play', state);
+    _gifAutoPlay = state;
+  }
+
+  setHost(String host) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('host', host);
+    _host = host;
+  }
+
+  setHostList(List<String> hostList) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('host-list', jsonEncode(hostList));
+    _hostList = hostList;
   }
 }

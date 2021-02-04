@@ -23,9 +23,7 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Разное'),
-      ),
+      appBar: AppBar(title: const Text('Разное')),
       body: AppFuturePage<Stats>(
         load: (_) => Api().loadSidebar(),
         builder: (context, stats, _) {
@@ -38,10 +36,14 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
                   const AppCategoriesMain()
                 ]),
               ),
-              SliverToBoxAdapter(child: _trends(stats)),
-              SliverToBoxAdapter(child: _tags(stats)),
-              SliverToBoxAdapter(child: _comments(stats)),
-              SliverToBoxAdapter(child: _users(stats)),
+              if (stats.trends != null)
+                SliverToBoxAdapter(child: _trends(stats)),
+              if (stats.twoDayTags != null)
+                SliverToBoxAdapter(child: _tags(stats)),
+              if (stats.twoDayComments != null)
+                SliverToBoxAdapter(child: _comments(stats)),
+              if (stats.weekUsers != null)
+                SliverToBoxAdapter(child: _users(stats)),
             ],
           );
         },
@@ -63,11 +65,13 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
         ),
         SizedBox(
           height: stats.twoDayTags.length * 60.0,
-          child: TabBarView(children: <Widget>[
-            AppCategoriesTags(tags: stats.twoDayTags),
-            AppCategoriesTags(tags: stats.weekTags),
-            AppCategoriesTags(tags: stats.allTimeTags)
-          ]),
+          child: TabBarView(
+            children: <Widget>[
+              AppCategoriesTags(tags: stats.twoDayTags),
+              AppCategoriesTags(tags: stats.weekTags),
+              AppCategoriesTags(tags: stats.allTimeTags)
+            ],
+          ),
         ),
       ]),
     );
@@ -87,10 +91,12 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
         ),
         SizedBox(
           height: stats.twoDayComments.length * 40.0,
-          child: TabBarView(children: <Widget>[
-            AppCategoriesComments(comments: stats.twoDayComments),
-            AppCategoriesComments(comments: stats.weekComments)
-          ]),
+          child: TabBarView(
+            children: <Widget>[
+              AppCategoriesComments(comments: stats.twoDayComments),
+              AppCategoriesComments(comments: stats.weekComments)
+            ],
+          ),
         ),
       ]),
     );
@@ -133,10 +139,12 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
         ),
         SizedBox(
           height: stats.weekUsers.length * 40.0,
-          child: TabBarView(children: <Widget>[
-            AppCategoriesUsers(users: stats.weekUsers),
-            AppCategoriesUsers(users: stats.monthUsers)
-          ]),
+          child: TabBarView(
+            children: <Widget>[
+              AppCategoriesUsers(users: stats.weekUsers),
+              AppCategoriesUsers(users: stats.monthUsers)
+            ],
+          ),
         ),
       ]),
     );

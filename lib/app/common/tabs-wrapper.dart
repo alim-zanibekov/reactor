@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../home.dart';
+import 'open.dart';
 
 class _ReloadNotifier extends ChangeNotifier {
   void notify() {
@@ -130,6 +131,15 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
       ),
     );
 
+    final searchButton = Padding(
+      padding: EdgeInsets.all(10),
+      child: IconButton(
+        padding: EdgeInsets.zero,
+        onPressed: () => openSearch(context),
+        icon: const Icon(Icons.search, size: 22),
+      ),
+    );
+
     Widget leading;
     final offset = Offset(0, (_appBarHeight - _maxAppBarHeight) * 1.5);
 
@@ -155,6 +165,7 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
         Transform.translate(
           offset: offset,
           child: Row(children: <Widget>[
+            if (widget.main) searchButton,
             reloadButton,
             if (widget.actions != null) ...widget.actions.map((e) => e)
           ]),

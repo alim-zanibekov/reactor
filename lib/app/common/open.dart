@@ -7,6 +7,8 @@ import '../../core/parsers/types/module.dart';
 import '../image-gallery/image-gallery.dart';
 import '../page/posts-page.dart';
 import '../post/post-page.dart';
+import '../search/search-list.dart';
+import '../search/search.dart';
 import '../user/user-page.dart';
 import 'page-wrapper.dart';
 
@@ -96,6 +98,32 @@ openUser(BuildContext context, String username, String link,
             main: false,
           ),
         )),
+  );
+}
+
+openSearch(BuildContext context, {bool animate = true}) {
+  Navigator.push(
+    context,
+    PageTransition(
+      duration: animate ? _duration : Duration.zero,
+      curve: Curves.easeInOut,
+      type: PageTransitionType.rightToLeft,
+      child: AppSearch(),
+    ),
+  );
+}
+
+openSearchList(
+    BuildContext context, String query, String author, List<String> tags,
+    {bool animate = true}) {
+  Navigator.push(
+    context,
+    PageTransition(
+      duration: animate ? _duration : Duration.zero,
+      curve: Curves.easeInOut,
+      type: PageTransitionType.rightToLeft,
+      child: AppSearchList(query: query, author: author, tags: tags),
+    ),
   );
 }
 

@@ -1,4 +1,7 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:flutter_advanced_networkimage/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 import '../common/retry-network-image.dart';
@@ -17,7 +20,7 @@ class AppSafeImage extends StatefulWidget {
   const AppSafeImage({
     Key key,
     this.imageProvider,
-    this.fit = BoxFit.contain,
+    this.fit = BoxFit.cover,
     this.onInfo,
     this.showAnimation = true,
     this.background,
@@ -33,17 +36,28 @@ class _AppSafeImageState extends State<AppSafeImage> {
   bool _loaded = false;
   bool _animate = false;
   bool _withoutFades = false;
-  bool _mayBeTransparent = false;
+  bool _animated = false;
+  bool _hasAlphaChannel = false;
   AnimationController _controller;
+  ui.Image image;
 
   @override
   void initState() {
     _animate = widget.showAnimation;
-    if (widget.imageProvider is AppNetworkImageWithRetry) {
-      final url = (widget.imageProvider as AppNetworkImageWithRetry).url;
-      _mayBeTransparent = url.endsWith('png') || url.endsWith('gif');
+
+    if (widget.imageProvider is AdvancedNetworkImage) {
+      final url =
+          (widget.imageProvider as AdvancedNetworkImage).url.toLowerCase();
+      if (url.endsWith('.gif') || url.endsWith('.apng')) {
+        _animated = true;
+        _hasAlphaChannel = true;
+      } else if (url.endsWith('.png')) {
+        _hasAlphaChannel = true;
+      }
     }
+
     _load();
+
     super.initState();
   }
 
@@ -82,6 +96,7 @@ class _AppSafeImageState extends State<AppSafeImage> {
     widget.imageProvider
         .resolve(ImageConfiguration())
         .addListener(ImageStreamListener((imageInfo, bool _) async {
+      image = imageInfo.image;
           if (widget.onInfo != null && !_loaded) {
             _loaded = true;
             widget.onInfo(imageInfo);
@@ -93,34 +108,48 @@ class _AppSafeImageState extends State<AppSafeImage> {
           if (mounted) {
             setState(() {});
           }
-        }, onError: (obj, stack) {
-          _error = true;
-          _animate = false;
-          if (mounted) {
-            setState(() {});
-          }
-        }));
+    }, onError: (obj, stack) {
+      _error = true;
+      _animate = false;
+      if (mounted) {
+        setState(() {});
+      }
+    }));
 
     if (mounted) {
       setState(() {});
     }
   }
 
-  Widget buildImage(Color bgColor, Color outerBgColor) {
+  Widget _buildImageWithSubstrate() {
     return Container(
-      decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.symmetric(
-          vertical: BorderSide(
-            width: 0,
-            color: Colors.black,
-          ),
-        ),
-      ),
+      decoration: BoxDecoration(color: Colors.white),
       child: Image(
-        fit: widget.fit,
         image: widget.imageProvider,
+        fit: widget.fit,
       ),
+    );
+  }
+
+  Widget _buildImageOnCanvas() {
+    return CustomPaint(
+      painter: CustomImagePainter(
+        image: image,
+        backgroundColor: Colors.white,
+        fit: widget.fit,
+      ),
+    );
+  }
+
+  Widget _buildImage() {
+    if (_animated) {
+      return _buildImageWithSubstrate();
+    } else if (_hasAlphaChannel && _loaded) {
+      return _buildImageOnCanvas();
+    }
+    return Image(
+      image: widget.imageProvider,
+      fit: widget.fit,
     );
   }
 
@@ -140,9 +169,6 @@ class _AppSafeImageState extends State<AppSafeImage> {
     final color =
         widget.background ?? (isDark ? Colors.black26 : Colors.grey[200]);
 
-    final bgColor =
-        _loaded && !_mayBeTransparent ? Colors.white : Colors.transparent;
-
     return ColoredBox(
       color: color,
       child: Stack(children: <Widget>[
@@ -152,15 +178,48 @@ class _AppSafeImageState extends State<AppSafeImage> {
             icon: Icon(Icons.image, color: Colors.grey[500], size: 44),
           ),
         if (_withoutFades)
-          buildImage(bgColor, color)
+          _buildImage()
         else
           AnimatedOpacity(
             opacity: _animate ? 0 : 1,
             duration: _fadeInDuration,
             curve: Curves.easeIn,
-            child: buildImage(bgColor, color),
+            child: _buildImage(),
           )
       ], fit: StackFit.expand),
     );
+  }
+}
+
+class CustomImagePainter extends CustomPainter {
+  final Color backgroundColor;
+  final ui.Image image;
+  final BoxFit fit;
+
+  CustomImagePainter(
+      {@required this.image,
+      @required this.backgroundColor,
+      this.fit = BoxFit.cover});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final outputRect = Rect.fromLTWH(0, 0, size.width, size.height);
+    final Size imageSize =
+        Size(image.width.toDouble(), image.height.toDouble());
+    final FittedSizes sizes = applyBoxFit(
+      fit,
+      imageSize,
+      outputRect.size,
+    );
+    final Rect inputSubRect =
+        Alignment.center.inscribe(sizes.source, Offset.zero & imageSize);
+    final Rect outputSubRect =
+        Alignment.center.inscribe(sizes.destination, outputRect);
+    canvas.drawImageRect(image, inputSubRect, outputSubRect, new Paint());
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
   }
 }

@@ -20,7 +20,7 @@ class _PageWrapperState extends State<PageWrapper> {
     }
     return Container(
       color: Theme.of(context).primaryColor,
-      padding: new EdgeInsets.only(top: _statusBarHeight),
+      padding: EdgeInsets.only(top: _statusBarHeight),
       child: widget.child,
     );
   }

@@ -59,8 +59,15 @@ class _AppPostListState extends State<AppPostList>
     _animationController.value = 1;
     _scrollController.addListener(_onScrollChange);
     _subscription = Auth().authorized$.listen((event) {
-      AppFuturePageState appFuturePageState = _pageKey.currentState;
-      appFuturePageState?.reload(hideContent: true);
+      if (mounted) {
+        _posts = null;
+        widget.loader.reset();
+        setState(() {});
+      }
+      Future.microtask(() {
+        AppFuturePageState appFuturePageState = _pageKey.currentState;
+        appFuturePageState?.reload(hideContent: true);
+      });
     });
 
     widget.reloadNotifier?.addListener(_reload);
@@ -137,9 +144,11 @@ class _AppPostListState extends State<AppPostList>
   }
 
   void _onScrollChange() {
-    if (!_collapsing) {
+    if (!_collapsing && widget.onScrollChange != null) {
       widget.onScrollChange(_scrollController.offset - _scrollPrevious);
     }
+    bool isCollapseShow = _showCollapsePostId != null;
+    int postId;
     _mounted.forEach((element) {
       if (element.post.expanded) {
         RenderBox renderBoxTop = _pageKey.currentContext.findRenderObject();
@@ -151,18 +160,18 @@ class _AppPostListState extends State<AppPostList>
         if (offset.dy + postSize.height - renderBoxWrapperSize.height - 60 >
                 0 &&
             offset.dy < renderBoxWrapperSize.height / 1.5) {
-          if (_showCollapsePostId == null) {
-            _animationController.reverse(from: 1);
-          }
-          _showCollapsePostId = element.post.id;
-        } else {
-          if (_showCollapsePostId != null) {
-            _animationController.forward(from: 0);
-          }
-          _showCollapsePostId = null;
+          postId = element.post.id;
         }
       }
     });
+    if (postId != null) {
+      if (!isCollapseShow) {
+        _animationController.reverse(from: 1);
+      }
+    } else if (isCollapseShow) {
+      _animationController.forward(from: 0);
+    }
+    _showCollapsePostId = postId;
     _scrollPrevious = _scrollController.offset;
   }
 

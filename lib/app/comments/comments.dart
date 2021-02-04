@@ -351,7 +351,7 @@ class AppComments extends StatefulWidget {
     final parentStack = List.filled(stack.length, 0, growable: true);
     final List<AppComment> children = [];
 
-    while (stack.length > 0) {
+    while (stack.isNotEmpty) {
       final comment = stack.removeLast();
       if (comment.deleted) {
         continue;
@@ -399,7 +399,7 @@ class _AppCommentsState extends State<AppComments> {
     final depthStack = List.filled(stack.length, 0, growable: true);
     _children = [];
 
-    while (stack.length > 0) {
+    while (stack.isNotEmpty) {
       final comment = stack.removeLast();
       if (comment.deleted) {
         continue;

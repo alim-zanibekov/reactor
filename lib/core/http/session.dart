@@ -44,7 +44,8 @@ class Session {
     if (_sfw) {
       cookie += (_authToken != null ? ';' : '') + 'sfw=1';
     }
-    if (cookie.length > 0) {
+
+    if (cookie.isNotEmpty) {
       _headers = {HttpHeaders.cookieHeader: cookie};
     } else {
       _headers = null;
@@ -55,8 +56,8 @@ class Session {
     _dio = Dio();
   }
 
-  Future<Response> get(String url) async {
-    final res = await _dio.get(url, options: Options(headers: _headers));
+  Future<Response> get<T>(String url) async {
+    final res = await _dio.get<T>(url, options: Options(headers: _headers));
     if (url.contains('reactor.cc') &&
         res.data is String &&
         _authToken != null) {

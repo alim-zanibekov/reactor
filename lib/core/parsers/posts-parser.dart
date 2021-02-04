@@ -95,6 +95,17 @@ class PostsParser {
             ) ??
             0
         : 0;
+    bool reversedPagination = false;
+    int lastPageId = 0;
+
+    final paginationBlock = parsedPage.querySelector('.pagination_expanded');
+    if (current != null && paginationBlock != null) {
+      lastPageId = int.tryParse(paginationBlock.children.last?.text) ?? 0;
+      reversedPagination = paginationBlock != null &&
+          paginationBlock.children.length > 1 &&
+          (int.tryParse(paginationBlock.children[0].text) ?? 0) >
+              (int.tryParse(paginationBlock.children[1].text) ?? 0);
+    }
 
     final pageInfo =
         TagParser.parsePageInfo(parsedPage.getElementById('tagArticle'));
@@ -102,7 +113,8 @@ class PostsParser {
     return ContentPage<Post>(
       authorized: parsedPage.querySelector('#topbar .login #settings') != null,
       pageInfo: pageInfo,
-      isLast: pageId <= 1,
+      reversedPagination: reversedPagination,
+      isLast: reversedPagination ? pageId <= 1 : pageId == lastPageId,
       content: parsedPage
           .querySelectorAll('.postContainer')
           .map((e) {

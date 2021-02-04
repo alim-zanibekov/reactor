@@ -14,13 +14,13 @@ class SentryReporter {
 
   SentryReporter._internal();
 
-  final SentryClient _sentry = SentryClient(
+  final SentryClient _sentry = SentryClient(SentryOptions(
     dsn:
         'https://20004fb264fd46598cc10667f873df42@o410122.ingest.sentry.io/5283781',
-  );
+  ));
 
   Map<String, dynamic> _extra;
-  User _userContext;
+  User _user;
   Contexts _contexts;
 
   Future init() async {
@@ -90,20 +90,21 @@ class SentryReporter {
   }
 
   void setUserContext(String username) {
-    _userContext = User(id: username.toLowerCase(), username: username);
+    _user = User(id: username.toLowerCase(), username: username);
   }
 
   void resetUserContext() {
-    _userContext = null;
+    _user = null;
   }
 
-  Future<void> capture(dynamic error, dynamic stackTrace) => _sentry.capture(
-        event: Event(
+  Future<void> capture(dynamic error, dynamic stackTrace) =>
+      _sentry.captureEvent(
+        SentryEvent(
           environment: 'production',
           exception: error,
           stackTrace: stackTrace,
           contexts: _contexts,
-          userContext: _userContext,
+          user: _user,
           extra: _extra,
         ),
       );

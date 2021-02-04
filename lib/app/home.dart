@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:uni_links/uni_links.dart';
 
 import '../core/auth/auth.dart';
+import '../core/common/reload-service.dart';
+import '../core/preferences/preferences.dart';
 import 'auth/auth.dart';
 import 'categories/categories-page.dart';
 import 'common/open.dart';
@@ -39,11 +42,11 @@ class AppPages extends StatefulWidget {
 class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
   static Future<String> _initUniLink() =>
       getInitialLink().catchError((e, stack) => null);
-
-  final double _bottomBarMaxHeight = 54.0;
+  StreamSubscription<bool> _reloadSubscription;
+  final double _bottomBarMaxHeight = Platform.isAndroid ? 54.0 : 54.0 + 30;
   final _auth = Auth();
 
-  double _bottomBarHeight = 54.0;
+  double _bottomBarHeight = Platform.isAndroid ? 54.0 : 54.0 + 30;
   List<StreamSubscription> _subscriptions;
   int _currentIndex = 0;
   AnimationController _animationController;
@@ -91,11 +94,16 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
           });
         }
       }),
-      getLinksStream().listen((link) => goToLink(context, link),
-          onError: (err) {
-        print(err);
-      })
+      getLinksStream().listen(
+        (link) => goToLink(context, link),
+        onError: (err) {
+          print(err);
+        },
+      )
     ];
+    _reloadSubscription = ReloadService.onReload$.stream.listen((bool _) {
+      setState(() {});
+    });
     super.initState();
   }
 
@@ -104,26 +112,31 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
     _subscriptions.forEach((sub) => sub.cancel());
     pageController.dispose();
     _animationController.dispose();
+    _reloadSubscription.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final host = Preferences().host;
+
     return Scaffold(
       body: PageView(
         controller: pageController,
         physics: NeverScrollableScrollPhysics(),
         children: <Widget>[
-          const PageWrapper(child: AppPage(main: true)),
-          const AppCategoriesPage(key: PageStorageKey('common')),
+          PageWrapper(
+            child: AppPage(main: true, key: PageStorageKey('main' + host)),
+          ),
+          AppCategoriesPage(key: PageStorageKey('common' + host)),
           !_authorized || _auth.username == null
               ? const AppAuthPage()
               : PageWrapper(
                   child: AppUserPage(
-                    username: _auth.username,
-                    link: null,
-                    main: true,
-                  ),
+                      username: _auth.username,
+                      link: null,
+                      main: true,
+                      key: PageStorageKey('user' + host)),
                 ),
           const AppSettingsPage()
         ],

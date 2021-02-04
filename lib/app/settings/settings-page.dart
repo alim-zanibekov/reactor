@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/api/api.dart';
+import '../../core/common/reload-service.dart';
 import '../../core/preferences/preferences.dart';
 import '../../main.dart';
 
@@ -14,8 +16,10 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
   Preferences _preferences = Preferences();
   AppTheme _theme;
   AppPostsType _postsType;
+  String _host;
   bool _sfw;
   bool _sendErrorStatistics;
+  bool _gifAutoPlay;
 
   @override
   void initState() {
@@ -23,6 +27,8 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
     _postsType = _preferences.postsType;
     _sfw = _preferences.sfw;
     _sendErrorStatistics = _preferences.sendErrorStatistics;
+    _gifAutoPlay = _preferences.gifAutoPlay;
+    _host = _preferences.host;
     super.initState();
   }
 
@@ -46,6 +52,42 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
       body: ListView(
         physics: const ClampingScrollPhysics(),
         children: <Widget>[
+          const ListTile(title: Text('Хост')),
+          Padding(
+              padding: padding,
+              child: Row(
+                children: [
+                  DropdownButton<String>(
+                    hint: Text('Хост'),
+                    value: _host,
+                    onChanged: (String value) async {
+                      setState(() => _host = value);
+                      await _preferences.setHost(_host);
+                      ReloadService.reload();
+                      Api().sethHost(value);
+                    },
+                    items: _preferences.hostList
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                  Expanded(child: SizedBox()),
+                  FlatButton(
+                    child: Text('Добавить'),
+                    onPressed: () async {
+                      final host = await _displayAddHostDialog(context);
+                      if (host != null) {
+                        _preferences.hostList.add(host);
+                        _preferences.setHostList(_preferences.hostList);
+                        setState(() {});
+                      }
+                    },
+                  ),
+                ],
+              )),
           const ListTile(title: Text('Открывать по умолчанию')),
           LabeledRadio<AppPostsType>(
             label: 'Новое',
@@ -107,6 +149,15 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
             },
           ),
           SwitchListTile(
+            title: const Text('Воспроизводить гифки автоматически'),
+            value: _gifAutoPlay,
+            activeColor: Theme.of(context).accentColor,
+            onChanged: (bool gifAutoPlay) async {
+              setState(() => _gifAutoPlay = gifAutoPlay);
+              await _preferences.setGifAutoPlay(gifAutoPlay);
+            },
+          ),
+          SwitchListTile(
             title: const Text('Отправлять отчеты об ошибках'),
             value: _sendErrorStatistics,
             activeColor: Theme.of(context).accentColor,
@@ -126,6 +177,79 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
         ],
       ),
     );
+  }
+
+  Future<String> _displayAddHostDialog(BuildContext context) async {
+    String result;
+    await showDialog(
+      context: context,
+      builder: (context) {
+        TextEditingController _textFieldController = TextEditingController();
+        String errorText;
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return SingleChildScrollView(
+              child: OrientationBuilder(builder: (context, orientation) {
+                return Container(
+                  constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height),
+                  alignment: Alignment.center,
+                  child: AlertDialog(
+                    title: Text('Введите новый хост'),
+                    content: TextField(
+                      autocorrect: false,
+                      controller: _textFieldController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 15.0),
+                        hintText: 'Хост',
+                        errorText: errorText,
+                      ),
+                    ),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text('Отмена'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      FlatButton(
+                        child: Text('Сохранить'),
+                        onPressed: () async {
+                          if (_preferences.hostList
+                              .contains(_textFieldController.text)) {
+                            setStateDialog(() {
+                              errorText = 'Такой хост уже существует';
+                            });
+                          } else if (_textFieldController.text == null ||
+                              _textFieldController.text == '') {
+                            setStateDialog(() {
+                              errorText = 'Введите хост';
+                            });
+                          } else {
+                            final isValid = await Api()
+                                .checkHost(_textFieldController.text);
+                            if (isValid) {
+                              result = _textFieldController.text;
+                              Navigator.pop(context);
+                            } else {
+                              setStateDialog(() {
+                                errorText = 'Это не хост реактора';
+                              });
+                            }
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            );
+          },
+        );
+      },
+    );
+    return result;
   }
 }
 

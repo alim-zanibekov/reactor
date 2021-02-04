@@ -9,6 +9,7 @@ class ErrorReporter {
   static Future<void> reportError(dynamic error, dynamic stackTrace) async {
     print('Caught error: $error');
     if (isInDebugMode || !_preferences.sendErrorStatistics) {
+      print(error);
       print(stackTrace);
     } else {
       await _sentryReporter.capture(error, stackTrace);

@@ -14,31 +14,39 @@ class StatsParser {
     final tags2DayBlock = sidebar.querySelector('#blogs_2days_content');
 
     final weekTags =
-        tagsWeekBlock.querySelectorAll('tr').map(_parseTag).toList();
+        tagsWeekBlock?.querySelectorAll('tr')?.map(_parseTag)?.toList();
     final allTimeTags =
-        tagsAllTimeBlock.querySelectorAll('tr').map(_parseTag).toList();
+        tagsAllTimeBlock?.querySelectorAll('tr')?.map(_parseTag)?.toList();
     final twoDayTags =
-        tags2DayBlock.querySelectorAll('tr').map(_parseTag).toList();
+        tags2DayBlock?.querySelectorAll('tr')?.map(_parseTag)?.toList();
 
     final comments2DayBlock = sidebar.querySelector('#comments_2days_content');
     final commentsWeekBlock = sidebar.querySelector('#comments_week_content');
 
-    final twoDayComments = _parseComments(comments2DayBlock);
-    final weekComments = _parseComments(commentsWeekBlock);
+    final twoDayComments =
+        comments2DayBlock != null ? _parseComments(comments2DayBlock) : null;
+    final weekComments =
+        commentsWeekBlock != null ? _parseComments(commentsWeekBlock) : null;
 
     final weekUsersBlock = sidebar.querySelector('#usertop_week_content');
     final monthUsersBlock = sidebar.querySelector('#usertop_month_content');
 
-    final weekUsers =
-        weekUsersBlock.querySelectorAll('.week_top').map(_parseUser).toList();
-    final monthUsers =
-        monthUsersBlock.querySelectorAll('.week_top').map(_parseUser).toList();
+    final weekUsers = weekUsersBlock
+        ?.querySelectorAll('.week_top')
+        ?.map(_parseUser)
+        ?.toList();
+    final monthUsers = monthUsersBlock
+        ?.querySelectorAll('.week_top')
+        ?.map(_parseUser)
+        ?.toList();
 
     final sidebarBlocks = sidebar.querySelectorAll('.sidebar_block');
     final trendsBlock = StatsParser.getBlockByName(sidebarBlocks, 'Тренды');
 
-    final trends =
-        trendsBlock.querySelectorAll('tr').map((e) => _parseTrend(e)).toList();
+    final trends = trendsBlock
+        ?.querySelectorAll('tr')
+        ?.map((e) => _parseTrend(e))
+        ?.toList();
 
     return Stats(
       weekComments: weekComments,

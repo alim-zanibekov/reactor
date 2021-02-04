@@ -14,7 +14,7 @@ description: JoyReactor client.
 version: 0.5.0
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.10.0 <3.0.0"
 
 dependencies:
   video_player:
@@ -25,11 +25,12 @@ dependencies:
   dio: ^3.0.10
   html: ^0.14.0+4
   transparent_image: ^1.0.0
-  page_transition: ^1.1.7+2
+  flutter_chips_input: ^1.9.5
+  page_transition: ^1.1.7+3
   flutter_inappwebview: ^4.0.0+4
-  url_launcher: ^5.7.7
+  url_launcher: ^5.7.10
   icon_shadow: ^1.0.1
-  shared_preferences: '>=0.5.12+2 <2.0.0'
+  shared_preferences: '>=0.5.12+4 <2.0.0'
   flutter_advanced_networkimage:
     git:
       url: https://github.com/mchome/flutter_advanced_networkimage
@@ -38,13 +39,13 @@ dependencies:
   double_back_to_close_app: ^1.2.0
   scrollable_positioned_list: ^0.1.8
   uni_links: ^0.4.0
-  sentry: ^3.0.1
-  file_picker: ^2.0.10
-  device_info: '>=0.4.2+9 <2.0.0'
-  package_info: '>=0.4.3 <2.0.0'
+  sentry: ^4.0.0
+  file_picker: ^2.1.6
+  device_info: 1.0.0
+  package_info: '>=0.4.3+2 <2.0.0'
   flutter_user_agent: ^1.2.2
-  path_provider: ^1.6.21
-  flutter_local_notifications: ^3.0.0
+  path_provider: ^1.6.24
+  flutter_local_notifications: ^4.0.0
   flutter:
     sdk: flutter
 

@@ -57,7 +57,7 @@ class CommentsParser {
       final pair = elementsStack.removeLast();
       final child = pair.right;
       if (pair.left != stack.length - 1) {
-        while (stack.length > 0 && stack.length - 1 != pair.left) {
+        while (stack.isNotEmpty && stack.length - 1 != pair.left) {
           stack.removeLast();
         }
       }

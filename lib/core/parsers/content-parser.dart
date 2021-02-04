@@ -97,7 +97,7 @@ class ContentParser {
       final pair = nodes.removeLast();
       final node = pair.right;
       if (pair.left < sizes.length - 1) {
-        while (sizes.length > 0 && sizes.length - 1 != pair.left) {
+        while (sizes.isNotEmpty && sizes.length - 1 != pair.left) {
           sizes.removeLast();
           styles.removeLast();
           links.removeLast();

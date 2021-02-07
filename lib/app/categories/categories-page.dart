@@ -33,7 +33,7 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
               SliverToBoxAdapter(
                 child: Column(children: <Widget>[
                   ..._title('Основные разделы'),
-                  const AppCategoriesMain()
+                  const AppCategoriesMain(),
                 ]),
               ),
               if (stats.trends != null)
@@ -69,7 +69,7 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
             children: <Widget>[
               AppCategoriesTags(tags: stats.twoDayTags),
               AppCategoriesTags(tags: stats.weekTags),
-              AppCategoriesTags(tags: stats.allTimeTags)
+              AppCategoriesTags(tags: stats.allTimeTags),
             ],
           ),
         ),
@@ -94,7 +94,7 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
           child: TabBarView(
             children: <Widget>[
               AppCategoriesComments(comments: stats.twoDayComments),
-              AppCategoriesComments(comments: stats.weekComments)
+              AppCategoriesComments(comments: stats.weekComments),
             ],
           ),
         ),
@@ -112,11 +112,13 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
             height: stats.trends.length * 60.0,
             child: AppCategoriesTags(
               tags: stats.trends
-                  .map((e) => ExtendedTag(e.value,
-                      icon: e.icon,
-                      link: e.link,
-                      isMain: e.isMain,
-                      prefix: e.prefix))
+                  .map((e) => ExtendedTag(
+                        e.value,
+                        icon: e.icon,
+                        link: e.link,
+                        isMain: e.isMain,
+                        prefix: e.prefix,
+                      ))
                   .toList(),
             ),
           ),
@@ -142,7 +144,7 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
           child: TabBarView(
             children: <Widget>[
               AppCategoriesUsers(users: stats.weekUsers),
-              AppCategoriesUsers(users: stats.monthUsers)
+              AppCategoriesUsers(users: stats.monthUsers),
             ],
           ),
         ),
@@ -160,7 +162,7 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
           style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
         ),
       ),
-      Padding(padding: _defaultPadding, child: Divider(height: 0))
+      Padding(padding: _defaultPadding, child: Divider(height: 0)),
     ];
   }
 

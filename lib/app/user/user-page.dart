@@ -218,10 +218,7 @@ class _AppUserLoaderState extends State<_AppUserLoader>
               controller: _scrollController,
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: MediaQuery
-                      .of(context)
-                      .size
-                      .height,
+                  minHeight: MediaQuery.of(context).size.height,
                 ),
                 child: AppUser(
                   user: user,

@@ -415,9 +415,7 @@ class _AppContentState extends State<AppContent> {
       child: RichText(
         text: TextSpan(
           text: '',
-          style: DefaultTextStyle
-              .of(context)
-              .style,
+          style: DefaultTextStyle.of(context).style,
           children: result,
         ),
       ),

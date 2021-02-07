@@ -52,7 +52,7 @@ class AppTag extends StatelessWidget {
                         height: tag.value != null ? 2 : 1,
                       ),
                     ),
-                    TextSpan(text: '${tag.subscribersCount}')
+                    TextSpan(text: '${tag.subscribersCount}'),
                   ],
                   if (tag.subscribersDeltaCount != null) ...[
                     TextSpan(
@@ -62,21 +62,21 @@ class AppTag extends StatelessWidget {
                         height: tag.value != null ? 2 : 1,
                       ),
                     ),
-                    TextSpan(text: '+${tag.subscribersDeltaCount}')
+                    TextSpan(text: '+${tag.subscribersDeltaCount}'),
                   ],
                   if (tag.count != null) ...[
                     TextSpan(
                       text: '\nСообщений: ',
                       style: const TextStyle(fontWeight: FontWeight.w500),
                     ),
-                    TextSpan(text: '${tag.count}')
+                    TextSpan(text: '${tag.count}'),
                   ],
                   if (tag.commonRating != null) ...[
                     TextSpan(
                       text: '\nРейтинг постов: ',
                       style: const TextStyle(fontWeight: FontWeight.w500),
                     ),
-                    TextSpan(text: '${tag.commonRating}')
+                    TextSpan(text: '${tag.commonRating}'),
                   ],
                 ],
               ),

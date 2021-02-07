@@ -170,8 +170,8 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
                 ),
               );
               _sendErrorStatistics = true;
-//            setState(() => _sendErrorStatistics = sendErrorStatistics);
-//            await _preferences.setSendErrorStatistics(sendErrorStatistics);
+              // setState(() => _sendErrorStatistics = sendErrorStatistics);
+              // await _preferences.setSendErrorStatistics(sendErrorStatistics);
             },
           )
         ],
@@ -189,10 +189,11 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             return SingleChildScrollView(
-              child: OrientationBuilder(builder: (context, orientation) {
+              child: OrientationBuilder(builder: (context, _) {
                 return Container(
                   constraints: BoxConstraints(
-                      minHeight: MediaQuery.of(context).size.height),
+                    minHeight: MediaQuery.of(context).size.height,
+                  ),
                   alignment: Alignment.center,
                   child: AlertDialog(
                     title: Text('Введите новый хост'),
@@ -209,23 +210,17 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
                     actions: <Widget>[
                       FlatButton(
                         child: Text('Отмена'),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                        onPressed: () => Navigator.pop(context),
                       ),
                       FlatButton(
                         child: Text('Сохранить'),
                         onPressed: () async {
                           if (_preferences.hostList
                               .contains(_textFieldController.text)) {
-                            setStateDialog(() {
-                              errorText = 'Такой хост уже существует';
-                            });
+                            errorText = 'Такой хост уже существует';
                           } else if (_textFieldController.text == null ||
                               _textFieldController.text == '') {
-                            setStateDialog(() {
-                              errorText = 'Введите хост';
-                            });
+                            errorText = 'Введите хост';
                           } else {
                             final isValid = await Api()
                                 .checkHost(_textFieldController.text);
@@ -233,11 +228,10 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
                               result = _textFieldController.text;
                               Navigator.pop(context);
                             } else {
-                              setStateDialog(() {
-                                errorText = 'Это не хост реактора';
-                              });
+                              errorText = 'Это не хост реактора';
                             }
                           }
+                          setStateDialog(() {});
                         },
                       ),
                     ],

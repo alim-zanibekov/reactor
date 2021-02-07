@@ -161,65 +161,65 @@ class _AppVideoPlayerState extends State<AppVideoPlayer> {
       key: ValueKey(widget.url),
       child: _initialized
           ? Stack(children: <Widget>[
-        ClipRect(child: VideoPlayer(_controller)),
-        GestureDetector(
-          onTap: () {
-            if (!_isPlaying) {
-              _controller.play();
-            } else {
-              _controller.pause();
-            }
-          },
-          child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 150),
-            opacity: _isPlaying ? 0 : 1,
-            child: const DecoratedBox(
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(0, 0, 0, 0.5),
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.play_arrow,
-                  size: 42,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ),
-        if (_isPlaying)
-          Positioned(
-            right: 0,
-            top: 0,
-            child: GestureDetector(
-              onTap: () {
-                _controller.seekTo(Duration.zero);
-                _controller.play();
-              },
-              child: Container(
-                color: Colors.transparent,
-                padding: const EdgeInsets.only(
-                  top: 10,
-                  right: 10,
-                  bottom: 20,
-                  left: 20,
-                ),
-                child: IconShadowWidget(
-                  const Icon(
-                    Icons.refresh,
-                    size: 22,
-                    color: Colors.white,
+              ClipRect(child: VideoPlayer(_controller)),
+              GestureDetector(
+                onTap: () {
+                  if (!_isPlaying) {
+                    _controller.play();
+                  } else {
+                    _controller.pause();
+                  }
+                },
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 150),
+                  opacity: _isPlaying ? 0 : 1,
+                  child: const DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(0, 0, 0, 0.5),
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.play_arrow,
+                        size: 42,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                  shadowColor: Colors.black,
                 ),
               ),
-            ),
-          ),
-      ])
+              if (_isPlaying)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: GestureDetector(
+                    onTap: () {
+                      _controller.seekTo(Duration.zero);
+                      _controller.play();
+                    },
+                    child: Container(
+                      color: Colors.transparent,
+                      padding: const EdgeInsets.only(
+                        top: 10,
+                        right: 10,
+                        bottom: 20,
+                        left: 20,
+                      ),
+                      child: IconShadowWidget(
+                        const Icon(
+                          Icons.refresh,
+                          size: 22,
+                          color: Colors.white,
+                        ),
+                        shadowColor: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+            ])
           : FadeIcon(
-        key: ObjectKey(widget.url),
-        icon: Icon(Icons.gif, color: Colors.grey[500], size: 44),
-      ),
+              key: ObjectKey(widget.url),
+              icon: Icon(Icons.gif, color: Colors.grey[500], size: 44),
+            ),
     );
   }
 }

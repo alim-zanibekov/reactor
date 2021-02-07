@@ -2,13 +2,10 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_networkimage/provider.dart';
-import 'package:transparent_image/transparent_image.dart';
 
 import '../common/retry-network-image.dart';
 import '../widgets/fade-icon.dart';
 import 'onerror-reload.dart';
-
-final placeholder = MemoryImage(kTransparentImage);
 
 class AppSafeImage extends StatefulWidget {
   final ImageProvider imageProvider;
@@ -96,7 +93,7 @@ class _AppSafeImageState extends State<AppSafeImage> {
     widget.imageProvider
         .resolve(ImageConfiguration())
         .addListener(ImageStreamListener((imageInfo, bool _) async {
-      image = imageInfo.image;
+          image = imageInfo.image;
           if (widget.onInfo != null && !_loaded) {
             _loaded = true;
             widget.onInfo(imageInfo);
@@ -108,13 +105,13 @@ class _AppSafeImageState extends State<AppSafeImage> {
           if (mounted) {
             setState(() {});
           }
-    }, onError: (obj, stack) {
-      _error = true;
-      _animate = false;
-      if (mounted) {
-        setState(() {});
-      }
-    }));
+        }, onError: (obj, stack) {
+          _error = true;
+          _animate = false;
+          if (mounted) {
+            setState(() {});
+          }
+        }));
 
     if (mounted) {
       setState(() {});

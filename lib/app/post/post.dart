@@ -186,8 +186,8 @@ class _AppPostContentState extends State<AppPostContent>
     }
 
     bool hasUndefinedSizeImages = _post.content.any(
-            (e) =>
-        e is ContentUnitImage && (e.width == null || e.height == null));
+      (e) => e is ContentUnitImage && (e.width == null || e.height == null),
+    );
 
     if (_realPostHeight - _postMaxHeight > 300 || hasUndefinedSizeImages) {
       _currentMaxHeight = _postMaxHeight;

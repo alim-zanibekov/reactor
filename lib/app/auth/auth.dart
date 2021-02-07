@@ -42,8 +42,9 @@ class _AppAuthPageState extends State<AppAuthPage> {
                       opacity: _error ? 1 : 0,
                       child: Text(
                         'Неверное имя пользователя или пароль',
-                        style:
-                            style.copyWith(color: Theme.of(context).errorColor),
+                        style: style.copyWith(
+                          color: Theme.of(context).errorColor,
+                        ),
                       ),
                     ),
                   ),

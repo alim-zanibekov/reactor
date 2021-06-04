@@ -60,19 +60,19 @@ class _AppVimeoPlayerState extends State<AppVimeoPlayer>
     return OrientationBuilder(
       builder: (context, orientation) {
         return InAppWebView(
-          initialUrl: _url,
+          initialUrlRequest: URLRequest(url: Uri.parse(_url)),
           initialOptions: inAppWebViewDefaultOptions(),
-          onLoadStop: (controller, String url) {
+          onLoadStop: (controller, _) {
             controller.injectCSSCode(
                 source: '.vp-sidedock { display: none!important;}');
             controller.evaluateJavascript(
                 source: 'document.querySelector("button.play").click()');
           },
           shouldOverrideUrlLoading: (controller, request) async {
-            canLaunch(request.url)
-                .then((value) => value ? launch(request.url) : null);
+            canLaunch(request.request.url.toString()).then((value) =>
+                value ? launch(request.request.url.toString()) : null);
 
-            return ShouldOverrideUrlLoadingAction.CANCEL;
+            return NavigationActionPolicy.CANCEL;
           },
           onEnterFullscreen: (_) {
             _wantKeepAlive = true;
@@ -82,7 +82,7 @@ class _AppVimeoPlayerState extends State<AppVimeoPlayer>
             _wantKeepAlive = false;
             updateKeepAlive();
           },
-          onLoadError: (controller, String url, err1, err2) {
+          onLoadError: (controller, url, err1, err2) {
             _error = true;
             if (mounted) {
               setState(() {});

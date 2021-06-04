@@ -162,7 +162,7 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
             value: _sendErrorStatistics,
             activeColor: Theme.of(context).accentColor,
             onChanged: (bool sendErrorStatistics) async {
-              Scaffold.of(context).showSnackBar(
+              ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text(
                     'Пока что нельзя это выключить, подождите более стабильной версии',

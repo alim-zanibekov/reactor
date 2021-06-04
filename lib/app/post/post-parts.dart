@@ -58,7 +58,7 @@ class PostTopControls extends StatelessWidget {
             onSelected: (selected) {
               if (selected == 0) {
                 Clipboard.setData(ClipboardData(text: post.link));
-                Scaffold.of(context).showSnackBar(
+                ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Скопировано')),
                 );
               } else {

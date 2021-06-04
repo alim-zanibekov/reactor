@@ -130,25 +130,27 @@ class _AppPostContentState extends State<AppPostContent>
               curve: widget.collapseCurve,
               key: _postKey,
               height: _currentMaxHeight,
-              child: AppContent(
-                key: ObjectKey(_post),
-                content: _post.content,
-                onLoad: _onLoad,
-                children: _post.quiz != null
-                    ? <Widget>[
-                        Container(
-                          color: _isDark ? Colors.black26 : Colors.grey[300],
-                          height: 1,
-                        ),
-                        AppQuiz(
-                          quiz: _post.quiz,
-                          quizUpdated: (quiz) {
-                            _post.quiz = quiz;
-                            if (mounted) setState(() => null);
-                          },
-                        )
-                      ]
-                    : null,
+              child: ClipRect(
+                child: AppContent(
+                  key: ObjectKey(_post),
+                  content: _post.content,
+                  onLoad: _onLoad,
+                  children: _post.quiz != null
+                      ? <Widget>[
+                          Container(
+                            color: _isDark ? Colors.black26 : Colors.grey[300],
+                            height: 1,
+                          ),
+                          AppQuiz(
+                            quiz: _post.quiz,
+                            quizUpdated: (quiz) {
+                              _post.quiz = quiz;
+                              if (mounted) setState(() => null);
+                            },
+                          )
+                        ]
+                      : null,
+                ),
               ),
             )
           else if (_post.censored || _post.unsafe)

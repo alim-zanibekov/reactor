@@ -263,9 +263,9 @@ class _AppContentState extends State<AppContent> {
       onLongPress: () {
         showMenu(
           position: RelativeRect.fromRect(
-              pos & Size(40, 40), // smaller rect, the touch area
-              Offset.zero & overlay.size // Bigger rect, the entire screen
-              ),
+            pos & Size(40, 40), // smaller rect, the touch area
+            Offset.zero & overlay.size, // Bigger rect, the entire screen
+          ),
           context: context,
           items: [
             if (entry.gifUrl != null)

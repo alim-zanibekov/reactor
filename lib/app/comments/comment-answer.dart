@@ -44,7 +44,7 @@ class _AppCommentAnswerState extends State<AppCommentAnswer> {
       }
       _controller.text = '';
     } on Exception {
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: const Text('Произошла ошибка при загрузке')),
       );
     }

@@ -6,7 +6,8 @@ import '../common/open.dart';
 class AppCategoriesComments extends StatelessWidget {
   final List<StatsComment> comments;
 
-  const AppCategoriesComments({Key key, this.comments}) : super(key: key);
+  const AppCategoriesComments({Key key, this.comments = const []})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

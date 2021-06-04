@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chips_input/flutter_chips_input.dart';
 
 import '../../core/api/api.dart';
+import '../../core/widgets/chips-input.dart';
 import '../common/open.dart';
 
 class AppSearch extends StatefulWidget {
@@ -36,6 +36,7 @@ class _AppSearchState extends State<AppSearch> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
                     children: [
                       Expanded(
                         flex: 2,

@@ -96,13 +96,13 @@ class _AppYouTubePlayerState extends State<AppYouTubePlayer>
             source:
                 'document.querySelector(\'iframe\')).contentWindow.postMessage({ type: \'pause\'}, \'*\');');
 
-        canLaunch(request.url)
-            .then((value) => value ? launch(request.url) : null);
+        canLaunch(request.request.url.toString()).then(
+            (value) => value ? launch(request.request.url.toString()) : null);
 
-        return ShouldOverrideUrlLoadingAction.CANCEL;
+        return NavigationActionPolicy.CANCEL;
       },
       androidShouldInterceptRequest: (controller, request) async {
-        if (request.url == 'https://www.youtube.com/embed') {
+        if (request.url.toString() == 'https://www.youtube.com/embed') {
           return WebResourceResponse(
             contentEncoding: 'utf-8',
             contentType: "text/html",
@@ -125,7 +125,7 @@ class _AppYouTubePlayerState extends State<AppYouTubePlayer>
         }
         return null;
       },
-      onLoadError: (controller, String url, err1, err2) {
+      onLoadError: (controller, url, err1, err2) {
         _error = true;
         if (mounted) {
           setState(() {});

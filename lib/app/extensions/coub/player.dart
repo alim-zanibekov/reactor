@@ -22,7 +22,7 @@ class AppCoubPlayer extends StatefulWidget {
 }
 
 class _AppCoubPlayerState extends State<AppCoubPlayer> {
-  String url;
+  String _url;
   OEmbedMetadata metadata;
   double aspectRatio = 16.0 / 9.0;
   bool webViewShow = false;
@@ -47,14 +47,14 @@ class _AppCoubPlayerState extends State<AppCoubPlayer> {
         ErrorReporter.reportError(error, stackTrace);
       });
     }
-    url = 'https://coub.com/embed/${widget.videoId}';
+    _url = 'https://coub.com/embed/${widget.videoId}';
   }
 
   Widget getVideo(BuildContext context) {
     return OrientationBuilder(
       builder: (context, orientation) {
         return InAppWebView(
-          initialUrl: url,
+          initialUrlRequest: URLRequest(url: Uri.parse(_url)),
           initialOptions: inAppWebViewDefaultOptions(),
           onProgressChanged: (controller, _) {
             controller.injectCSSCode(
@@ -62,19 +62,19 @@ class _AppCoubPlayerState extends State<AppCoubPlayer> {
                   ' .viewer__click { opacity: 0!important; }',
             );
           },
-          onLoadStop: (InAppWebViewController controller, String url) {
+          onLoadStop: (InAppWebViewController controller, Uri url) {
             controller.evaluateJavascript(
               source: 'document.querySelector(".viewer__click").click()',
             );
           },
           shouldOverrideUrlLoading: (controller, request) async {
-            canLaunch(request.url)
-                .then((value) => value ? launch(request.url) : null);
+            canLaunch(request.request.url.toString()).then((value) =>
+                value ? launch(request.request.url.toString()) : null);
 
-            return ShouldOverrideUrlLoadingAction.CANCEL;
+            return NavigationActionPolicy.CANCEL;
           },
           onLoadError:
-              (InAppWebViewController controller, String url, err1, err2) {
+              (InAppWebViewController controller, Uri url, err1, err2) {
             error = true;
             if (mounted) {
               setState(() {});

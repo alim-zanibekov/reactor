@@ -114,6 +114,8 @@ class Api {
           'Ключ авторизации недействителен, ключ удален',
         );
       });
+    } else {
+      _auth.updateTokenIfNeed(res);
     }
     return page;
   }
@@ -142,16 +144,16 @@ class Api {
       _loadPage('$_host/user/$username/$pageId');
 
   Future<ContentPage<Post>> loadSubscriptions() =>
-      _loadPage('$_host/subscriptions');
+      _loadPage('http://old.reactor.cc/subscriptions');
 
   Future<ContentPage<Post>> loadSubscriptionsByPageId(int id) =>
-      _loadPage('$_host/subscriptions/$id');
+      _loadPage('http://old.reactor.cc/subscriptions/$id');
 
   Future<ContentPage<Post>> loadFavorite(String username) =>
-      _loadPage('$_host/user/$username/favorite');
+      _loadPage('http://old.reactor.cc/user/$username/favorite');
 
   Future<ContentPage<Post>> loadFavoriteByPageId(String username, int id) =>
-      _loadPage('$_host/user/$username/favorite/$id');
+      _loadPage('http://old.reactor.cc/user/$username/favorite/$id');
 
   Future<List<ContentUnit>> loadComment(int id) async {
     final res = await _session.get('$_host/post/comment/$id');

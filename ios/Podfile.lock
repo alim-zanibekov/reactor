@@ -1,4 +1,6 @@
 PODS:
+  - advanced_image (0.0.1):
+    - Flutter
   - CocoaAsyncSocket (7.6.4)
   - device_info (0.0.1):
     - Flutter
@@ -42,6 +44,11 @@ PODS:
   - Flutter (1.0.0)
   - flutter_inappwebview (0.0.1):
     - Flutter
+    - flutter_inappwebview/Core (= 0.0.1)
+    - OrderedSet (~> 5.0)
+  - flutter_inappwebview/Core (0.0.1):
+    - Flutter
+    - OrderedSet (~> 5.0)
   - flutter_local_notifications (0.0.1):
     - Flutter
   - flutter_user_agent (1.2.2):
@@ -50,11 +57,12 @@ PODS:
     - CocoaAsyncSocket
   - KTVHTTPCache (2.0.1):
     - KTVCocoaHTTPServer
+  - OrderedSet (5.0.0)
   - package_info (0.0.1):
     - Flutter
   - path_provider (0.0.1):
     - Flutter
-  - "permission_handler (5.0.1+1)":
+  - "permission_handler (5.1.0+2)":
     - Flutter
   - SDWebImage (5.8.1):
     - SDWebImage/Core (= 5.8.1)
@@ -73,6 +81,7 @@ PODS:
     - KTVHTTPCache (~> 2.0.0)
 
 DEPENDENCIES:
+  - advanced_image (from `.symlinks/plugins/advanced_image/ios`)
   - device_info (from `.symlinks/plugins/device_info/ios`)
   - ext_storage (from `.symlinks/plugins/ext_storage/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
@@ -96,10 +105,13 @@ SPEC REPOS:
     - FLAnimatedImage
     - KTVCocoaHTTPServer
     - KTVHTTPCache
+    - OrderedSet
     - SDWebImage
     - SDWebImageFLPlugin
 
 EXTERNAL SOURCES:
+  advanced_image:
+    :path: ".symlinks/plugins/advanced_image/ios"
   device_info:
     :path: ".symlinks/plugins/device_info/ios"
   ext_storage:
@@ -130,6 +142,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/video_player/ios"
 
 SPEC CHECKSUMS:
+  advanced_image: c45d41d62c4ed30509825713092ae389e077362d
   CocoaAsyncSocket: 694058e7c0ed05a9e217d1b3c7ded962f4180845
   device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
   DKImagePickerController: 4a3e7948a848c4348e600b3fe5ce41478835fa10
@@ -137,15 +150,16 @@ SPEC CHECKSUMS:
   ext_storage: 4eaf3a84d5594106e2ebcc2502248cfde53c8fa1
   file_picker: 3e6c3790de664ccf9b882732d9db5eaf6b8d4eb1
   FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
-  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_inappwebview: 69dfbac46157b336ffbec19ca6dfd4638c7bf189
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  flutter_inappwebview: bfd58618f49dc62f2676de690fc6dcda1d6c3721
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
   flutter_user_agent: 27c45d034dc31b80948d29998cea52cd3a7bf936
   KTVCocoaHTTPServer: df8d7b861e603ff8037e9b2138aca2563a6b768d
   KTVHTTPCache: 588c3eb16f6bd1e6fde1e230dabfb7bd4e490a4d
+  OrderedSet: aaeb196f7fef5a9edf55d89760da9176ad40b93c
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
-  permission_handler: eac8e15b4a1a3fba55b761d19f3f4e6b005d15b6
+  permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
   SDWebImage: e3eae2eda88578db0685a0c88597fdadd9433f05
   SDWebImageFLPlugin: 6c2295fb1242d44467c6c87dc5db6b0a13228fd8
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d

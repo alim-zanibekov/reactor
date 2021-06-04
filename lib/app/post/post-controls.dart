@@ -47,7 +47,7 @@ class _AppPostControlsState extends State<AppPostControls> {
       await Api().setFavorite(widget.post.id, !widget.post.favorite);
       widget.post.favorite = !widget.post.favorite;
     } catch (e) {
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         widget.post.favorite
             ? const SnackBar(content: Text('Не удалось удалить из закладок'))
             : const SnackBar(content: Text('Не удалось добавить в закладки')),
@@ -70,7 +70,7 @@ class _AppPostControlsState extends State<AppPostControls> {
       _loading = false;
       if (mounted) setState(() {});
     } on Exception {
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Не удалось проголосовать')),
       );
       _loading = false;

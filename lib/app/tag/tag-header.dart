@@ -47,7 +47,7 @@ class _AppTagHeaderState extends State<AppTagHeader> {
       _pageInfo.subscribed = !_pageInfo.subscribed;
       _pageInfo.blocked = false;
     } on Exception {
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         _pageInfo.subscribed
             ? const SnackBar(content: Text('Не удалось отписаться'))
             : const SnackBar(content: Text('Не удалось подписаться')),
@@ -69,7 +69,7 @@ class _AppTagHeaderState extends State<AppTagHeader> {
         widget.onBlock();
       }
     } on Exception {
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         _pageInfo.blocked
             ? const SnackBar(content: Text('Не удалось разблокировать'))
             : const SnackBar(content: Text('Не удалось заблокировать')),

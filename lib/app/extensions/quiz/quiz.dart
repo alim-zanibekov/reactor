@@ -28,7 +28,7 @@ class _AppQuizState extends State<AppQuiz> {
       final quiz = await _api.voteQuiz(id);
       widget.quizUpdated(quiz);
     } catch (e) {
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Не удалось проголосовать')),
       );
     } finally {

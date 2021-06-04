@@ -1,7 +1,6 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_advanced_networkimage/provider.dart';
 
 import '../common/retry-network-image.dart';
 import '../widgets/fade-icon.dart';
@@ -42,9 +41,9 @@ class _AppSafeImageState extends State<AppSafeImage> {
   void initState() {
     _animate = widget.showAnimation;
 
-    if (widget.imageProvider is AdvancedNetworkImage) {
+    if (widget.imageProvider is AppNetworkImageWithRetry) {
       final url =
-          (widget.imageProvider as AdvancedNetworkImage).url.toLowerCase();
+          (widget.imageProvider as AppNetworkImageWithRetry).url.toLowerCase();
       if (url.endsWith('.gif') || url.endsWith('.apng')) {
         _animated = true;
         _hasAlphaChannel = true;

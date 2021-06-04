@@ -18,6 +18,7 @@ class _AppAuthPageState extends State<AppAuthPage> {
 
   bool _loading = false;
   bool _error = false;
+  String _errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,7 @@ class _AppAuthPageState extends State<AppAuthPage> {
                       duration: const Duration(milliseconds: 150),
                       opacity: _error ? 1 : 0,
                       child: Text(
-                        'Неверное имя пользователя или пароль',
+                        _errorMessage ?? 'Неверное имя пользователя или пароль',
                         style: style.copyWith(
                           color: Theme.of(context).errorColor,
                         ),
@@ -52,8 +53,9 @@ class _AppAuthPageState extends State<AppAuthPage> {
                 TextFormField(
                   controller: _usernameEditingController,
                   obscureText: false,
-                  validator: (value) =>
-                      value.isEmpty ? 'Введите имя пользователя' : null,
+                  validator: (value) => (value?.isEmpty ?? true)
+                      ? 'Введите имя пользователя'
+                      : null,
                   decoration: const InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 15.0),
                     hintText: 'Имя пользователя',
@@ -63,7 +65,8 @@ class _AppAuthPageState extends State<AppAuthPage> {
                 TextFormField(
                   controller: _passwordEditingController,
                   obscureText: true,
-                  validator: (value) => value.isEmpty ? 'Введите пароль' : null,
+                  validator: (value) =>
+                      (value?.isEmpty ?? true) ? 'Введите пароль' : null,
                   decoration: const InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 15.0),
                     hintText: 'Пароль',
@@ -76,7 +79,7 @@ class _AppAuthPageState extends State<AppAuthPage> {
                     highlightedBorderColor: Theme.of(context).accentColor,
                     padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                     onPressed: () async {
-                      if (_formKey.currentState.validate()) {
+                      if (_formKey.currentState?.validate() ?? false) {
                         FocusScope.of(context).requestFocus(FocusNode());
                         setState(() => _loading = true);
                         try {
@@ -85,7 +88,16 @@ class _AppAuthPageState extends State<AppAuthPage> {
                               _passwordEditingController.value.text);
                           _loading = false;
                           AppPages.appBottomBarPage.add(AppBottomBarPage.MAIN);
-                        } on UnauthorizedException {
+                        } catch (err) {
+                          if (err is InvalidUsernameOrPasswordException) {
+                            _errorMessage =
+                                'Неверное имя пользователя или пароль';
+                          } else if (err is RateLimitException) {
+                            _errorMessage = 'Превышен лимит обращений';
+                          } else if (err is InvalidStatusCodeException) {
+                            _errorMessage =
+                                'Что то пошло не так, повторите позже';
+                          }
                           setState(() {
                             _error = true;
                             _loading = false;

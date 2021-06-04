@@ -151,7 +151,7 @@ goToLink(BuildContext context, String link) {
   } else if (parsed is UserLink) {
     openUser(context, parsed.username, parsed.link, animate: false);
   } else {
-    Scaffold.of(context).showSnackBar(const SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text('Ссылка не распознана'),
     ));
   }

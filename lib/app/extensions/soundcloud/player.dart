@@ -22,7 +22,7 @@ class AppSoundCloudPlayer extends StatefulWidget {
 }
 
 class _AppSoundCloudPlayerState extends State<AppSoundCloudPlayer> {
-  String url;
+  String _url;
   OEmbedMetadata metadata;
   bool webViewShow = false;
 
@@ -42,7 +42,7 @@ class _AppSoundCloudPlayerState extends State<AppSoundCloudPlayer> {
         ErrorReporter.reportError(error, stackTrace);
       });
     }
-    url = 'https://w.soundcloud.com/player/'
+    _url = 'https://w.soundcloud.com/player/'
         '?url=${Uri.encodeQueryComponent(widget.url)}';
   }
 
@@ -50,7 +50,7 @@ class _AppSoundCloudPlayerState extends State<AppSoundCloudPlayer> {
     return OrientationBuilder(
       builder: (context, orientation) {
         return InAppWebView(
-          initialUrl: url,
+          initialUrlRequest: URLRequest(url: Uri.parse(_url)),
           initialOptions: inAppWebViewDefaultOptions(),
           onProgressChanged: (controller, _) {
             controller.injectCSSCode(
@@ -65,9 +65,10 @@ class _AppSoundCloudPlayerState extends State<AppSoundCloudPlayer> {
             );
           },
           shouldOverrideUrlLoading: (controller, request) async {
-            canLaunch(request.url)
-                .then((value) => value ? launch(request.url) : null);
-            return ShouldOverrideUrlLoadingAction.CANCEL;
+            canLaunch(request.request.url.toString()).then((value) =>
+                value ? launch(request.request.url.toString()) : null);
+
+            return NavigationActionPolicy.CANCEL;
           },
           onLoadError: (controller, _, err1, err2) {
             error = true;

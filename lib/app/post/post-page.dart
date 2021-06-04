@@ -132,7 +132,7 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
                 _post = post;
                 if (mounted) setState(() {});
               } on Exception {
-                Scaffold.of(context).showSnackBar(
+                ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Не удалось загрзить содержимое поста'),
                   ),

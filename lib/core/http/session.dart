@@ -16,7 +16,7 @@ class Session {
   String _authToken;
   bool _sfw = false;
 
-  Dio _dio;
+  Dio _dio = Dio();
   Map<String, dynamic> _headers;
 
   void setToken(String token) {
@@ -52,9 +52,7 @@ class Session {
     }
   }
 
-  Session._internal() {
-    _dio = Dio();
-  }
+  Session._internal();
 
   Future<Response> get<T>(String url) async {
     final res = await _dio.get<T>(url, options: Options(headers: _headers));
@@ -75,7 +73,7 @@ class Session {
   }
 
   Future<Response> post(String url, dynamic data,
-      {ProgressCallback onSendProgress}) async {
+      {ProgressCallback onSendProgress, bool withoutAuth = false}) async {
     return _dio.post(
       url,
       data: data,
@@ -85,7 +83,7 @@ class Session {
         validateStatus: (status) {
           return status < 400;
         },
-        headers: _headers,
+        headers: withoutAuth ? {} : _headers ?? {},
       ),
     );
   }

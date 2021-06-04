@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:ext_storage/ext_storage.dart';
+// import 'package:ext_storage/ext_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -18,8 +18,9 @@ class SaveFile {
         throw 'denied';
       }
     }
-    final path = await ExtStorage.getExternalStoragePublicDirectory(
-        ExtStorage.DIRECTORY_DOWNLOADS);
+    // final path = await ExtStorage.getExternalStoragePublicDirectory(
+    //     ExtStorage.DIRECTORY_DOWNLOADS);
+    final path = 'dsds';
     String fileName =
         Uri.decodeComponent(fileUrl?.split('/')?.last ?? 'reactor.file');
 
@@ -37,11 +38,11 @@ class SaveFile {
       });
       notification.hide();
       SaveFile.save(url, file);
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Сохранено')),
       );
     } on Exception {
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Не удалось загрузить')),
       );
     }

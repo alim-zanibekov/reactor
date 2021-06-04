@@ -1,11 +1,9 @@
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
-import '../../../variables.dart';
-
 InAppWebViewGroupOptions inAppWebViewDefaultOptions() =>
     InAppWebViewGroupOptions(
       crossPlatform: InAppWebViewOptions(
-        debuggingEnabled: isInDebugMode,
+        // debuggingEnabled: isInDebugMode,
         mediaPlaybackRequiresUserGesture: false,
         horizontalScrollBarEnabled: false,
         transparentBackground: true,

@@ -20,7 +20,7 @@ class SentryReporter {
   ));
 
   Map<String, dynamic> _extra;
-  User _user;
+  SentryUser _user;
   Contexts _contexts;
 
   Future init() async {
@@ -28,7 +28,7 @@ class SentryReporter {
     final packageInfo = await PackageInfo.fromPlatform();
 
     String appHash;
-    Device device;
+    SentryDevice device;
     if (Platform.isAndroid) {
       final AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
       _extra = <String, dynamic>{
@@ -49,7 +49,7 @@ class SentryReporter {
         'isPhysicalDevice': androidDeviceInfo.isPhysicalDevice,
       };
       appHash = androidDeviceInfo.androidId;
-      device = Device(
+      device = SentryDevice(
         brand: androidDeviceInfo.brand,
         model: androidDeviceInfo.model,
         modelId: androidDeviceInfo.device,
@@ -68,7 +68,7 @@ class SentryReporter {
         'isPhysicalDevice': iosDeviceInfo.isPhysicalDevice,
       };
       appHash = iosDeviceInfo.identifierForVendor;
-      device = Device(
+      device = SentryDevice(
         brand: 'Apple',
         model: iosDeviceInfo.model,
         simulator: !iosDeviceInfo.isPhysicalDevice,
@@ -76,7 +76,7 @@ class SentryReporter {
     }
 
     _contexts = Contexts(
-      app: App(
+      app: SentryApp(
         name: packageInfo.appName,
         version: packageInfo.version,
         build: packageInfo.buildNumber,
@@ -90,7 +90,7 @@ class SentryReporter {
   }
 
   void setUserContext(String username) {
-    _user = User(id: username.toLowerCase(), username: username);
+    _user = SentryUser(id: username.toLowerCase(), username: username);
   }
 
   void resetUserContext() {

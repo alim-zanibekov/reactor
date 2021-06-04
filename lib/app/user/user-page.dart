@@ -88,7 +88,7 @@ class _AppUserPageState extends State<AppUserPage>
                 Clipboard.setData(
                   ClipboardData(text: 'http://joyreactor.cc/user/$_link'),
                 );
-                Scaffold.of(context).showSnackBar(
+                ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Скопировано')),
                 );
               } else {
@@ -96,10 +96,11 @@ class _AppUserPageState extends State<AppUserPage>
                 AppPages.appBottomBarPage.add(AppBottomBarPage.PROFILE);
               }
             },
-            itemBuilder: (context) => [
-              if (widget.main)
-                const PopupMenuItem(child: Text('Выход'), value: 0),
+            itemBuilder: (context) =>
+            [
               const PopupMenuItem(child: Text('Скопировать ссылку'), value: 0),
+              if (widget.main)
+                const PopupMenuItem(child: Text('Выход'), value: 1),
             ],
           ),
         )

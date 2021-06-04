@@ -40,8 +40,8 @@ class _AppUserAwards extends State<AppUserAwards> {
             .map(
               (e) => GestureDetector(
                 onTap: () {
-                  Scaffold.of(context).removeCurrentSnackBar();
-                  Scaffold.of(context).showSnackBar(SnackBar(
+                  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       duration: Duration(seconds: 10), content: Text(e.title)));
                 },
                 child: SizedBox(

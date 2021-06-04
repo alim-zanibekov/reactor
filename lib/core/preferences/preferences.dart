@@ -42,6 +42,8 @@ class Preferences {
         final hostListRaw = prefs.getString('host-list');
         final hostList = hostListRaw != null
             ? jsonDecode(hostListRaw)
+                .map<String>((str) => str as String)
+                .toList()
             : ['old.reactor.cc', 'joyreactor.cc', 'reactor.cc'];
         _hostList = hostList;
 

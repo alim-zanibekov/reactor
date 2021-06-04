@@ -1,7 +1,7 @@
 import 'dart:async';
 
+import 'package:decorated_icon/decorated_icon.dart';
 import 'package:flutter/material.dart';
-import 'package:icon_shadow/icon_shadow.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../core/preferences/preferences.dart';
@@ -99,7 +99,7 @@ class _AppVideoPlayerState extends State<AppVideoPlayer> {
 
       _cache.add(_controller);
       _controller.addListener(_onChangeVideoState);
-      _initialized = _controller.value.initialized;
+      _initialized = _controller.value.isInitialized;
 
       _notify();
     }
@@ -121,8 +121,8 @@ class _AppVideoPlayerState extends State<AppVideoPlayer> {
       _notify();
     }
 
-    if (_initialized != _controller.value.initialized) {
-      _initialized = _controller.value.initialized;
+    if (_initialized != _controller.value.isInitialized) {
+      _initialized = _controller.value.isInitialized;
       if (preferences.gifAutoPlay) {
         _controller.play();
       }
@@ -204,13 +204,17 @@ class _AppVideoPlayerState extends State<AppVideoPlayer> {
                         bottom: 20,
                         left: 20,
                       ),
-                      child: IconShadowWidget(
-                        const Icon(
-                          Icons.refresh,
-                          size: 22,
-                          color: Colors.white,
-                        ),
-                        shadowColor: Colors.black,
+                      child: DecoratedIcon(
+                        Icons.refresh,
+                        size: 22,
+                        color: Colors.white,
+                        shadows: [
+                          BoxShadow(
+                            color: Colors.black,
+                            // offset: Offset(3.0, 3.0),
+                            blurRadius: 2.0,
+                          ),
+                        ],
                       ),
                     ),
                   ),

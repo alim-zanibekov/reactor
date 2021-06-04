@@ -104,7 +104,7 @@ class _AppPostListState extends State<AppPostList>
           _postWidgets = List.from(_postWidgets);
           if (mounted) setState(() {});
         } on Exception {
-          Scaffold.of(context).showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
                 content: Text('Не удалось загрзить содержимое поста')),
           );

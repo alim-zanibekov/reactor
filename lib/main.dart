@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_user_agent/flutter_user_agent.dart';
+
+// import 'package:flutter_user_agent/flutter_user_agent.dart';
 
 import 'app/home.dart';
 import 'core/auth/auth.dart';
 import 'core/common/in-app-notifications-manager.dart';
-import 'core/common/retry-network-image.dart';
 import 'core/external/error-reporter.dart';
 import 'core/external/sentry.dart';
 import 'core/preferences/preferences.dart';
@@ -34,23 +34,21 @@ void main() {
       Zone.current.handleUncaughtError(details.exception, details.stack);
     }
   };
-
   runZonedGuarded<Future<void>>(() async {
     runApp(Builder(
       builder: (context) {
-        AppNetworkImageWithRetry.init();
         return FutureBuilder(
           future: Future.wait([
             Auth().init(),
             Preferences().init(),
             SentryReporter().init(),
-            FlutterUserAgent.init(),
+            // FlutterUserAgent.init(),
           ]),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               ErrorReporter.reportError(snapshot.error, null);
               print(snapshot.error);
-            } else {
+            } else if (snapshot.data != null) {
               return App();
             }
             return Container(color: Color.fromRGBO(51, 51, 51, 1));
@@ -90,7 +88,7 @@ class _AppState extends State<App> {
     if (_theme != AppTheme.AUTO) {
       themeMode = _theme == AppTheme.DARK ? ThemeMode.dark : ThemeMode.light;
     }
-    Headers.updateUserAgent(FlutterUserAgent.webViewUserAgent);
+    // Headers.updateUserAgent(FlutterUserAgent.webViewUserAgent);
 
     return MaterialApp(
       theme: ThemeData(
@@ -113,7 +111,8 @@ class _AppState extends State<App> {
             }
             _notificationsSubscription =
                 InAppNotificationsManager.messages$.listen((String text) {
-              Scaffold.of(context).showSnackBar(SnackBar(content: Text(text)));
+                  ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(text)));
             });
             return AppPages();
           }),

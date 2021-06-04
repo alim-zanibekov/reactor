@@ -285,7 +285,7 @@ class _ImageGalleryState extends State<ImageGallery>
       ],
       onSelected: (selected) async {
         if (_activeImage.info == null) {
-          Scaffold.of(context).showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Дождитесь загрузки изображения'),
             ),
@@ -299,11 +299,11 @@ class _ImageGalleryState extends State<ImageGallery>
             (_activeImage.imageProvider as AppNetworkImageWithRetry).url;
         try {
           await SaveFile.save(url, rawBytes);
-          Scaffold.of(context).showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Сохранено')),
           );
         } on Exception {
-          Scaffold.of(context).showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Не удалось сохранить изображение')),
           );
         }

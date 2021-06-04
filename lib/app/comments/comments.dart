@@ -77,7 +77,7 @@ class _AppCommentState extends State<AppComment>
       widget.comment.content = value;
       widget.comment.hidden = false;
     } on Exception {
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Не удалось загрузить комментарий')),
       );
     } finally {
@@ -98,7 +98,7 @@ class _AppCommentState extends State<AppComment>
       _loading = false;
       if (mounted) setState(() {});
     } on Exception {
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Не удалось проголосовать')),
       );
       _loading = false;
@@ -116,7 +116,7 @@ class _AppCommentState extends State<AppComment>
         widget.onDelete();
       }
     } on Exception {
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Не удалось удалить комментарий')),
       );
       _setNotLoading();

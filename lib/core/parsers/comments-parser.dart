@@ -1,5 +1,6 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as parser;
+import 'package:reactor/core/parsers/utils.dart';
 
 import './types/module.dart';
 import '../common/pair.dart';
@@ -9,23 +10,23 @@ import 'types/post.dart';
 class CommentsParser {
   final _contentParser = ContentParser();
 
-  List<PostComment> parsePostComments(Element parsedPage, int postId) {
+  List<PostComment>? parsePostComments(Element parsedPage, int postId) {
     final commentsContainer =
-        parsedPage.querySelector('.ufoot .comment_list_post');
+        parsedPage.querySelector('.ufoot .comment_list_post')!;
     return _parseCommentsElement(commentsContainer, postId);
   }
 
-  List<PostComment> parseComments(String c, int postId) {
+  List<PostComment>? parseComments(String? c, int postId) {
     final parsedPage = parser.parse(c);
     return _parseCommentsElement(
-        parsedPage.querySelector('.comment_list_post'), postId);
+        parsedPage.querySelector('.comment_list_post')!, postId);
   }
 
   PostComment parseComment(Element element, int postId) {
     return _parseComment(element, 0, postId);
   }
 
-  PostComment parseBestCommentElement(Element parsedPage, int postId) {
+  PostComment? parseBestCommentElement(Element parsedPage, int postId) {
     final commentsContainer =
         parsedPage.querySelector('.post_top .post_comment_list');
     if (commentsContainer != null) {
@@ -34,23 +35,23 @@ class CommentsParser {
       HasChildren last = parent;
       int i = 0;
       if (comments.isNotEmpty) {
-        comments[0].firstChild.remove();
+        comments[0].firstChild!.remove();
         comments.forEach((element) {
           final comment = _parseBestComment(element, i++, postId);
-          last.children.add(comment);
+          last.children!.add(comment);
           last = comment;
         });
-        return parent.children[0];
+        return parent.children![0];
       }
     }
     return null;
   }
 
-  List<PostComment> _parseCommentsElement(
+  List<PostComment>? _parseCommentsElement(
       Element commentsContainer, int postId) {
-    PostComment last;
+    PostComment? last;
     final parent = CommentParent();
-    List<HasChildren> stack = [parent];
+    List<HasChildren?> stack = [parent];
     List<Pair<int, Element>> elementsStack =
         commentsContainer.children.reversed.map((e) => Pair(0, e)).toList();
     while (elementsStack.isNotEmpty) {
@@ -65,7 +66,7 @@ class CommentsParser {
       if (child.classes.contains('comment')) {
         final comment = _parseComment(child, pair.left, postId);
         last = comment;
-        stack.last.children.add(comment);
+        stack.last!.children!.add(comment);
       } else if (child.classes.contains('comment_list') &&
           child.children.isNotEmpty) {
         elementsStack
@@ -79,18 +80,17 @@ class CommentsParser {
 
   PostComment _parseComment(Element element, int depth, int postId) {
     final time = DateTime.fromMillisecondsSinceEpoch(
-        int.parse(element.attributes['timestamp']) * 1000);
-    final bottom = element.querySelector('.comments_bottom');
+        int.parse(element.attributes['timestamp']!) * 1000);
+    final bottom = element.querySelector('.comments_bottom')!;
     final avatarElement = bottom.querySelector('.avatar');
-    final id = int.parse(element.attributes['id'].replaceFirst('comment', ''));
-    final creatorId = int.parse(element?.attributes['userid']);
+    final id = int.parse(element.attributes['id']!.replaceFirst('comment', ''));
+    final creatorId = Utils.getNumberInt(element.attributes['userid']!);
     final ratingText = bottom.querySelector('.comment_rating')?.text;
     final avatar = avatarElement?.attributes['src'];
     final username = avatarElement?.attributes['alt'];
     final hidden = element.querySelector('.comment_show') != null;
     final usernameElement = bottom.querySelector('.comment_username');
-    final userLink =
-        (usernameElement?.attributes ?? {})['href']?.split('/')?.last;
+    final userLink = usernameElement?.attributes['href']?.split('/').last;
 
     final votedUp = bottom.querySelector('.vote-minus.vote-change') != null;
     final votedDown = bottom.querySelector('.vote-plus.vote-change') != null;
@@ -99,31 +99,33 @@ class CommentsParser {
     return PostComment(
       id: id,
       postId: postId,
-      votedUp: votedUp ?? false,
-      votedDown: votedDown ?? false,
-      canVote: canVote ?? false,
+      votedUp: votedUp,
+      votedDown: votedDown,
+      canVote: canVote,
       time: time,
       rating: double.tryParse(ratingText?.trim() ?? ''),
       hidden: hidden,
-      user: UserShort(
-        id: creatorId,
-        avatar: avatar,
-        username: username,
-        link: userLink,
-      ),
+      user: (username != null && userLink != null)
+          ? UserShort(
+              id: creatorId,
+              avatar: avatar,
+              username: username,
+              link: userLink,
+            )
+          : null,
       content:
-          !hidden ? _contentParser.parse(element.querySelector('.txt')) : null,
+          !hidden ? _contentParser.parse(element.querySelector('.txt')!) : null,
       depth: depth,
     );
   }
 
   PostComment _parseBestComment(Element element, int depth, int postId) {
-    final bottom = element.querySelector('.comments_bottom');
+    final bottom = element.querySelector('.comments_bottom')!;
     final avatarElement = bottom.querySelector('.avatar');
     final timestampString = bottom
         .querySelector('.comment_date')
         ?.children[0]
-        ?.attributes['data-time'];
+        .attributes['data-time'];
     final time = timestampString != null
         ? DateTime.fromMillisecondsSinceEpoch(int.parse(timestampString) * 1000)
         : DateTime.now();
@@ -132,14 +134,13 @@ class CommentsParser {
                 ?.split('#comment')
                 ?.last ??
             '');
-    final creatorId = null;
-    final ratingText = bottom.querySelector('.post_rating')?.text?.trim();
+    final dynamic creatorId = null;
+    final ratingText = bottom.querySelector('.post_rating')?.text.trim();
     final avatar = avatarElement?.attributes['src'];
     final username = avatarElement?.attributes['alt'];
     final hidden = element.querySelector('.comment_show') != null;
     final usernameElement = bottom.querySelector('.comment_username');
-    final userLink =
-        (usernameElement?.attributes ?? {})['href']?.split('/')?.last;
+    final userLink = usernameElement?.attributes['href']?.split('/').last;
 
     return PostComment(
       id: id,
@@ -148,14 +149,16 @@ class CommentsParser {
       votedUp: false,
       votedDown: false,
       canVote: false,
-      rating: double.tryParse(ratingText?.replaceAll('+', '')?.trim() ?? ''),
+      rating: double.tryParse(ratingText?.replaceAll('+', '').trim() ?? ''),
       hidden: hidden,
-      user: UserShort(
-        id: creatorId,
-        avatar: avatar,
-        username: username,
-        link: userLink,
-      ),
+      user: (username != null && userLink != null)
+          ? UserShort(
+              id: creatorId,
+              avatar: avatar,
+              username: username,
+              link: userLink,
+            )
+          : null,
       content: !hidden ? _contentParser.parse(element) : null,
       depth: depth,
     );

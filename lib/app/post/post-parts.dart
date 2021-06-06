@@ -9,17 +9,17 @@ import '../user/user-short.dart';
 
 class PostTopControls extends StatelessWidget {
   const PostTopControls({
-    Key key,
-    @required this.post,
-    @required this.isDark,
-    @required this.canOpenPost,
-    @required this.loadContent,
+    Key? key,
+    required this.post,
+    required this.isDark,
+    required this.canOpenPost,
+    required this.loadContent,
   }) : super(key: key);
 
   final Post post;
   final bool isDark;
   final bool canOpenPost;
-  final Function loadContent;
+  final Function? loadContent;
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +33,11 @@ class PostTopControls extends StatelessWidget {
         color: Colors.transparent,
         padding: const EdgeInsets.all(8),
         child: Row(children: <Widget>[
-          AppPostUser(
-            user: post.user,
-            dateTime: post.dateTime,
-          ),
+          if (post.user != null)
+            AppPostUser(
+              user: post.user!,
+              dateTime: post.dateTime,
+            ),
           PopupMenuButton<int>(
             offset: Offset(0, 100),
             padding: EdgeInsets.zero,
@@ -74,12 +75,12 @@ class PostTopControls extends StatelessWidget {
 
 class PostBestComment extends StatelessWidget {
   final bool isDark;
-  final PostComment bestComment;
+  final PostComment? bestComment;
 
   const PostBestComment({
-    Key key,
-    @required this.isDark,
-    @required this.bestComment,
+    Key? key,
+    required this.isDark,
+    required this.bestComment,
   }) : super(key: key);
 
   @override
@@ -109,9 +110,9 @@ class PostUnavailable extends StatelessWidget {
   final String text;
 
   const PostUnavailable({
-    Key key,
-    @required this.isDark,
-    @required this.text,
+    Key? key,
+    required this.isDark,
+    required this.text,
   }) : super(key: key);
 
   @override
@@ -142,10 +143,10 @@ class PostExpandCollapseButton extends StatelessWidget {
   final Function toggle;
 
   const PostExpandCollapseButton({
-    Key key,
-    @required this.expanded,
-    @required this.isDark,
-    @required this.toggle,
+    Key? key,
+    required this.expanded,
+    required this.isDark,
+    required this.toggle,
   }) : super(key: key);
 
   @override
@@ -153,19 +154,16 @@ class PostExpandCollapseButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: 35,
-      child: FlatButton(
-        color: isDark ? Colors.grey[900] : Colors.grey[100],
-        onPressed: toggle,
+      child: TextButton(
+        style: TextButton.styleFrom(
+          primary: isDark ? Colors.white : Colors.grey[100],
+        ),
+        onPressed: toggle as void Function()?,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Text(expanded ? 'Свернуть' : 'Развернуть'),
-            Padding(
-              padding: const EdgeInsets.only(top: 3),
-              child: Icon(expanded
-                  ? Icons.keyboard_arrow_up
-                  : Icons.keyboard_arrow_down),
-            )
+            Icon(expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down)
           ],
         ),
       ),
@@ -177,8 +175,8 @@ class PostHiddenContent extends StatefulWidget {
   final Function loadContent;
 
   const PostHiddenContent({
-    Key key,
-    @required this.loadContent,
+    Key? key,
+    required this.loadContent,
   }) : super(key: key);
 
   @override
@@ -193,13 +191,10 @@ class _PostHiddenContentState extends State<PostHiddenContent> {
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Center(
-        child: OutlineButton(
-          highlightedBorderColor: Theme.of(context).accentColor,
+        child: OutlinedButton(
           onPressed: () => setState(() {
-            if (widget.loadContent != null) {
-              _loading = true;
-              widget.loadContent();
-            }
+            _loading = true;
+            widget.loadContent();
           }),
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 150),
@@ -228,7 +223,7 @@ class _PostHiddenContentState extends State<PostHiddenContent> {
 
 class PostBottomGradient extends StatelessWidget {
   const PostBottomGradient({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -242,14 +237,14 @@ class PostBottomGradient extends StatelessWidget {
             end: Alignment.bottomCenter,
             colors: [
               Colors.black26,
-              Colors.grey[900],
-              Colors.grey[900],
-              Colors.grey[900],
-              Colors.grey[900],
-              Colors.grey[900],
-              Colors.grey[900],
-              Colors.grey[900],
-              Colors.grey[900],
+              Colors.grey[900]!,
+              Colors.grey[900]!,
+              Colors.grey[900]!,
+              Colors.grey[900]!,
+              Colors.grey[900]!,
+              Colors.grey[900]!,
+              Colors.grey[900]!,
+              Colors.grey[900]!,
             ],
           ),
           color: Colors.grey[1200],
@@ -263,11 +258,11 @@ class PostBottomGradient extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.grey[400],
-            Colors.grey[300],
-            Colors.grey[200],
-            Colors.grey[100],
-            Colors.grey[200],
+            Colors.grey[400]!,
+            Colors.grey[300]!,
+            Colors.grey[200]!,
+            Colors.grey[100]!,
+            Colors.grey[200]!,
           ],
         ),
         color: Colors.grey[300],

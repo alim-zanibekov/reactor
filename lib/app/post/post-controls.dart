@@ -7,12 +7,12 @@ import '../../core/parsers/types/module.dart';
 
 class AppPostControls extends StatefulWidget {
   final Post post;
-  final Function onCommentsClick;
+  final void Function() onCommentsClick;
 
   const AppPostControls({
-    Key key,
-    @required this.post,
-    @required this.onCommentsClick,
+    Key? key,
+    required this.post,
+    required this.onCommentsClick,
   }) : super(key: key);
 
   @override
@@ -89,9 +89,10 @@ class _AppPostControlsState extends State<AppPostControls> {
               height: 30,
               child: ButtonTheme(
                 height: 30.0,
-                child: OutlineButton(
-                  highlightedBorderColor: Theme.of(context).accentColor,
-                  padding: EdgeInsets.only(left: 8, right: 8),
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.only(left: 8, right: 8),
+                  ),
                   onPressed: widget.onCommentsClick,
                   child: Text('Комментарии ${widget.post.commentsCount}'),
                 ),
@@ -114,7 +115,7 @@ class _AppPostControlsState extends State<AppPostControls> {
           ]),
           if (_auth.authorized)
             Row(children: <Widget>[
-              if (widget.post.canVote)
+              if (widget.post.canVote!)
                 Padding(
                   padding: EdgeInsets.only(right: 10),
                   child: InkWell(
@@ -124,8 +125,8 @@ class _AppPostControlsState extends State<AppPostControls> {
                         : Icon(Icons.mood, size: 22),
                   ),
                 ),
-              Text(widget.post?.rating?.toString() ?? '––'),
-              if (widget.post.canVote)
+              Text(widget.post.rating?.toString() ?? '––'),
+              if (widget.post.canVote!)
                 Padding(
                   padding: EdgeInsets.only(left: 10),
                   child: InkWell(
@@ -137,7 +138,7 @@ class _AppPostControlsState extends State<AppPostControls> {
                 ),
             ])
           else
-            Text(widget.post?.rating?.toString() ?? '––')
+            Text(widget.post.rating?.toString() ?? '––')
         ],
       ),
     );

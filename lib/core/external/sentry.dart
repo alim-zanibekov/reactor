@@ -19,16 +19,16 @@ class SentryReporter {
         'https://20004fb264fd46598cc10667f873df42@o410122.ingest.sentry.io/5283781',
   ));
 
-  Map<String, dynamic> _extra;
-  SentryUser _user;
-  Contexts _contexts;
+  Map<String, dynamic>? _extra;
+  SentryUser? _user;
+  Contexts? _contexts;
 
   Future init() async {
     final deviceInfo = DeviceInfoPlugin();
     final packageInfo = await PackageInfo.fromPlatform();
 
-    String appHash;
-    SentryDevice device;
+    String? appHash;
+    SentryDevice? device;
     if (Platform.isAndroid) {
       final AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
       _extra = <String, dynamic>{

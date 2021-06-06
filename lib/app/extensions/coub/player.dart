@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -9,12 +11,12 @@ import '../common/options.dart';
 import '../common/video-thumbnail.dart';
 
 class AppCoubPlayer extends StatefulWidget {
-  final String videoId;
-  final OEmbedMetadata metadata;
-  final Future<OEmbedMetadata> futureMetadata;
+  final String? videoId;
+  final OEmbedMetadata? metadata;
+  final Future<OEmbedMetadata>? futureMetadata;
 
   AppCoubPlayer(
-      {Key key, @required this.videoId, this.metadata, this.futureMetadata})
+      {Key? key, required this.videoId, this.metadata, this.futureMetadata})
       : super(key: key);
 
   @override
@@ -22,8 +24,8 @@ class AppCoubPlayer extends StatefulWidget {
 }
 
 class _AppCoubPlayerState extends State<AppCoubPlayer> {
-  String _url;
-  OEmbedMetadata metadata;
+  late String _url;
+  OEmbedMetadata? metadata;
   double aspectRatio = 16.0 / 9.0;
   bool webViewShow = false;
 
@@ -35,11 +37,11 @@ class _AppCoubPlayerState extends State<AppCoubPlayer> {
     metadata = widget.metadata;
 
     if (metadata != null) {
-      aspectRatio = metadata.width / metadata.height;
+      aspectRatio = metadata!.width! / metadata!.height!;
     } else {
-      widget.futureMetadata.then((value) {
+      widget.futureMetadata!.then((value) {
         metadata = value;
-        aspectRatio = metadata.width / metadata.height;
+        aspectRatio = metadata!.width! / metadata!.height!;
         if (mounted) {
           setState(() {});
         }
@@ -62,19 +64,20 @@ class _AppCoubPlayerState extends State<AppCoubPlayer> {
                   ' .viewer__click { opacity: 0!important; }',
             );
           },
-          onLoadStop: (InAppWebViewController controller, Uri url) {
+          onLoadStop: (InAppWebViewController controller, Uri? url) {
             controller.evaluateJavascript(
               source: 'document.querySelector(".viewer__click").click()',
             );
           },
           shouldOverrideUrlLoading: (controller, request) async {
-            canLaunch(request.request.url.toString()).then((value) =>
-                value ? launch(request.request.url.toString()) : null);
+            canLaunch(request.request.url.toString()).then((value) => value
+                ? launch(request.request.url.toString())
+                : Future.value(false));
 
             return NavigationActionPolicy.CANCEL;
           },
           onLoadError:
-              (InAppWebViewController controller, Uri url, err1, err2) {
+              (InAppWebViewController controller, Uri? url, err1, err2) {
             error = true;
             if (mounted) {
               setState(() {});

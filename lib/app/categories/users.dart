@@ -6,7 +6,7 @@ import '../common/open.dart';
 class AppCategoriesUsers extends StatelessWidget {
   final List<StatsUser> users;
 
-  const AppCategoriesUsers({Key key, this.users}) : super(key: key);
+  const AppCategoriesUsers({Key? key, required this.users}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +21,7 @@ class AppCategoriesUsers extends StatelessWidget {
     return Material(
       child: InkWell(
         onTap: () {
-          if (user.username != null) {
-            openUser(context, user.username, user.link);
-          }
+          openUser(context, user.username, user.link);
         },
         child: Container(
           padding: const EdgeInsets.only(left: 4, right: 8, top: 8, bottom: 8),
@@ -60,7 +58,7 @@ class DashedLinePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     double dashWidth = 4, dashSpace = 2, startX = 0;
     final paint = Paint()
-      ..color = Colors.grey[500]
+      ..color = Colors.grey[500]!
       ..strokeWidth = 0.5;
 
     while (startX < size.width) {

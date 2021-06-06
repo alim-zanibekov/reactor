@@ -5,22 +5,22 @@ import '../../core/parsers/types/module.dart';
 import '../common/open.dart';
 
 class AppUserMainTags extends StatelessWidget {
-  final List<UserTag> tags;
-  final EdgeInsets defaultPadding;
+  final List<UserTag>? tags;
+  final EdgeInsets? defaultPadding;
 
-  const AppUserMainTags({Key key, this.tags, this.defaultPadding})
+  const AppUserMainTags({Key? key, this.tags, this.defaultPadding})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(children: <Widget>[
-      ...tags.map((e) => Material(
+      ...tags!.map((e) => Material(
               child: InkWell(
             onTap: () {
               openTag(context, e);
             },
             child: Padding(
-              padding: defaultPadding.copyWith(top: 5, bottom: 5),
+              padding: defaultPadding!.copyWith(top: 5, bottom: 5),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: <Widget>[
@@ -31,7 +31,7 @@ class AppUserMainTags extends StatelessWidget {
                     child: ClipRRect(
                       child: Image(
                         fit: BoxFit.cover,
-                        image: AppNetworkImageWithRetry(e.icon),
+                        image: AppNetworkImageWithRetry(e.icon!),
                       ),
                       borderRadius: BorderRadius.circular(6),
                     ),
@@ -73,7 +73,7 @@ class AppUserMainTags extends StatelessWidget {
     ]);
   }
 
-  String _toRating(double rating) => rating == null
+  String _toRating(double? rating) => rating == null
       ? '––'
       : rating > 0
           ? '+$rating'

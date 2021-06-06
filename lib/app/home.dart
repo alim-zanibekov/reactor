@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:reactor/main.dart';
 import 'package:uni_links/uni_links.dart';
 
 import '../core/auth/auth.dart';
@@ -31,26 +31,27 @@ class AppPages extends StatefulWidget {
 
   static StreamSink<AppBottomBarPage> get appBottomBarPage => _appBottomBarPage;
 
-  final Widget child;
+  final Widget? child;
 
-  const AppPages({Key key, this.child}) : super(key: key);
+  const AppPages({Key? key, this.child}) : super(key: key);
 
   @override
   _AppPagesState createState() => _AppPagesState();
 }
 
 class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
-  static Future<String> _initUniLink() =>
+  static Future<String?> _initUniLink() =>
       getInitialLink().catchError((e, stack) => null);
-  StreamSubscription<bool> _reloadSubscription;
-  final double _bottomBarMaxHeight = Platform.isAndroid ? 54.0 : 54.0 + 30;
+  late StreamSubscription<bool> _reloadSubscription;
   final _auth = Auth();
+  double _bottomBarHeight = 54.0;
+  late List<StreamSubscription> _subscriptions;
+  late AnimationController _animationController;
+  late TabController _tabController;
+  final double _bottomBarMaxHeight = 54.0;
 
-  double _bottomBarHeight = Platform.isAndroid ? 54.0 : 54.0 + 30;
-  List<StreamSubscription> _subscriptions;
-  int _currentIndex = 0;
-  AnimationController _animationController;
-  PageController pageController;
+  PageController _pageController =
+      PageController(initialPage: 0, keepPage: true);
   bool _authorized = false;
 
   void _postFrameCallback(context, initLink) {
@@ -61,21 +62,28 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
   void initState() {
     _initUniLink().then((link) {
       if (link != null) {
-        SchedulerBinding.instance.addPostFrameCallback(
+        SchedulerBinding.instance!.addPostFrameCallback(
           (_) => _postFrameCallback(context, link),
         );
       }
     });
+
+    _tabController = TabController(length: 4, vsync: this)
+      ..addListener(() {
+        _pageController.jumpToPage(_tabController.index);
+        _animationController.notifyListeners();
+        if (_authorized != _auth.authorized) {
+          setState(() {
+            _authorized = _auth.authorized;
+          });
+        }
+      });
 
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 200),
     );
     _animationController.value = 1;
-    pageController = PageController(
-      initialPage: 0,
-      keepPage: true,
-    );
     _authorized = _auth.authorized;
     _subscriptions = [
       _appBottomBarState.stream.listen((event) {
@@ -86,16 +94,15 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
         }
       }),
       _appBottomBarPage.stream.listen((event) {
-        _currentIndex = event.index;
-        pageController.jumpToPage(_currentIndex);
+        _tabController.animateTo(event.index);
         if (_authorized != _auth.authorized) {
           setState(() {
             _authorized = _auth.authorized;
           });
         }
       }),
-      getLinksStream().listen(
-        (link) => goToLink(context, link),
+      linkStream.listen(
+        (link) => goToLink(context, link!),
         onError: (err) {
           print(err);
         },
@@ -110,7 +117,7 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
   @override
   void dispose() {
     _subscriptions.forEach((sub) => sub.cancel());
-    pageController.dispose();
+    _pageController.dispose();
     _animationController.dispose();
     _reloadSubscription.cancel();
     super.dispose();
@@ -122,7 +129,7 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
 
     return Scaffold(
       body: PageView(
-        controller: pageController,
+        controller: _pageController,
         physics: NeverScrollableScrollPhysics(),
         children: <Widget>[
           PageWrapper(
@@ -133,8 +140,8 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
               ? const AppAuthPage()
               : PageWrapper(
                   child: AppUserPage(
-                      username: _auth.username,
-                      link: null,
+                      username: _auth.username!,
+                      link: _auth.username!.replaceAll(' ', '+'),
                       main: true,
                       key: PageStorageKey('user' + host)),
                 ),
@@ -143,45 +150,31 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
       ),
       bottomNavigationBar: AnimatedBuilder(
         animation: _animationController,
-        builder: (BuildContext context, Widget child) {
+        builder: (BuildContext context, Widget? child) {
           return SizedBox(
             height: _bottomBarHeight * _animationController.value,
             child: OverflowBox(
               alignment: Alignment.topLeft,
               maxHeight: _bottomBarMaxHeight,
-              child: BottomNavigationBar(
-                currentIndex: _currentIndex,
-                showSelectedLabels: false,
-                showUnselectedLabels: false,
-                onTap: (index) {
-                  if (_currentIndex != index) {
-                    pageController.jumpToPage(index);
-                    _currentIndex = index;
-                    _animationController.notifyListeners();
-                    if (_authorized != _auth.authorized) {
-                      setState(() {
-                        _authorized = _auth.authorized;
-                      });
-                    }
-                  }
-                },
-                type: BottomNavigationBarType.fixed,
-                items: const <BottomNavigationBarItem>[
-                  BottomNavigationBarItem(
+              child: TabBar(
+                controller: _tabController,
+                indicatorWeight: 1,
+                enableFeedback: false,
+                labelColor: ThemeInfo.primaryColor,
+                unselectedLabelColor: ThemeInfo.colors.shade200,
+                indicatorColor: Colors.transparent,
+                tabs: const <Tab>[
+                  Tab(
                     icon: Icon(Icons.view_stream),
-                    label: 'Лента',
                   ),
-                  BottomNavigationBarItem(
+                  Tab(
                     icon: Icon(Icons.category),
-                    label: 'Разное',
                   ),
-                  BottomNavigationBarItem(
+                  Tab(
                     icon: Icon(Icons.portrait),
-                    label: 'Аккаунт',
                   ),
-                  BottomNavigationBarItem(
+                  Tab(
                     icon: Icon(Icons.settings),
-                    label: 'Настройки',
                   ),
                 ],
               ),

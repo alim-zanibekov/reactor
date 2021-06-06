@@ -10,9 +10,11 @@ class AppQuiz extends StatefulWidget {
   final Quiz quiz;
   final void Function(Quiz) quizUpdated;
 
-  const AppQuiz({Key key, this.quiz, this.quizUpdated})
-      : assert(quiz != null && quizUpdated != null),
-        super(key: key);
+  const AppQuiz({
+    Key? key,
+    required this.quiz,
+    required this.quizUpdated,
+  }) : super(key: key);
 
   @override
   _AppQuizState createState() => _AppQuizState();
@@ -47,7 +49,7 @@ class _AppQuizState extends State<AppQuiz> {
         return InkWell(
           onTap: () {
             if (!_loading) {
-              _vote(e.id);
+              _vote(e.id!);
             }
           },
           child: SizedBox(
@@ -64,7 +66,7 @@ class _AppQuizState extends State<AppQuiz> {
                     onChanged: (_) {},
                   ),
                 ),
-                Text(e.text, style: const TextStyle(fontSize: 13)),
+                Text(e.text!, style: const TextStyle(fontSize: 13)),
               ]),
             ),
           ),
@@ -79,14 +81,14 @@ class _AppQuizState extends State<AppQuiz> {
           children: <Widget>[
             Padding(
               padding: EdgeInsets.symmetric(vertical: 5),
-              child: Text(e.text),
+              child: Text(e.text!),
             ),
             Row(
               children: <Widget>[
                 SizedBox(
                   width: width - maxLenText * 8,
                   child: LinearProgressIndicator(
-                    value: e.percent / 100.0,
+                    value: e.percent! / 100.0,
                   ),
                 ),
                 Expanded(child: SizedBox()),

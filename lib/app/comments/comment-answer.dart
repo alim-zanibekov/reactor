@@ -8,9 +8,9 @@ import '../../core/parsers/types/module.dart';
 
 class AppCommentAnswer extends StatefulWidget {
   final PostComment comment;
-  final Function onSend;
+  final Function? onSend;
 
-  const AppCommentAnswer({Key key, @required this.comment, this.onSend})
+  const AppCommentAnswer({Key? key, required this.comment, this.onSend})
       : super(key: key);
 
   @override
@@ -20,7 +20,7 @@ class AppCommentAnswer extends StatefulWidget {
 class _AppCommentAnswerState extends State<AppCommentAnswer> {
   static final _api = Api();
   bool _loading = false;
-  File _file;
+  File? _file;
   double _progressSend = 0.0000001;
   TextEditingController _controller = TextEditingController();
 
@@ -40,7 +40,7 @@ class _AppCommentAnswerState extends State<AppCommentAnswer> {
         }),
       );
       if (widget.onSend != null) {
-        widget.onSend();
+        widget.onSend!();
       }
       _controller.text = '';
     } on Exception {
@@ -59,7 +59,7 @@ class _AppCommentAnswerState extends State<AppCommentAnswer> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return ColoredBox(
-      color: isDark ? Colors.black26 : Colors.grey[200],
+      color: isDark ? Colors.black26 : Colors.grey[200]!,
       child: Column(children: <Widget>[
         SizedBox(
           height: 2,
@@ -93,7 +93,7 @@ class _AppCommentAnswerState extends State<AppCommentAnswer> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 10, right: 5),
                 child: Text(
-                  _file?.path?.split('/')?.last ?? '',
+                  _file?.path.split('/').last ?? '',
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -108,15 +108,17 @@ class _AppCommentAnswerState extends State<AppCommentAnswer> {
               ),
             SizedBox(
               height: 25,
-              child: FlatButton(
-                padding: const EdgeInsets.only(left: 5, right: 5),
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.only(left: 5, right: 5),
+                ),
                 onPressed: () async {
                   if (_loading) return;
 
                   final result = await FilePicker.platform
                       .pickFiles(type: FileType.image, allowMultiple: false);
                   if (result != null) {
-                    _file = File(result.files.single.path);
+                    _file = File(result.files.single.path!);
                   }
                   setState(() {});
                 },
@@ -130,9 +132,10 @@ class _AppCommentAnswerState extends State<AppCommentAnswer> {
             Container(
               height: 25,
               padding: const EdgeInsets.only(right: 10),
-              child: OutlineButton(
-                highlightedBorderColor: Theme.of(context).accentColor,
-                padding: const EdgeInsets.all(3.0),
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.all(3.0),
+                ),
                 onPressed: () {
                   if (_loading) return;
                   _sendAnswer();

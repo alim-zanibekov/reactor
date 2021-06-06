@@ -4,14 +4,14 @@ import 'package:flutter/scheduler.dart';
 import '../../core/widgets/onerror-reload.dart';
 
 class AppFuturePage<T> extends StatefulWidget {
-  final Widget Function(BuildContext, T, bool hasError) builder;
+  final Widget Function(BuildContext, T?, bool hasError) builder;
   final Future<T> Function(bool fromUser) load;
   final bool customError;
 
   const AppFuturePage(
-      {Key key,
-      @required this.builder,
-      @required this.load,
+      {Key? key,
+      required this.builder,
+      required this.load,
       this.customError = false})
       : super(key: key);
 
@@ -28,11 +28,11 @@ class AppFuturePageState<T> extends State<AppFuturePage<T>> {
 
   bool get loading => _loading;
 
-  T _value;
+  T? _value;
 
   @override
   void initState() {
-    SchedulerBinding.instance.addPostFrameCallback((_) => reload());
+    SchedulerBinding.instance!.addPostFrameCallback((_) => reload());
     super.initState();
   }
 
@@ -60,7 +60,8 @@ class AppFuturePageState<T> extends State<AppFuturePage<T>> {
       _load();
     } else {
       _fromUser = false;
-      RefreshIndicatorState refreshIndicatorState = _refreshKey.currentState;
+      RefreshIndicatorState? refreshIndicatorState =
+          _refreshKey.currentState as RefreshIndicatorState?;
       refreshIndicatorState?.show();
     }
     if (hideContent) {

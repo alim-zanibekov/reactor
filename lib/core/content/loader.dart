@@ -11,7 +11,7 @@ abstract class Loader<T> {
 
   void reset();
 
-  Future<List<T>> load();
+  Future<List<T>?> load();
 
-  Future<List<T>> loadNext();
+  Future<List<T>?> loadNext();
 }

@@ -10,10 +10,10 @@ import '../post/post-list.dart';
 import '../tag/tag-list.dart';
 
 class AppPage extends StatefulWidget {
-  final Tag tag;
+  final Tag? tag;
   final bool main;
 
-  const AppPage({Key key, this.tag, this.main = false}) : super(key: key);
+  const AppPage({Key? key, this.tag, this.main = false}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() =>
@@ -21,8 +21,8 @@ class AppPage extends StatefulWidget {
 }
 
 class _AppPagePostsState extends State<AppPage> {
-  List<PostLoader> _postLoaders;
-  String _title;
+  late List<PostLoader> _postLoaders;
+  late String _title;
   Preferences _preferences = Preferences();
 
   @override
@@ -63,7 +63,7 @@ class _AppPagePostsState extends State<AppPage> {
   @override
   Widget build(BuildContext context) {
     return AppTabsWrapper(
-      initialIndex: _preferences?.postsType?.index,
+      initialIndex: _preferences.postsType.index,
       main: widget.main,
       tabs: ['Все', 'Хорошее', 'Лучшее', 'Бездна'],
       title: _title,
@@ -81,20 +81,20 @@ class _AppPagePostsState extends State<AppPage> {
 }
 
 class _AppPageTagsState extends State<AppPage> {
-  List<TagLoader> _tagLoaders;
-  String _title;
+  late List<TagLoader> _tagLoaders;
+  String? _title;
 
   @override
   void initState() {
     _tagLoaders = [
       TagLoader(
-        path: widget.tag.link,
-        prefix: widget.tag.prefix,
+        path: widget.tag!.link,
+        prefix: widget.tag!.prefix,
         tagListType: TagListType.BEST,
       ),
       TagLoader(
-        path: widget.tag.link,
-        prefix: widget.tag.prefix,
+        path: widget.tag!.link,
+        prefix: widget.tag!.prefix,
         tagListType: TagListType.NEW,
       ),
     ];
@@ -113,11 +113,11 @@ class _AppPageTagsState extends State<AppPage> {
     return AppTabsWrapper(
       main: widget.main,
       tabs: ['Лучшие', 'Новые'],
-      title: _title,
+      title: _title!,
       builder:
           (BuildContext context, int index, onScrollChange, onReloadPress) {
         return AppTagList(
-          pageStorageKey: PageStorageKey<String>(_title + index.toString()),
+          pageStorageKey: PageStorageKey<String>(_title! + index.toString()),
           onScrollChange: onScrollChange,
           reloadNotifier: onReloadPress,
           loader: _tagLoaders[index],

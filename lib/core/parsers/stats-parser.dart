@@ -5,20 +5,20 @@ import 'types/module.dart';
 import 'utils.dart';
 
 class StatsParser {
-  Stats parse(String c) {
-    final parsedPage = parser.parse(c);
-    final sidebar = parsedPage.getElementById('sidebar');
+  Stats parse(String content) {
+    final parsedPage = parser.parse(content);
+    final sidebar = parsedPage.getElementById('sidebar')!;
 
     final tagsWeekBlock = sidebar.querySelector('#blogs_week_content');
     final tagsAllTimeBlock = sidebar.querySelector('#blogs_alltime_content');
     final tags2DayBlock = sidebar.querySelector('#blogs_2days_content');
 
     final weekTags =
-        tagsWeekBlock?.querySelectorAll('tr')?.map(_parseTag)?.toList();
+        tagsWeekBlock?.querySelectorAll('tr').map(_parseTag).toList();
     final allTimeTags =
-        tagsAllTimeBlock?.querySelectorAll('tr')?.map(_parseTag)?.toList();
+        tagsAllTimeBlock?.querySelectorAll('tr').map(_parseTag).toList();
     final twoDayTags =
-        tags2DayBlock?.querySelectorAll('tr')?.map(_parseTag)?.toList();
+        tags2DayBlock?.querySelectorAll('tr').map(_parseTag).toList();
 
     final comments2DayBlock = sidebar.querySelector('#comments_2days_content');
     final commentsWeekBlock = sidebar.querySelector('#comments_week_content');
@@ -31,30 +31,34 @@ class StatsParser {
     final weekUsersBlock = sidebar.querySelector('#usertop_week_content');
     final monthUsersBlock = sidebar.querySelector('#usertop_month_content');
 
-    final weekUsers = weekUsersBlock
-        ?.querySelectorAll('.week_top')
-        ?.map(_parseUser)
-        ?.toList();
-    final monthUsers = monthUsersBlock
-        ?.querySelectorAll('.week_top')
-        ?.map(_parseUser)
-        ?.toList();
+    final weekUsers =
+        weekUsersBlock?.querySelectorAll('.week_top').map(_parseUser).toList();
+    final monthUsers =
+        monthUsersBlock?.querySelectorAll('.week_top').map(_parseUser).toList();
 
     final sidebarBlocks = sidebar.querySelectorAll('.sidebar_block');
     final trendsBlock = StatsParser.getBlockByName(sidebarBlocks, 'Тренды');
 
-    final trends = trendsBlock
-        ?.querySelectorAll('tr')
-        ?.map((e) => _parseTrend(e))
-        ?.toList();
+    final trends =
+        trendsBlock?.querySelectorAll('tr').map((e) => _parseTrend(e)).toList();
 
     return Stats(
       weekComments: weekComments,
       weekTags: weekTags,
-      weekUsers: weekUsers,
+      weekUsers: weekUsers != null
+          ? [
+              for (var i in weekUsers)
+                if (i != null) i
+            ]
+          : null,
       twoDayComments: twoDayComments,
       twoDayTags: twoDayTags,
-      monthUsers: monthUsers,
+      monthUsers: monthUsers != null
+          ? [
+              for (var i in monthUsers)
+                if (i != null) i
+            ]
+          : null,
       allTimeTags: allTimeTags,
       trends: trends,
     );
@@ -65,7 +69,7 @@ class StatsParser {
     final infoBlock = element.querySelector('small');
     final subscribersDeltaCount = Utils.getNumberInt(infoBlock?.text);
     final link = element.querySelector('a');
-    final isDelta = infoBlock?.text?.contains('+');
+    final bool isDelta = infoBlock?.text.contains('+') ?? false;
     var icon = (tagImg?.attributes ?? {})['src'];
 
     if (icon.startsWith('/')) icon = 'http://joyreactor.cc$icon';
@@ -81,7 +85,7 @@ class StatsParser {
   }
 
   IconTag _parseTrend(Element element) {
-    final block = element.querySelector('td');
+    final block = element.querySelector('td')!;
     final tagImg = block.querySelector('img');
     final link = block.querySelector('a');
     var icon = (tagImg?.attributes ?? {})['src'];
@@ -102,26 +106,27 @@ class StatsParser {
     for (int i = 0; i < element.nodes.length; ++i) {
       final node = element.nodes[i];
       if (node.nodeType == Node.ELEMENT_NODE) {
-        Element e = node;
+        Element e = node as Element;
         if (e.localName == 'div') {
           final href =
               (e.querySelector('a')?.attributes ?? {})['href']?.split('#');
-          final id = Utils.getNumberInt(href?.last).toInt();
-          final postId = Utils.getNumberInt(href?.first).toInt();
-          final rating = Utils.getNumberDouble(element.nodes[i + 1]?.text);
+          final id = Utils.getNumberInt(href?.last)!.toInt();
+          final postId = Utils.getNumberInt(href?.first)!.toInt();
+          final rating = Utils.getNumberDouble(element.nodes[i + 1].text);
           final linkElement =
-              (element.nodes[i + 2] as Element)?.querySelector('a');
-          final username = linkElement?.text?.trim();
-          final link =
-              (linkElement?.attributes ?? {})['href']?.split('/')?.last;
-          comments.add(StatsComment(
-            username: username,
-            userLink: link,
-            rating: rating,
-            postId: postId,
-            id: id,
-          ));
-          i += 2;
+              (element.nodes[i + 2] as Element).querySelector('a');
+          final username = linkElement?.text.trim();
+          final link = linkElement?.attributes['href']?.split('/').last;
+          if (username != null && link != null) {
+            comments.add(StatsComment(
+              username: username,
+              userLink: link,
+              rating: rating,
+              postId: postId,
+              id: id,
+            ));
+            i += 2;
+          }
         }
       }
     }
@@ -129,21 +134,26 @@ class StatsParser {
     return comments;
   }
 
-  StatsUser _parseUser(Element element) {
-    final username = element.querySelector('a')?.text?.trim();
+  StatsUser? _parseUser(Element element) {
+    final linkElement = element.querySelector('a');
+    final username = linkElement?.text.trim();
     final rating =
         Utils.getNumberDouble(element.querySelector('.weekrating')?.text);
+    final link = linkElement?.attributes['href']?.split('/').last;
 
-    return StatsUser(
-      username: username,
-      ratingDelta: rating,
-    );
+    if (username != null && link != null) {
+      return StatsUser(
+        username: username,
+        link: link,
+        ratingDelta: rating,
+      );
+    }
   }
 
-  static Element getBlockByName(List<Element> elements, String header) {
+  static Element? getBlockByName(List<Element> elements, String header) {
     try {
       return elements.firstWhere((element) =>
-          element?.children?.first?.text?.trim()?.toLowerCase() ==
+          element.children.first.text.trim().toLowerCase() ==
           header.toLowerCase().trim());
     } on StateError {
       return null;

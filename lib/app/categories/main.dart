@@ -5,7 +5,7 @@ import '../../core/parsers/types/module.dart';
 import '../common/open.dart';
 
 class AppCategoriesMain extends StatelessWidget {
-  const AppCategoriesMain({Key key}) : super(key: key);
+  const AppCategoriesMain({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +67,7 @@ class AppCategoriesMain extends StatelessWidget {
               Alignment.center,
               Alignment.centerLeft,
               0.34,
-            ),
+            )!,
             image: AppNetworkImageWithRetry(source),
           ),
         ),
@@ -88,11 +88,10 @@ class AppCategoriesMain extends StatelessWidget {
             padding: const EdgeInsets.only(left: 5, top: 2),
             child: Text(title, style: style.copyWith(fontSize: 18)),
           ),
-          if (!tag.isMain && tag.value != 'anon' && tag.value != 'политота')
+          if (!tag.isMain! && tag.value != 'anon' && tag.value != 'политота')
             SizedBox(
               height: 30,
-              child: OutlineButton(
-                highlightedBorderColor: Theme.of(context).accentColor,
+              child: OutlinedButton(
                 onPressed: () => openTag(
                   context,
                   Tag(

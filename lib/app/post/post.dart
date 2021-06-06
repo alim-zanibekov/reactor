@@ -13,11 +13,16 @@ import 'post-tags.dart';
 
 class MountInfo {
   final bool state;
-  final GlobalKey key;
   final Post post;
-  final Function collapse;
+  final GlobalKey? key;
+  final Function? collapse;
 
-  MountInfo({this.state, this.key, this.post, this.collapse});
+  MountInfo({
+    required this.state,
+    required this.post,
+    this.key,
+    this.collapse,
+  });
 }
 
 class AppPostContent extends StatefulWidget {
@@ -25,14 +30,14 @@ class AppPostContent extends StatefulWidget {
   final bool onPage;
   final Duration collapseDuration;
   final Curve collapseCurve;
-  final Function(bool state, double diff) onCollapse;
   final Function loadContent;
-  final Function(MountInfo) onMountInfo;
+  final Function(bool state, double? diff)? onCollapse;
+  final Function(MountInfo)? onMountInfo;
 
   AppPostContent({
-    Key key,
-    this.post,
-    this.loadContent,
+    Key? key,
+    required this.post,
+    required this.loadContent,
     this.onPage = false,
     this.onCollapse,
     this.collapseDuration = Duration.zero,
@@ -48,11 +53,12 @@ class _AppPostContentState extends State<AppPostContent>
     with SingleTickerProviderStateMixin {
   final _postKey = GlobalKey();
   final _wrapKey = GlobalKey();
-  Post _post;
+  late Post _post;
+
   double _postMaxHeight = 500;
-  double _realPostHeight;
-  double _currentMaxHeight;
-  double _width;
+  double? _realPostHeight;
+  double? _currentMaxHeight;
+  late double _width;
   bool _isDark = false;
 
   @override
@@ -68,14 +74,14 @@ class _AppPostContentState extends State<AppPostContent>
           _currentMaxHeight = _post.height;
         }
         if (widget.onPage) {
-          SchedulerBinding.instance.addPostFrameCallback(_postFrameCallback);
+          SchedulerBinding.instance!.addPostFrameCallback(_postFrameCallback);
         }
       } else {
-        SchedulerBinding.instance.addPostFrameCallback(_postFrameCallback);
+        SchedulerBinding.instance!.addPostFrameCallback(_postFrameCallback);
       }
     }
     if (widget.onMountInfo != null) {
-      widget.onMountInfo(MountInfo(
+      widget.onMountInfo!(MountInfo(
           state: true, key: _wrapKey, post: _post, collapse: collapse));
     }
     super.initState();
@@ -84,7 +90,7 @@ class _AppPostContentState extends State<AppPostContent>
   @override
   void dispose() {
     if (widget.onMountInfo != null) {
-      widget.onMountInfo(MountInfo(state: false, post: _post));
+      widget.onMountInfo!(MountInfo(state: false, post: _post));
     }
     super.dispose();
   }
@@ -142,7 +148,7 @@ class _AppPostContentState extends State<AppPostContent>
                             height: 1,
                           ),
                           AppQuiz(
-                            quiz: _post.quiz,
+                            quiz: _post.quiz!,
                             quizUpdated: (quiz) {
                               _post.quiz = quiz;
                               if (mounted) setState(() => null);
@@ -191,7 +197,7 @@ class _AppPostContentState extends State<AppPostContent>
       (e) => e is ContentUnitImage && (e.width == null || e.height == null),
     );
 
-    if (_realPostHeight - _postMaxHeight > 300 || hasUndefinedSizeImages) {
+    if (_realPostHeight! - _postMaxHeight > 300 || hasUndefinedSizeImages) {
       _currentMaxHeight = _postMaxHeight;
     } else {
       _currentMaxHeight = null;
@@ -207,7 +213,7 @@ class _AppPostContentState extends State<AppPostContent>
       return;
     }
     if (_postKey.currentContext != null) {
-      _realPostHeight = _postKey.currentContext.size.height;
+      _realPostHeight = _postKey.currentContext!.size!.height;
       _post.height = _realPostHeight;
 
       if (!_post.expanded) {
@@ -228,7 +234,7 @@ class _AppPostContentState extends State<AppPostContent>
       final newHeight = _width / (e.right.width / e.right.height);
       heightDiff += oldHeight - newHeight;
     });
-    _realPostHeight -= heightDiff;
+    _realPostHeight = _realPostHeight! - heightDiff;
     _post.height = _realPostHeight;
 
     if (!_post.expanded) {
@@ -241,12 +247,16 @@ class _AppPostContentState extends State<AppPostContent>
   void _toggle() {
     setState(() {
       _post.expanded = !_post.expanded;
-      if (_currentMaxHeight.toInt() != _realPostHeight.toInt()) {
+      if (_currentMaxHeight!.toInt() != _realPostHeight!.toInt()) {
         _currentMaxHeight = _realPostHeight;
-        widget.onCollapse(false, null);
+        if (widget.onCollapse != null) {
+          widget.onCollapse!(false, null);
+        }
       } else {
         _currentMaxHeight = _postMaxHeight;
-        widget.onCollapse(true, _realPostHeight - _postMaxHeight);
+        if (widget.onCollapse != null && _realPostHeight != null) {
+          widget.onCollapse!(true, _realPostHeight! - _postMaxHeight);
+        }
       }
     });
   }

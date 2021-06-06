@@ -12,17 +12,17 @@ import '../user/user-short.dart';
 class AppComment extends StatefulWidget {
   final PostComment comment;
   final int depth;
-  final Color color;
-  final bool showAnswer;
+  final Color? color;
+  final bool? showAnswer;
   final bool showGoToPost;
-  final Function onSend;
-  final Function onDelete;
-  final Function scrollToParent;
+  final Function? onSend;
+  final Function? onDelete;
+  final Function? scrollToParent;
 
   AppComment({
-    Key key,
-    @required this.depth,
-    @required this.comment,
+    Key? key,
+    required this.depth,
+    required this.comment,
     this.onSend,
     this.showAnswer = false,
     this.showGoToPost = false,
@@ -39,10 +39,10 @@ class _AppCommentState extends State<AppComment>
     with SingleTickerProviderStateMixin {
   static final _auth = Auth();
   bool _loading = false;
-  Widget content;
+  Widget? content;
   bool _showAnswer = false;
-  AnimationController _controller;
-  Animation<double> _heightFactor;
+  late AnimationController _controller;
+  late Animation<double> _heightFactor;
 
   @override
   void initState() {
@@ -86,7 +86,7 @@ class _AppCommentState extends State<AppComment>
   }
 
   _vote(VoteType type) async {
-    if (widget.comment.votedDown || _loading) return;
+    if (widget.comment.votedDown! || _loading) return;
     _loading = true;
     try {
       final value = await Api().voteComment(widget.comment.id, type);
@@ -113,7 +113,7 @@ class _AppCommentState extends State<AppComment>
       widget.comment.deleted = true;
       _loading = false;
       if (widget.onDelete != null) {
-        widget.onDelete();
+        widget.onDelete!();
       }
     } on Exception {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -125,12 +125,14 @@ class _AppCommentState extends State<AppComment>
 
   Widget _controls() {
     return Row(children: <Widget>[
-      if (widget.showGoToPost && widget.comment.postId != null)
+      if (widget.showGoToPost)
         SizedBox(
           height: 25,
           width: 60,
-          child: FlatButton(
-            padding: EdgeInsets.symmetric(vertical: 3.0),
+          child: TextButton(
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 3.0),
+            ),
             onPressed: () {
               openPostById(context, widget.comment.postId,
                   commentId: widget.comment.id);
@@ -144,9 +146,12 @@ class _AppCommentState extends State<AppComment>
       if (widget.onSend != null)
         SizedBox(
           height: 25,
-          width: 60,
-          child: FlatButton(
-            padding: EdgeInsets.symmetric(vertical: 3.0),
+          width: 70,
+          child: TextButton(
+            style: TextButton.styleFrom(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 3.0, horizontal: 5.0),
+            ),
             onPressed: () {
               setState(() {
                 _showAnswer = !_showAnswer;
@@ -163,11 +168,13 @@ class _AppCommentState extends State<AppComment>
             ),
           ),
         ),
-      if (widget.showAnswer && widget.comment.user.username == _auth.username)
+      if (widget.showAnswer! && widget.comment.user?.username == _auth.username)
         SizedBox(
           height: 25,
-          child: FlatButton(
-            padding: const EdgeInsets.all(3.0),
+          child: TextButton(
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.all(3.0),
+            ),
             onPressed: _delete,
             child: const Text(
               'Удалить',
@@ -176,23 +183,23 @@ class _AppCommentState extends State<AppComment>
           ),
         ),
       const Expanded(child: SizedBox()),
-      if (widget.comment.canVote)
+      if (widget.comment.canVote!)
         Padding(
           padding: const EdgeInsets.only(right: 10),
           child: InkWell(
             onTap: () => _vote(VoteType.UP),
-            child: widget.comment.votedUp
+            child: widget.comment.votedUp!
                 ? Icon(Icons.mood, color: Colors.green[600], size: 18)
                 : Icon(Icons.mood, size: 18),
           ),
         ),
-      Text(widget.comment?.rating?.toString() ?? '––'),
-      if (widget.comment.canVote)
+      Text(widget.comment.rating?.toString() ?? '––'),
+      if (widget.comment.canVote!)
         Padding(
           padding: const EdgeInsets.only(left: 10),
           child: InkWell(
             onTap: () => _vote(VoteType.DOWN),
-            child: widget.comment.votedDown
+            child: widget.comment.votedDown!
                 ? Icon(Icons.mood_bad, color: Colors.red[600], size: 18)
                 : Icon(Icons.mood_bad, size: 18),
           ),
@@ -217,13 +224,14 @@ class _AppCommentState extends State<AppComment>
     } else {
       if (!widget.comment.hidden && widget.comment.content != null) {
         content = AppContent(
-            key: ValueKey(widget.comment.id.toString() + 'content'),
-            content: widget.comment.content,
-            noHorizontalPadding: true);
+          key: ValueKey(widget.comment.id.toString() + 'content'),
+          content: widget.comment.content!,
+          noHorizontalPadding: true,
+        );
       } else if (widget.comment.hidden) {
         content = Align(
           alignment: Alignment.centerLeft,
-          child: OutlineButton(
+          child: OutlinedButton(
             onPressed: _loadComment,
             child: const Text('Показать комментарий'),
           ),
@@ -232,21 +240,22 @@ class _AppCommentState extends State<AppComment>
         content = SizedBox();
       }
     }
-    String rating = widget.comment?.rating?.toString() ?? '––';
+    String rating = widget.comment.rating?.toString() ?? '––';
 
     final comment = ColoredBox(
       color: widget.color ?? Colors.transparent,
       child: Column(children: <Widget>[
         Row(children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 5, top: 4, left: 8),
-            child: AppShortUser(user: widget.comment.user),
-          ),
+          if (widget.comment.user != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 5, top: 4, left: 8),
+              child: AppShortUser(user: widget.comment.user!),
+            ),
           if (widget.depth != 0 && widget.scrollToParent != null)
             Padding(
               padding: const EdgeInsets.only(right: 5),
               child: InkWell(
-                onTap: widget.scrollToParent,
+                onTap: widget.scrollToParent as void Function()?,
                 child: const Icon(Icons.keyboard_arrow_up),
               ),
             )
@@ -298,7 +307,7 @@ class _AppCommentState extends State<AppComment>
               padding: EdgeInsets.only(left: 15.0 * depth),
             )
           ]),
-        if (_auth.authorized && widget.showAnswer)
+        if (_auth.authorized && widget.showAnswer!)
           AnimatedBuilder(
             animation: _controller.view,
             builder: (context, child) {
@@ -315,7 +324,7 @@ class _AppCommentState extends State<AppComment>
               onSend: () {
                 _showAnswer = false;
                 if (widget.onSend != null) {
-                  widget.onSend();
+                  widget.onSend!();
                 } else {
                   setState(() {});
                 }
@@ -329,22 +338,22 @@ class _AppCommentState extends State<AppComment>
 }
 
 class AppComments extends StatefulWidget {
-  final List<PostComment> comments;
+  final List<PostComment?> comments;
 
   AppComments({
-    Key key,
-    @required this.comments,
+    Key? key,
+    required this.comments,
   }) : super(key: key);
 
   @override
   _AppCommentsState createState() => _AppCommentsState();
 
   static List<AppComment> getCommentsList({
-    List<PostComment> comments,
-    bool showAnswer,
-    void Function(int) goTo,
-    Function reload,
-    Color Function(int) getColor,
+    required List<PostComment> comments,
+    bool? showAnswer,
+    void Function(int?)? goTo,
+    Function? reload,
+    Color? Function(int?)? getColor,
   }) {
     final stack = List.of(comments.reversed);
     final depthStack = List.filled(stack.length, 0, growable: true);
@@ -358,7 +367,7 @@ class AppComments extends StatefulWidget {
       }
       final depth = depthStack.removeLast();
       final parentId = parentStack.removeLast();
-      Color color = getColor != null ? getColor(comment.id) : null;
+      Color? color = getColor != null ? getColor(comment.id) : null;
 
       children.add(AppComment(
         depth: depth,
@@ -367,14 +376,14 @@ class AppComments extends StatefulWidget {
         showAnswer: showAnswer,
         onSend: reload,
         scrollToParent: () {
-          goTo(parentId);
+          goTo!(parentId);
         },
         onDelete: reload,
       ));
 
-      depthStack.addAll(List.filled(comment.children.length, depth + 1));
-      parentStack.addAll(List.filled(comment.children.length, comment.id));
-      stack.addAll(comment.children.reversed);
+      depthStack.addAll(List.filled(comment.children!.length, depth + 1));
+      parentStack.addAll(List.filled(comment.children!.length, comment.id));
+      stack.addAll(comment.children!.reversed);
     }
     return children.toList();
   }
@@ -400,7 +409,7 @@ class _AppCommentsState extends State<AppComments> {
     _children = [];
 
     while (stack.isNotEmpty) {
-      final comment = stack.removeLast();
+      final comment = stack.removeLast()!;
       if (comment.deleted) {
         continue;
       }
@@ -412,8 +421,8 @@ class _AppCommentsState extends State<AppComments> {
         showAnswer: false,
       ));
 
-      depthStack.addAll(List.filled(comment.children.length, depth + 1));
-      stack.addAll(comment.children.reversed);
+      depthStack.addAll(List.filled(comment.children!.length, depth + 1));
+      stack.addAll(comment.children!.reversed);
     }
 
     return Container(

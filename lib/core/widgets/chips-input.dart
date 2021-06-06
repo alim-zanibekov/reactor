@@ -1,5 +1,3 @@
-// @dart = 2.13
-
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';

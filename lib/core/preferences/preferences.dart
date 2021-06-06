@@ -15,13 +15,13 @@ class Preferences {
     return _preferences;
   }
 
-  AppTheme _theme;
-  AppPostsType _postsType;
-  bool _sfw;
-  bool _sendErrorStatistics;
-  bool _gifAutoPlay;
-  List<String> _hostList;
-  String _host;
+  late AppTheme _theme;
+  late AppPostsType _postsType;
+  late bool _sfw;
+  late bool _sendErrorStatistics;
+  late bool _gifAutoPlay;
+  late List<String> _hostList;
+  late String _host;
 
   Preferences._internal();
 

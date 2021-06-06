@@ -23,13 +23,13 @@ class Auth {
 
   final _dio = Dio();
 
-  String _token;
-  String _username;
+  String? _token;
+  String? _username;
   bool _authorized = false;
 
   bool get authorized => _authorized;
 
-  String get username => _username;
+  String? get username => _username;
 
   Stream<bool> get authorized$ {
     return _authState.stream;
@@ -40,14 +40,14 @@ class Auth {
       if (prefs.getBool('auth') ?? false) {
         _token = prefs.getString('auth-token');
         _username = prefs.getString('username');
-        _sentryReporter.setUserContext(_username);
+        _sentryReporter.setUserContext(_username!);
         _session.setToken(_token);
         _authorized = true;
       }
     });
   }
 
-  String _parseTokenHeader(Response res) {
+  String? _parseTokenHeader(Response res) {
     final setCookieHeader = res.headers[HttpHeaders.setCookieHeader];
     if (setCookieHeader != null && setCookieHeader.isNotEmpty) {
       for (final value in setCookieHeader) {
@@ -114,7 +114,7 @@ class Auth {
       final res = await _dio.get(
         'http://joyreactor.cc/login',
         options: Options(
-          validateStatus: (status) => status < 400,
+          validateStatus: (status) => status! < 400,
           headers: {
             'Connection': 'keep-alive',
             'Cookie': 'joyreactor_sess3=$sessionToken; jr_jwt=$jwt'

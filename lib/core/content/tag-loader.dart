@@ -5,20 +5,20 @@ import 'loader.dart';
 
 class TagLoader extends Loader<ExtendedTag> {
   final _api;
-  final String path;
+  final String? path;
   final TagListType tagListType;
 
   TagLoader({
     this.path,
     this.tagListType = TagListType.BEST,
-    String prefix,
+    String? prefix,
   }) : _api = prefix == null ? Api() : Api.withPrefix(prefix);
 
   final List<ContentPage<ExtendedTag>> _pages = [];
   final List<ExtendedTag> _tags = [];
 
   bool get complete {
-    return (_pages.last?.isLast ?? false) || _complete;
+    return (_pages.last.isLast ?? false) || _complete;
   }
 
   List<ExtendedTag> get elements {
@@ -39,18 +39,18 @@ class TagLoader extends Loader<ExtendedTag> {
     _complete = false;
   }
 
-  Future<List<ExtendedTag>> load() async {
+  Future<List<ExtendedTag>?> load() async {
     final page = await _api.loadMainTag(path, tagListType);
     _pages.add(page);
     _tags.addAll(page.content);
     return page.content;
   }
 
-  Future<List<ExtendedTag>> loadNext() async {
-    if (_pages.last.isLast || _complete) {
+  Future<List<ExtendedTag>?> loadNext() async {
+    if (_pages.last.isLast! || _complete) {
       return [];
     }
-    int id = _pages.last.id + 1;
+    int id = _pages.last.id! + 1;
     final page = await _api.loadMainTagByPageId(id, path, tagListType);
     if (page.id == _pages.last.id) {
       _complete = true;

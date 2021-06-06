@@ -11,11 +11,11 @@ class _ReloadNotifier extends ChangeNotifier {
 }
 
 class AppSearchList extends StatefulWidget {
-  final String query;
-  final String author;
-  final List<String> tags;
+  final String? query;
+  final String? author;
+  final List<String?>? tags;
 
-  const AppSearchList({Key key, this.query, this.author, this.tags})
+  const AppSearchList({Key? key, this.query, this.author, this.tags})
       : super(key: key);
 
   @override
@@ -24,7 +24,7 @@ class AppSearchList extends StatefulWidget {
 
 class _AppSearchListState extends State<AppSearchList> {
   final _reloadNotifier = _ReloadNotifier();
-  PostLoader _loader;
+  late PostLoader _loader;
 
   @override
   void initState() {

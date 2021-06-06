@@ -3,14 +3,14 @@ import 'package:flutter/widgets.dart';
 
 class AppOnErrorReload extends StatelessWidget {
   final String text;
-  final Function onReloadPressed;
+  final Function? onReloadPressed;
   final bool hasMaxWidth;
-  final Widget button;
+  final Widget? button;
   final Icon icon;
 
   const AppOnErrorReload({
-    Key key,
-    this.text,
+    Key? key,
+    required this.text,
     this.icon = const Icon(
       Icons.error_outline,
       color: Color(0xFFFF8A80),
@@ -43,17 +43,15 @@ class AppOnErrorReload extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-          if (button == null)
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: () async {
-                if (onReloadPressed != null) {
-                  onReloadPressed();
-                }
-              },
-            )
-          else
-            button
+          button ??
+              IconButton(
+                icon: const Icon(Icons.refresh),
+                onPressed: () async {
+                  if (onReloadPressed != null) {
+                    onReloadPressed!();
+                  }
+                },
+              )
         ],
       ),
     );
@@ -61,9 +59,9 @@ class AppOnErrorReload extends StatelessWidget {
 }
 
 class AppOnErrorReloadExpanded extends StatelessWidget {
-  final Function onReloadPressed;
+  final Function? onReloadPressed;
 
-  const AppOnErrorReloadExpanded({Key key, this.onReloadPressed})
+  const AppOnErrorReloadExpanded({Key? key, this.onReloadPressed})
       : super(key: key);
 
   @override
@@ -75,11 +73,10 @@ class AppOnErrorReloadExpanded extends StatelessWidget {
         hasMaxWidth: false,
         button: Padding(
           padding: const EdgeInsets.only(top: 10),
-          child: OutlineButton(
-            highlightedBorderColor: Theme.of(context).accentColor,
+          child: OutlinedButton(
             onPressed: () {
               if (onReloadPressed != null) {
-                onReloadPressed();
+                onReloadPressed!();
               }
             },
             child: const Text('Попробовать снова'),

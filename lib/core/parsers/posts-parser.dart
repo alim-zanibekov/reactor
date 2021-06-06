@@ -1,5 +1,6 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as parser;
+import 'package:reactor/core/parsers/utils.dart';
 
 import './types/module.dart';
 import 'comments-parser.dart';
@@ -15,12 +16,12 @@ class PostsParser {
 
   Post parsePost(int id, String c) {
     final parsedPage = parser.parse(c);
-    return _parse(id, parsedPage.querySelector('.postContainer'), true);
+    return _parse(id, parsedPage.querySelector('.postContainer')!, true);
   }
 
   Post parseInner(int id, String c) {
     final parsedPage = parser.parse(c);
-    return _parse(id, parsedPage.body, false);
+    return _parse(id, parsedPage.body!, false);
   }
 
   Post _parse(int id, Element parsedPage, bool parseComments) {
@@ -33,9 +34,9 @@ class PostsParser {
     } else {
       content = _contentParser.parse(contentBlock);
     }
-    final footer = parsedPage.querySelector('.ufoot');
+    final footer = parsedPage.querySelector('.ufoot')!;
 
-    final ratingContainer = footer.querySelector('.post_rating');
+    final ratingContainer = footer.querySelector('.post_rating')!;
 
     final rating = _parseRating(ratingContainer);
     final quiz = _quizParser.parseQuizFromPost(parsedPage);
@@ -52,7 +53,7 @@ class PostsParser {
     final dateTime = _parseDate(parsedPage);
     final favorite = _parseFavorite(parsedPage);
     final commentsCount = int.parse(parsedPage
-        .querySelector('.toggleComments')
+        .querySelector('.toggleComments')!
         .text
         .replaceAll(RegExp(r'[^0-9]+'), ''));
 
@@ -60,9 +61,8 @@ class PostsParser {
         (footer.querySelector('.hidden_link a')?.attributes ?? {})['href']
             ?.contains('delete');
 
-    final unsafe = contentBlock?.children?.length == 1 &&
-        ((contentBlock.children[0]?.attributes ?? {})['src']
-                ?.contains('unsafe') ??
+    final unsafe = contentBlock?.children.length == 1 &&
+        (contentBlock!.children[0].attributes['src']?.contains('unsafe') ??
             false);
 
     return Post(
@@ -86,11 +86,11 @@ class PostsParser {
     );
   }
 
-  ContentPage<Post> parsePage(String c) {
+  ContentPage<Post> parsePage(String? c) {
     final parsedPage = parser.parse(c);
     final current = parsedPage.querySelector('.pagination_expanded .current');
     final pageId = current != null
-        ? int.tryParse(
+        ? Utils.getNumberInt(
               parsedPage.querySelector('.pagination_expanded .current')?.text,
             ) ??
             0
@@ -100,9 +100,8 @@ class PostsParser {
 
     final paginationBlock = parsedPage.querySelector('.pagination_expanded');
     if (current != null && paginationBlock != null) {
-      lastPageId = int.tryParse(paginationBlock.children.last?.text) ?? 0;
-      reversedPagination = paginationBlock != null &&
-          paginationBlock.children.length > 1 &&
+      lastPageId = Utils.getNumberInt(paginationBlock.children.last.text) ?? 0;
+      reversedPagination = paginationBlock.children.length > 1 &&
           (int.tryParse(paginationBlock.children[0].text) ?? 0) >
               (int.tryParse(paginationBlock.children[1].text) ?? 0);
     }
@@ -111,19 +110,17 @@ class PostsParser {
         TagParser.parsePageInfo(parsedPage.getElementById('tagArticle'));
 
     return ContentPage<Post>(
-      authorized: parsedPage.querySelector('#topbar .login #settings') != null,
+      authorized:
+          parsedPage.querySelector('#topbar .login #settings') != null ||
+              parsedPage.querySelector('#navlist .login #settings') != null,
       pageInfo: pageInfo,
       reversedPagination: reversedPagination,
       isLast: reversedPagination ? pageId <= 1 : pageId == lastPageId,
-      content: parsedPage
-          .querySelectorAll('.postContainer')
-          .map((e) {
-            final id = int.tryParse(
-                e.attributes['id'].replaceAll('postContainer', ''));
-            return _parse(id ?? 0, e, false);
-          })
-          .where((element) => element != null)
-          .toList(),
+      content: parsedPage.querySelectorAll('.postContainer').map((e) {
+        final id =
+            int.tryParse(e.attributes['id']!.replaceAll('postContainer', ''));
+        return _parse(id ?? 0, e, false);
+      }).toList(),
       id: pageId,
     );
   }
@@ -136,25 +133,26 @@ class PostsParser {
   List<Tag> _parseTags(Element parsedPage) {
     final tags = parsedPage.querySelectorAll('.taglist a');
     return tags.map((tag) {
-      final attributes = tag?.attributes ?? {};
-
       final value = tag.text;
       return Tag(
         value,
-        isMain: Tag.parseIsMain(attributes['href']),
-        prefix: Tag.parsePrefix(attributes['href']),
-        link: Tag.parseLink(attributes['href']),
+        isMain: Tag.parseIsMain(tag.attributes['href']),
+        prefix: Tag.parsePrefix(tag.attributes['href']),
+        link: Tag.parseLink(tag.attributes['href']),
       );
     }).toList();
   }
 
-  UserShort _parseUser(Element parsedPage) {
+  UserShort? _parseUser(Element parsedPage) {
     final nick = parsedPage.querySelector('.uhead_nick');
-    final img = nick?.querySelector('img');
-    final avatar = img.attributes['src'];
-    final username = img.attributes['alt'];
+    final img = nick?.querySelector('img')!;
+    final avatar = img?.attributes['src'];
+    final username = img?.attributes['alt'];
     final userLink =
-        (nick?.querySelector('a')?.attributes ?? {})['href']?.split('/')?.last;
+        nick?.querySelector('a')?.attributes['href']?.split('/').last;
+    if (username == null || userLink == null) {
+      return null;
+    }
     return UserShort(avatar: avatar, username: username, link: userLink);
   }
 
@@ -167,16 +165,13 @@ class PostsParser {
   }
 
   DateTime _parseDate(Element parsedPage) {
-    final date = parsedPage.querySelector('.date > span');
-    final timestamp = int.parse(date.attributes['data-time']);
+    final date = parsedPage.querySelector('.date > span')!;
+    final timestamp = int.parse(date.attributes['data-time']!);
     return DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
   }
 
-  double _parseRating(Element ratingContainer) {
-    if (ratingContainer != null) {
-      final text = ratingContainer.text.trim();
-      return text == '--' ? null : double.tryParse(text);
-    }
-    return null;
+  double? _parseRating(Element ratingContainer) {
+    final text = ratingContainer.text.trim();
+    return text == '--' ? null : double.tryParse(text);
   }
 }

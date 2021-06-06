@@ -1,4 +1,5 @@
 import 'package:html/parser.dart' as parser;
+import 'package:reactor/core/parsers/utils.dart';
 
 import './types/module.dart';
 import 'comments-parser.dart';
@@ -11,9 +12,9 @@ class UserCommentsParser {
     final parsedPage = parser.parse(c);
     final current = parsedPage.querySelector('.pagination_expanded .current');
     final pageId = current != null
-        ? int.tryParse(
-              parsedPage.querySelector('.pagination_expanded .current')?.text,
-            ) ??
+        ? Utils.getNumberInt(parsedPage
+                .querySelector('.pagination_expanded .current')
+                ?.text) ??
             0
         : 0;
 
@@ -24,12 +25,12 @@ class UserCommentsParser {
           parsedPage.querySelector('.pagination_main.pLeft') != null,
       content: parsedPage
           .querySelectorAll('.post_comment_list > .comment')
-          .map((e) {
-            final id = int.tryParse(e.attributes['parent']);
-            return _commentsParser.parseComment(e, id);
-          })
-          .where((element) => element != null)
-          .toList(),
+          .where((element) =>
+              Utils.getNumberInt(element.attributes['parent']) != null)
+          .map((element) {
+        final id = Utils.getNumberInt(element.attributes['parent'])!;
+        return _commentsParser.parseComment(element, id);
+      }).toList(),
       id: pageId,
     );
   }

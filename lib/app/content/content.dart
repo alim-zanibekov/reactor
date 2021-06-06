@@ -17,13 +17,13 @@ import '../extensions/youtube/player.dart';
 
 class AppContent extends StatefulWidget {
   final List<ContentUnit> content;
-  final void Function(List<Pair<double, Size>>) onLoad;
+  final void Function(List<Pair<double, Size>>)? onLoad;
   final bool noHorizontalPadding;
-  final List<Widget> children;
+  final List<Widget>? children;
 
   const AppContent({
-    Key key,
-    this.content,
+    Key? key,
+    required this.content,
     this.onLoad,
     this.noHorizontalPadding = false,
     this.children,
@@ -36,18 +36,24 @@ class AppContent extends StatefulWidget {
 class _AppContentState extends State<AppContent> {
   static final _defaultPadding =
       EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0);
-  List<Future<OEmbedMetadata>> _futures = [];
+  List<Future<OEmbedMetadata>?> _futures = [];
   List<AppNetworkImageWithRetry> _images = [];
   List<AppNetworkImageWithRetry> _imagesForGallery = [];
-  List<ContentUnitImage> _undefinedSizeImages;
-  int _undefinedSizeImagesCount;
+  late List<ContentUnitImage> _undefinedSizeImages;
+  int _undefinedSizeImagesCount = 0;
 
-  List<Future<OEmbedMetadata>> _filteredFutures;
+  late List<Future<OEmbedMetadata>> _filteredFutures;
 
   @override
   void initState() {
     _getFutures();
     super.initState();
+  }
+
+  _onLoad(List<Pair<double, Size>> arg) {
+    if (widget.onLoad != null) {
+      widget.onLoad!(arg);
+    }
   }
 
   _fillGalleryImage(index) {
@@ -59,7 +65,7 @@ class _AppContentState extends State<AppContent> {
       if (images[index].prettyImageLink != null &&
           _imagesForGallery[index].url != images[index].prettyImageLink) {
         _imagesForGallery[index] = AppNetworkImageWithRetry(
-          images[index].prettyImageLink,
+          images[index].prettyImageLink!,
           headers: Headers.reactorHeaders,
         );
       }
@@ -102,21 +108,23 @@ class _AppContentState extends State<AppContent> {
       }
     }
 
-    _filteredFutures = _futures.where((element) => element != null).toList();
+    _filteredFutures = [
+      for (var i in _futures)
+        if (i != null) i
+    ];
 
-    if (widget.onLoad != null && _undefinedSizeImages.isEmpty) {
+    if (_undefinedSizeImages.isEmpty) {
       if (_filteredFutures.isNotEmpty) {
-        Future.wait(_filteredFutures).then((value) => widget.onLoad(
+        Future.wait(_filteredFutures).then(((value) => _onLoad(
               value
-                  .where((element) => element != null)
                   .map((e) => Pair(
                         16.0 / 9.0,
-                        Size(e.width.toDouble(), e.height.toDouble()),
+                        Size(e.width!.toDouble(), e.height!.toDouble()),
                       ))
                   .toList(),
-            ));
+            )));
       } else {
-        widget.onLoad([]);
+        _onLoad([]);
       }
     }
 
@@ -132,20 +140,20 @@ class _AppContentState extends State<AppContent> {
       _undefinedSizeImagesCount -= 1;
       if (_undefinedSizeImagesCount == 0) {
         final imageSizes = _undefinedSizeImages
-            .map((e) => Pair(9.0 / 16.0, Size(e.width, e.height)))
+            .map((e) => Pair(9.0 / 16.0, Size(e.width!, e.height!)))
             .toList();
         if (_filteredFutures.isNotEmpty) {
           Future.wait(_filteredFutures).then((value) {
-            widget.onLoad([
+            _onLoad([
               ...value.map((e) => Pair(
                     16.0 / 9.0,
-                    Size(e.width.toDouble(), e.height.toDouble()),
+                    Size(e.width!.toDouble(), e.height!.toDouble()),
                   )),
               ...imageSizes
             ]);
           });
         } else {
-          widget.onLoad(imageSizes);
+          _onLoad(imageSizes);
         }
       }
     }
@@ -257,14 +265,15 @@ class _AppContentState extends State<AppContent> {
   }
 
   Widget _buildGif(ContentUnitGif entry, BuildContext context) {
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+    final RenderBox? overlay =
+        Overlay.of(context)!.context.findRenderObject() as RenderBox?;
     Offset pos = Offset.zero;
     return GestureDetector(
       onLongPress: () {
         showMenu(
           position: RelativeRect.fromRect(
             pos & Size(40, 40), // smaller rect, the touch area
-            Offset.zero & overlay.size, // Bigger rect, the entire screen
+            Offset.zero & overlay!.size, // Bigger rect, the entire screen
           ),
           context: context,
           items: [
@@ -281,7 +290,7 @@ class _AppContentState extends State<AppContent> {
           elevation: 8.0,
         ).then<void>((dynamic delta) async {
           if (delta != null) {
-            final url = (delta == 1) ? entry.gifUrl : entry.value;
+            final String url = (delta == 1) ? entry.gifUrl! : entry.value;
             SaveFile.downloadAndSave(context, url);
           }
         });
@@ -298,14 +307,15 @@ class _AppContentState extends State<AppContent> {
   }
 
   Widget _buildImage(ContentUnitImage image, BuildContext context, int index) {
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+    final RenderBox? overlay =
+        Overlay.of(context)!.context.findRenderObject() as RenderBox?;
     Offset pos = Offset.zero;
     return GestureDetector(
       onLongPress: () {
         showMenu(
           position: RelativeRect.fromRect(
             pos & Size(40, 40), // smaller rect, the touch area
-            Offset.zero & overlay.size, // Bigger rect, the entire screen
+            Offset.zero & overlay!.size, // Bigger rect, the entire screen
           ),
           context: context,
           items: [
@@ -339,7 +349,7 @@ class _AppContentState extends State<AppContent> {
       },
       child: AspectRatio(
         aspectRatio: (image.width != null && image.height != null)
-            ? image.width / image.height
+            ? image.width! / image.height!
             : 9.0 / 16.0,
         child: AppSafeImage(
           imageProvider: _images[index],
@@ -376,10 +386,10 @@ class _AppContentState extends State<AppContent> {
           break;
       }
 
-      TapGestureRecognizer recognizer;
+      TapGestureRecognizer? recognizer;
       if (text is ContentUnitLink) {
         recognizer = TapGestureRecognizer()
-          ..onTap = () => goToLinkOrOpen(context, text.link);
+          ..onTap = () => goToLinkOrOpen(context, text.link!);
       }
 
       TextDecoration decoration = TextDecoration.none;

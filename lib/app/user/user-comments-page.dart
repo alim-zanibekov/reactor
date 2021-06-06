@@ -8,12 +8,12 @@ import '../common/loader-list.dart';
 class AppUserCommentsPage extends StatefulWidget {
   final String username;
 
-  final void Function(double delta) onScrollChange;
-  final ChangeNotifier reloadNotifier;
+  final void Function(double delta)? onScrollChange;
+  final ChangeNotifier? reloadNotifier;
 
   const AppUserCommentsPage({
-    Key key,
-    this.username,
+    Key? key,
+    required this.username,
     this.onScrollChange,
     this.reloadNotifier,
   }) : super(key: key);
@@ -23,12 +23,11 @@ class AppUserCommentsPage extends StatefulWidget {
 }
 
 class _AppUserCommentsPageState extends State<AppUserCommentsPage> {
-  CommentsLoader loader;
+  late CommentsLoader loader;
 
   @override
   void initState() {
-    loader = CommentsLoader(username: widget.username);
-
+    loader = CommentsLoader(widget.username);
     super.initState();
   }
 

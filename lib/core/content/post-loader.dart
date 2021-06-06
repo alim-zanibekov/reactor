@@ -8,14 +8,14 @@ import 'loader.dart';
 class PostLoader extends Loader<Post> {
   static const maxLoads = 20;
   final Api _api;
-  final String path;
+  final String? path;
   final bool user, subscriptions, search;
   final PostListType postListType;
-  final String prefix;
-  final String favorite;
-  final String query;
-  final String author;
-  final List<String> tags;
+  final String? prefix;
+  final String? favorite;
+  final String? query;
+  final String? author;
+  final List<String?>? tags;
 
   PostLoader({
     this.path,
@@ -33,9 +33,9 @@ class PostLoader extends Loader<Post> {
   int _loadCount = 0;
   final List<ContentPage<Post>> _pages = [];
   final List<Post> _posts = [];
-  final Set<int> _postIds = Set();
+  final Set<int?> _postIds = Set();
 
-  bool get complete => (_pages.last?.isLast ?? false) || _complete;
+  bool get complete => (_pages.last.isLast ?? false) || _complete;
 
   ContentPage<Post> get firstPage => _pages.first;
 
@@ -45,7 +45,7 @@ class PostLoader extends Loader<Post> {
 
   bool _complete = false;
   bool _destroyed = false;
-  bool _reversedPagination = false;
+  bool? _reversedPagination = false;
   int _postsPerPage = 10;
 
   void destroy() {
@@ -65,15 +65,15 @@ class PostLoader extends Loader<Post> {
     if (search) {
       return _api.search(query: query, author: author, tags: tags);
     } else if (favorite != null) {
-      return _api.loadFavorite(favorite);
+      return _api.loadFavorite(favorite!);
     } else if (user) {
-      return _api.loadUser(path);
+      return _api.loadUser(path!);
     } else if (subscriptions) {
       return _api.loadSubscriptions();
     } else if (path == null) {
       return _api.load(postListType);
     } else {
-      return _api.loadTag(path, postListType);
+      return _api.loadTag(path!, postListType);
     }
   }
 
@@ -81,15 +81,15 @@ class PostLoader extends Loader<Post> {
     if (search) {
       return _api.searchByPageId(id, query: query, author: author, tags: tags);
     } else if (favorite != null) {
-      return _api.loadFavoriteByPageId(favorite, id);
+      return _api.loadFavoriteByPageId(favorite!, id);
     } else if (user) {
-      return _api.loadUserByPageId(path, id);
+      return _api.loadUserByPageId(path!, id);
     } else if (subscriptions) {
       return _api.loadSubscriptionsByPageId(id);
     } else if (path == null) {
       return _api.loadByPageId(id, postListType);
     } else {
-      return _api.loadTagByPageId(path, id, postListType);
+      return _api.loadTagByPageId(path!, id, postListType);
     }
   }
 
@@ -114,7 +114,7 @@ class PostLoader extends Loader<Post> {
     }
     final List<Post> newPosts = [];
 
-    int id = _reversedPagination ? _pages.last.id - 1 : _pages.last.id + 1;
+    int id = _reversedPagination! ? _pages.last.id! - 1 : _pages.last.id! + 1;
     int i;
 
     for (i = 0;
@@ -137,7 +137,7 @@ class PostLoader extends Loader<Post> {
         _postsPerPage = max(page.content.length, _postsPerPage);
         _pages.add(page);
 
-        if (page.isLast) {
+        if (page.isLast!) {
           _complete = true;
         }
 
@@ -147,7 +147,7 @@ class PostLoader extends Loader<Post> {
 
         page.content.forEach((post) => _postIds.add(post.id));
 
-        id = _reversedPagination ? id - 1 : id + 1;
+        id = _reversedPagination! ? id - 1 : id + 1;
       }
     }
 

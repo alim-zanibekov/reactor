@@ -11,14 +11,14 @@ import '../common/future-page.dart';
 import 'post.dart';
 
 class AppOnePostPage extends StatefulWidget {
-  final Post post;
-  final int postId;
-  final Function loadContent;
+  final Post? post;
+  final int? postId;
+  final Function? loadContent;
   final bool scrollToComments;
-  final int commentId;
+  final int? commentId;
 
   AppOnePostPage({
-    Key key,
+    Key? key,
     this.post,
     this.postId,
     this.loadContent,
@@ -39,7 +39,7 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
       ItemPositionsListener.create();
   final ScrollController _controller = ScrollController();
   GlobalKey _pageKey = GlobalKey();
-  Post _post;
+  Post? _post;
   bool needScroll = false;
 
   @override
@@ -54,7 +54,7 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
     super.dispose();
   }
 
-  Color _getColor(int commentId) {
+  Color? _getColor(int? commentId) {
     if (commentId == widget.commentId) {
       return Theme.of(context).accentColor.withOpacity(0.2);
     }
@@ -62,25 +62,26 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
   }
 
   void _loadComments() {
-    _post.comments = null;
-    AppFuturePageState appFuturePageState = _pageKey.currentState;
+    _post!.comments = null;
+    AppFuturePageState? appFuturePageState =
+        _pageKey.currentState as AppFuturePageState<dynamic>?;
     appFuturePageState?.reload(withoutIndicator: true);
   }
 
   Widget _list() {
     List<Widget> children = [];
-    List<AppComment> comments;
-    if (_post?.comments == null) {
+    late List<AppComment> comments;
+    if (_post!.comments == null) {
       children.add(SizedBox(
         height: MediaQuery.of(context).size.height,
         child: FadeIcon(
-          key: ObjectKey(_post.dateTime),
+          key: ObjectKey(_post!.dateTime),
           icon: Icon(Icons.speaker_notes, color: Colors.grey[500], size: 44),
         ),
       ));
     } else {
       comments = AppComments.getCommentsList(
-        comments: _post.comments,
+        comments: _post!.comments ?? [],
         showAnswer: true,
         goTo: (e) {
           int i = comments.indexWhere((element) => element.comment.id == e);
@@ -92,19 +93,19 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
         reload: _loadComments,
         getColor: _getColor,
       );
-      _post.commentsCount = comments.length;
+      _post!.commentsCount = comments.length;
 
       children = [
         ...comments,
         if (_auth.authorized)
           AppCommentAnswer(
-            comment: PostComment(postId: _post.id, id: 0),
+            comment: PostComment(postId: _post!.id, id: 0, depth: 0),
             onSend: _loadComments,
           )
       ];
     }
 
-    int initialScrollIndex;
+    int? initialScrollIndex;
 
     if (needScroll) {
       needScroll = false;
@@ -122,13 +123,13 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
         if (index == 0) {
           return AppPostContent(
             key: ObjectKey(_post),
-            post: _post,
+            post: _post!,
             onPage: true,
             loadContent: () async {
               try {
-                if (widget.loadContent != null) widget.loadContent();
+                if (widget.loadContent != null) widget.loadContent!();
 
-                final post = await Api().loadPostContent(_post.id);
+                final post = await Api().loadPostContent(_post!.id);
                 _post = post;
                 if (mounted) setState(() {});
               } on Exception {
@@ -162,7 +163,8 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
               key: _pageKey,
               load: (fromUser) async {
                 if (fromUser) {
-                  _post = await Api().loadPost(widget.postId ?? widget.post.id);
+                  _post =
+                      await Api().loadPost(widget.postId ?? widget.post!.id);
                   return;
                 }
                 if (_post == null) {
@@ -170,14 +172,14 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
                     _post = widget.post;
                   } else {
                     _post =
-                        await Api().loadPost(widget.postId ?? widget.post.id);
+                        await Api().loadPost(widget.postId ?? widget.post!.id);
                   }
                 }
-                if (_post.comments == null) {
-                  _post.comments = await Api().loadComments(_post.id);
+                if (_post?.comments == null) {
+                  _post!.comments = await Api().loadComments(_post!.id);
                 }
               },
-              builder: (context, value, hasError) => _list(),
+              builder: (context, dynamic value, hasError) => _list(),
             ),
           ),
         ],

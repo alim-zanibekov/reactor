@@ -9,15 +9,13 @@ class AppShortUser extends StatelessWidget {
   final UserShort user;
   final double size;
 
-  const AppShortUser({@required this.user, this.size = 24});
+  const AppShortUser({required this.user, this.size = 24});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (user.username != null) {
-          openUser(context, user.username, user.link);
-        }
+        openUser(context, user.username, user.link);
       },
       child: ColoredBox(
         color: Colors.transparent,
@@ -27,7 +25,7 @@ class AppShortUser extends StatelessWidget {
             if (user.avatar != null)
               CircleAvatar(
                 radius: size / 2.0,
-                backgroundImage: AppNetworkImageWithRetry(user.avatar),
+                backgroundImage: AppNetworkImageWithRetry(user.avatar!),
               ),
             Container(
               height: size,
@@ -52,9 +50,9 @@ class AppShortUser extends StatelessWidget {
 class AppPostUser extends StatelessWidget {
   final UserShort user;
   final double size;
-  final DateTime dateTime;
+  final DateTime? dateTime;
 
-  const AppPostUser({@required this.user, this.dateTime, this.size = 42});
+  const AppPostUser({required this.user, this.dateTime, this.size = 42});
 
   @override
   Widget build(BuildContext context) {
@@ -62,9 +60,7 @@ class AppPostUser extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        if (user.username != null) {
-          openUser(context, user.username, user.link);
-        }
+        openUser(context, user.username, user.link);
       },
       child: ColoredBox(
         color: Colors.transparent,
@@ -73,7 +69,7 @@ class AppPostUser extends StatelessWidget {
           children: <Widget>[
             CircleAvatar(
               radius: size / 2.0,
-              backgroundImage: AppNetworkImageWithRetry(user.avatar),
+              backgroundImage: AppNetworkImageWithRetry(user.avatar!),
             ),
             Container(
               height: size,
@@ -93,7 +89,7 @@ class AppPostUser extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    DateTimeFormatter.formatDateTime(dateTime),
+                    DateTimeFormatter.formatDateTime(dateTime!),
                     style: TextStyle(
                       fontSize: 10,
                       color: isDark ? Colors.grey[400] : Colors.black38,

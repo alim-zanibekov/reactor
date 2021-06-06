@@ -2,53 +2,48 @@ import 'content.dart';
 import 'user.dart';
 
 abstract class HasChildren<T> {
-  List<T> children;
+  List<T>? children;
 }
 
 class QuizAnswer {
-  final int id;
-  final String text;
-  final double percent;
-  final int count;
+  final int? id;
+  final String? text;
+  final double? percent;
+  final int? count;
 
   const QuizAnswer({
+    this.id,
     this.text,
     this.count,
     this.percent,
-    this.id,
   });
 }
 
 class Quiz {
-  final bool voted;
   final String title;
   final List<QuizAnswer> answers;
 
-  const Quiz({
-    this.title,
-    this.voted,
-    this.answers,
-  });
+  const Quiz({required this.title, required this.answers});
 }
 
 class Tag {
   static final _extractTag3LDomainRegex =
       RegExp(r'https?:\/\/(.*?)\.reactor\.');
 
-  final bool isMain;
-  final String prefix;
-  final String link;
+  final bool? isMain;
+  final String? prefix;
+  final String? link;
   String value;
 
-  static parsePrefix(String link) {
+  static parsePrefix(String? link) {
     return _extractTag3LDomainRegex.firstMatch(link ?? '')?.group(1);
   }
 
-  static parseIsMain(String link) {
+  static parseIsMain(String? link) {
     return (link ?? '').contains('/rating');
   }
 
-  static parseLink(String link) {
+  static parseLink(String? link) {
     return _linkRegex.firstMatch(link ?? '')?.group(1);
   }
 
@@ -58,10 +53,10 @@ class Tag {
 }
 
 class IconTag extends Tag {
-  final String icon;
+  final String? icon;
 
   IconTag(
-    value, {
+    String value, {
     this.icon,
     isMain,
     prefix,
@@ -75,14 +70,14 @@ class IconTag extends Tag {
 }
 
 class ExtendedTag extends IconTag {
-  final int count;
-  final int subscribersCount;
-  final double commonRating;
-  final int subscribersDeltaCount;
+  final int? count;
+  final int? subscribersCount;
+  final double? commonRating;
+  final int? subscribersDeltaCount;
 
   ExtendedTag(
     String value, {
-    String icon,
+    String? icon,
     this.count,
     this.subscribersCount,
     this.commonRating,
@@ -104,19 +99,20 @@ class PageInfo extends ExtendedTag {
   bool blocked;
 
   final int tagId;
-  final String bg;
+  final String? bg;
 
-  PageInfo({
-    String icon,
-    this.tagId,
+  PageInfo(
+    String value, {
+    String? icon,
+    required this.tagId,
     this.bg,
-    int count,
-    int subscribersCount,
-    double commonRating,
+    int? count,
+    int? subscribersCount,
+    double? commonRating,
     this.blocked = false,
     this.subscribed = false,
   }) : super(
-          null,
+          value,
           icon: icon,
           count: count,
           subscribersCount: subscribersCount,
@@ -125,16 +121,16 @@ class PageInfo extends ExtendedTag {
 }
 
 class ContentPage<T> {
-  final int id;
+  final int? id;
   final List<T> content;
-  final PageInfo pageInfo;
-  final bool isLast;
-  final bool authorized;
-  final bool reversedPagination;
+  final PageInfo? pageInfo;
+  final bool? isLast;
+  final bool? authorized;
+  final bool? reversedPagination;
 
   ContentPage({
     this.id,
-    this.content,
+    required this.content,
     this.pageInfo,
     this.isLast,
     this.authorized,
@@ -156,45 +152,45 @@ class Post {
   final int id;
   final List<Tag> tags;
   final List<ContentUnit> content;
-  final UserShort user;
-  final DateTime dateTime;
-  final PostComment bestComment;
+  final UserShort? user;
+  final DateTime? dateTime;
+  final PostComment? bestComment;
   final bool censored;
   final bool unsafe;
   final bool hidden;
 
-  int commentsCount;
-  double rating;
+  int? commentsCount;
+  double? rating;
   bool votedUp;
-  bool canVote;
+  bool? canVote;
   bool votedDown;
   bool favorite;
-  List<PostComment> comments;
-  double height;
+  List<PostComment>? comments;
+  double? height;
   bool expanded = false;
-  Quiz quiz;
+  Quiz? quiz;
 
   get link {
     return 'http://joyreactor.cc/post/$id';
   }
 
   Post({
-    this.id,
-    this.tags,
-    this.content,
+    required this.id,
+    required this.tags,
+    required this.content,
     this.rating,
     this.bestComment,
     this.comments,
     this.user,
     this.dateTime,
-    this.hidden,
+    this.hidden = false,
     this.canVote,
-    this.unsafe,
+    this.unsafe = false,
     this.commentsCount,
     this.favorite = false,
     this.votedDown = false,
     this.votedUp = false,
-    this.censored,
+    this.censored = false,
     this.quiz,
   });
 }
@@ -203,24 +199,24 @@ class PostComment implements HasChildren<PostComment> {
   final int id;
   final int depth;
   final int postId;
-  final DateTime time;
-  final UserShort user;
+  final DateTime? time;
+  final UserShort? user;
 
-  double rating;
+  double? rating;
   bool hidden;
-  List<PostComment> children = [];
-  List<ContentUnit> content;
-  bool votedUp;
-  bool canVote;
-  bool votedDown;
+  List<PostComment>? children = [];
+  List<ContentUnit>? content;
+  bool? votedUp;
+  bool? canVote;
+  bool? votedDown;
 
   bool deleted = false;
 
   PostComment({
-    this.id,
-    this.depth,
+    required this.id,
+    required this.depth,
+    required this.postId,
     this.user,
-    this.postId,
     this.content,
     this.canVote,
     this.votedUp,
@@ -232,5 +228,5 @@ class PostComment implements HasChildren<PostComment> {
 }
 
 class CommentParent implements HasChildren<PostComment> {
-  List<PostComment> children = [];
+  List<PostComment>? children = [];
 }

@@ -19,7 +19,7 @@ class Headers {
     HttpHeaders.refererHeader: 'http://joyreactor.cc/'
   };
 
-  static updateUserAgent(userAgent) {
+  static updateUserAgent(String userAgent) {
     videoHeaders[HttpHeaders.userAgentHeader] = userAgent;
     reactorHeaders[HttpHeaders.userAgentHeader] = userAgent;
   }

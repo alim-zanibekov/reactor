@@ -11,12 +11,12 @@ import '../common/options.dart';
 import '../common/video-thumbnail.dart';
 
 class AppVimeoPlayer extends StatefulWidget {
-  final String videoId;
-  final OEmbedMetadata metadata;
-  final Future<OEmbedMetadata> futureMetadata;
+  final String? videoId;
+  final OEmbedMetadata? metadata;
+  final Future<OEmbedMetadata>? futureMetadata;
 
   AppVimeoPlayer(
-      {Key key, @required this.videoId, this.metadata, this.futureMetadata})
+      {Key? key, required this.videoId, this.metadata, this.futureMetadata})
       : super(key: key);
 
   @override
@@ -25,8 +25,8 @@ class AppVimeoPlayer extends StatefulWidget {
 
 class _AppVimeoPlayerState extends State<AppVimeoPlayer>
     with AutomaticKeepAliveClientMixin {
-  String _url;
-  OEmbedMetadata _metadata;
+  late String _url;
+  OEmbedMetadata? _metadata;
   double _aspectRatio = 16.0 / 9.0;
   bool _webViewShow = false;
   bool _error = false;
@@ -38,11 +38,11 @@ class _AppVimeoPlayerState extends State<AppVimeoPlayer>
     _metadata = widget.metadata;
 
     if (_metadata != null) {
-      _aspectRatio = _metadata.width / _metadata.height;
+      _aspectRatio = _metadata!.width! / _metadata!.height!;
     } else {
-      widget.futureMetadata.then((value) {
+      widget.futureMetadata!.then((value) {
         _metadata = value;
-        _aspectRatio = _metadata.width / _metadata.height;
+        _aspectRatio = _metadata!.width! / _metadata!.height!;
         if (mounted) {
           setState(() {});
         }
@@ -69,8 +69,9 @@ class _AppVimeoPlayerState extends State<AppVimeoPlayer>
                 source: 'document.querySelector("button.play").click()');
           },
           shouldOverrideUrlLoading: (controller, request) async {
-            canLaunch(request.request.url.toString()).then((value) =>
-                value ? launch(request.request.url.toString()) : null);
+            canLaunch(request.request.url.toString()).then((value) => value
+                ? launch(request.request.url.toString())
+                : Future.value(false));
 
             return NavigationActionPolicy.CANCEL;
           },

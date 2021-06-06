@@ -3,10 +3,11 @@ class CountFormatter {
 
   final List<String> titles;
 
-  CountFormatter({String few, String one, String two})
+  CountFormatter(
+      {required String few, required String one, required String two})
       : titles = [one, two, few];
 
-  format(int number) {
+  String format(int number) {
     return titles[number % 100 > 4 && number % 100 < 20
         ? 2
         : _cases[number % 10 < 5 ? number % 10 : 5]];

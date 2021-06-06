@@ -13,18 +13,18 @@ class Session {
 
   get apiToken => _apiToken;
 
-  String _authToken;
-  bool _sfw = false;
+  String? _authToken;
+  bool? _sfw = false;
 
   Dio _dio = Dio();
-  Map<String, dynamic> _headers;
+  Map<String, dynamic>? _headers;
 
-  void setToken(String token) {
+  void setToken(String? token) {
     _authToken = token;
     _generateCookie();
   }
 
-  void setSFW(bool state) {
+  void setSFW(bool? state) {
     _sfw = state;
     _generateCookie();
   }
@@ -41,7 +41,7 @@ class Session {
       cookie = 'joyreactor_sess3=$_authToken';
     }
 
-    if (_sfw) {
+    if (_sfw!) {
       cookie += (_authToken != null ? ';' : '') + 'sfw=1';
     }
 
@@ -73,7 +73,7 @@ class Session {
   }
 
   Future<Response> post(String url, dynamic data,
-      {ProgressCallback onSendProgress, bool withoutAuth = false}) async {
+      {ProgressCallback? onSendProgress, bool withoutAuth = false}) async {
     return _dio.post(
       url,
       data: data,
@@ -81,7 +81,7 @@ class Session {
       options: Options(
         followRedirects: false,
         validateStatus: (status) {
-          return status < 400;
+          return status! < 400;
         },
         headers: withoutAuth ? {} : _headers ?? {},
       ),

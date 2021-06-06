@@ -7,14 +7,14 @@ import '../common/open.dart';
 import '../tag/tag.dart';
 
 class AppTagList extends StatelessWidget {
-  final void Function(double delta) onScrollChange;
-  final PageStorageKey pageStorageKey;
+  final void Function(double delta)? onScrollChange;
+  final PageStorageKey? pageStorageKey;
   final TagLoader loader;
-  final ChangeNotifier reloadNotifier;
+  final ChangeNotifier? reloadNotifier;
 
   const AppTagList(
-      {Key key,
-      @required this.loader,
+      {Key? key,
+      required this.loader,
       this.pageStorageKey,
       this.onScrollChange,
       this.reloadNotifier})

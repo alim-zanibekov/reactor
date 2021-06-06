@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
 class FadeIcon extends StatefulWidget {
-  final Icon icon;
-  final Color color;
+  final Icon? icon;
+  final Color? color;
 
-  const FadeIcon({Key key, this.icon, this.color}) : super(key: key);
+  const FadeIcon({Key? key, this.icon, this.color}) : super(key: key);
 
   @override
   _FadeIconState createState() => _FadeIconState();
 }
 
 class _FadeIconState extends State<FadeIcon> with TickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<double> _animation;
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
   @override
   void initState() {
@@ -37,7 +37,7 @@ class _FadeIconState extends State<FadeIcon> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
-      color: widget.color ?? (isDark ? Colors.black26 : Colors.grey[200]),
+      color: widget.color ?? (isDark ? Colors.black26 : Colors.grey[200]!),
       child: Center(
         child: FadeTransition(opacity: _animation, child: widget.icon),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:reactor/core/widgets/onerror-reload.dart';
 
 import '../../core/api/api.dart';
 import '../../core/auth/auth.dart';
@@ -24,12 +25,11 @@ class AppUserPage extends StatefulWidget {
   final bool main;
 
   const AppUserPage({
-    Key key,
-    @required this.username,
-    @required this.link,
+    Key? key,
+    required this.username,
+    required this.link,
     this.main = false,
-  })  : assert(username != null || link != null),
-        super(key: key);
+  }) : super(key: key);
 
   @override
   _AppUserPageState createState() => _AppUserPageState();
@@ -37,17 +37,14 @@ class AppUserPage extends StatefulWidget {
 
 class _AppUserPageState extends State<AppUserPage>
     with AutomaticKeepAliveClientMixin {
-  PostLoader _loaderUserPosts;
-  PostLoader _loaderUserSubs;
-  PostLoader _loaderUserFavorite;
-  String _link;
+  late PostLoader _loaderUserPosts;
+  late PostLoader _loaderUserFavorite;
+  PostLoader? _loaderUserSubs;
 
   @override
   void initState() {
-    _link = widget.link ?? widget.username.replaceAll(' ', '+');
-
-    _loaderUserPosts = PostLoader(path: _link, user: true);
-    _loaderUserFavorite = PostLoader(favorite: _link);
+    _loaderUserPosts = PostLoader(path: widget.link, user: true);
+    _loaderUserFavorite = PostLoader(favorite: widget.link);
     if (widget.main) {
       _loaderUserSubs = PostLoader(subscriptions: true);
     }
@@ -83,10 +80,11 @@ class _AppUserPageState extends State<AppUserPage>
             offset: const Offset(0, 100),
             icon: const Icon(Icons.more_vert),
             tooltip: 'Меню профиля',
-            onSelected: (selected) {
+            onSelected: (dynamic selected) {
               if (selected == 0) {
                 Clipboard.setData(
-                  ClipboardData(text: 'http://joyreactor.cc/user/$_link'),
+                  ClipboardData(
+                      text: 'http://joyreactor.cc/user/${widget.link}'),
                 );
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Скопировано')),
@@ -96,8 +94,7 @@ class _AppUserPageState extends State<AppUserPage>
                 AppPages.appBottomBarPage.add(AppBottomBarPage.PROFILE);
               }
             },
-            itemBuilder: (context) =>
-            [
+            itemBuilder: (context) => [
               const PopupMenuItem(child: Text('Скопировать ссылку'), value: 0),
               if (widget.main)
                 const PopupMenuItem(child: Text('Выход'), value: 1),
@@ -111,7 +108,7 @@ class _AppUserPageState extends State<AppUserPage>
           return _AppUserLoader(
               key: PageStorageKey<String>(widget.username + index.toString()),
               username: widget.username,
-              link: _link,
+              link: widget.link,
               reloadNotifier: onReloadPress,
               onScrollChange: onScrollChange);
         if (index == 1)
@@ -122,26 +119,29 @@ class _AppUserPageState extends State<AppUserPage>
               onScrollChange: onScrollChange);
         if (index == 2)
           return AppPostList(
-              pageStorageKey:
-                  PageStorageKey<String>(widget.username + index.toString()),
-              onScrollChange: onScrollChange,
-              reloadNotifier: onReloadPress,
-              loader: _loaderUserPosts);
-
-        if (index == 3)
-          return AppPostList(
-              pageStorageKey:
-                  PageStorageKey<String>(widget.username + index.toString()),
-              onScrollChange: onScrollChange,
-              reloadNotifier: onReloadPress,
-              loader: _loaderUserFavorite);
-
-        return AppPostList(
             pageStorageKey:
                 PageStorageKey<String>(widget.username + index.toString()),
             onScrollChange: onScrollChange,
             reloadNotifier: onReloadPress,
-            loader: _loaderUserSubs);
+            loader: _loaderUserPosts,
+          );
+
+        if (index == 3)
+          return AppPostList(
+            pageStorageKey:
+                PageStorageKey<String>(widget.username + index.toString()),
+            onScrollChange: onScrollChange,
+            reloadNotifier: onReloadPress,
+            loader: _loaderUserFavorite,
+          );
+
+        return AppPostList(
+          pageStorageKey:
+              PageStorageKey<String>(widget.username + index.toString()),
+          onScrollChange: onScrollChange,
+          reloadNotifier: onReloadPress,
+          loader: _loaderUserSubs!,
+        );
       },
     );
   }
@@ -150,18 +150,16 @@ class _AppUserPageState extends State<AppUserPage>
 class _AppUserLoader extends StatefulWidget {
   final String username;
   final String link;
-  final void Function(double delta) onScrollChange;
-  final ChangeNotifier reloadNotifier;
+  final void Function(double delta)? onScrollChange;
+  final ChangeNotifier? reloadNotifier;
 
   _AppUserLoader(
-      {Key key,
-      @required this.username,
-      @required this.link,
+      {Key? key,
+      required this.username,
+      required this.link,
       this.onScrollChange,
       this.reloadNotifier})
-      : assert(username != null),
-        assert(link != null),
-        super(key: key);
+      : super(key: key);
 
   @override
   _AppUserLoaderState createState() => _AppUserLoaderState();
@@ -170,17 +168,17 @@ class _AppUserLoader extends StatefulWidget {
 class _AppUserLoaderState extends State<_AppUserLoader>
     with AutomaticKeepAliveClientMixin {
   final _pageKey = GlobalKey();
-  ScrollController _scrollController;
+  ScrollController? _scrollController;
   double _scrollPrevious = 0;
 
   @override
   void initState() {
     _scrollController = ScrollController();
-    _scrollController.addListener(() {
+    _scrollController!.addListener(() {
       if (widget.onScrollChange != null) {
-        widget.onScrollChange(_scrollController.offset - _scrollPrevious);
+        widget.onScrollChange!(_scrollController!.offset - _scrollPrevious);
       }
-      _scrollPrevious = _scrollController.offset;
+      _scrollPrevious = _scrollController!.offset;
     });
     widget.reloadNotifier?.addListener(_reload);
     super.initState();
@@ -188,7 +186,7 @@ class _AppUserLoaderState extends State<_AppUserLoader>
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _scrollController!.dispose();
     widget.reloadNotifier?.removeListener(_reload);
     super.dispose();
   }
@@ -197,9 +195,10 @@ class _AppUserLoaderState extends State<_AppUserLoader>
   bool get wantKeepAlive => true;
 
   void _reload() {
-    _scrollController.jumpTo(0);
+    _scrollController!.jumpTo(0);
     Future.microtask(() {
-      AppFuturePageState appFuturePageState = _pageKey.currentState;
+      AppFuturePageState? appFuturePageState =
+          _pageKey.currentState as AppFuturePageState<dynamic>?;
       appFuturePageState?.reload();
     });
   }
@@ -221,10 +220,17 @@ class _AppUserLoaderState extends State<_AppUserLoader>
                 constraints: BoxConstraints(
                   minHeight: MediaQuery.of(context).size.height,
                 ),
-                child: AppUser(
-                  user: user,
-                  onScrollChange: widget.onScrollChange,
-                ),
+                child: user != null
+                    ? AppUser(
+                        user: user,
+                        onScrollChange: widget.onScrollChange,
+                      )
+                    : AppOnErrorReload(
+                        text: 'Не удалось загрузить страницу',
+                        onReloadPressed: () {
+                          _reload();
+                        },
+                      ),
               ),
             );
           },
@@ -236,9 +242,9 @@ class _AppUserLoaderState extends State<_AppUserLoader>
 
 class AppUser extends StatefulWidget {
   final UserFull user;
-  final void Function(double delta) onScrollChange;
+  final void Function(double delta)? onScrollChange;
 
-  const AppUser({Key key, @required this.user, this.onScrollChange})
+  const AppUser({Key? key, required this.user, this.onScrollChange})
       : super(key: key);
 
   @override
@@ -247,14 +253,11 @@ class AppUser extends StatefulWidget {
 
 class _AppUserState extends State<AppUser> {
   final _defaultPadding = EdgeInsets.only(left: 8, right: 8);
-  TextStyle _textStyle;
+  late TextStyle _textStyle;
 
   @override
   Widget build(BuildContext context) {
     final user = widget.user;
-    if (user == null) {
-      return SizedBox();
-    }
     _textStyle = DefaultTextStyle.of(context).style;
     return Padding(
       padding: const EdgeInsets.only(top: 10),
@@ -274,7 +277,7 @@ class _AppUserState extends State<AppUser> {
             ),
           ),
           Padding(padding: _defaultPadding, child: AppUserRating(user: user)),
-          if (user.activeIn != null && user.activeIn.isNotEmpty)
+          if (user.activeIn != null && user.activeIn!.isNotEmpty)
             _wrapWithTitle(
               'Активный участник',
               AppUserMainTags(
@@ -283,13 +286,13 @@ class _AppUserState extends State<AppUser> {
               ),
               childPadding: false,
             ),
-          if (user.moderating != null && user.moderating.isNotEmpty)
+          if (user.moderating != null && user.moderating!.isNotEmpty)
             _wrapWithTitle('Модерирует', AppUserTags(tags: user.moderating)),
-          if (user.subscriptions != null && user.subscriptions.isNotEmpty)
+          if (user.subscriptions != null && user.subscriptions!.isNotEmpty)
             _wrapWithTitle('Читает', AppUserTags(tags: user.subscriptions)),
-          if (user.ignore != null && user.ignore.isNotEmpty)
+          if (user.ignore != null && user.ignore!.isNotEmpty)
             _wrapWithTitle('Не читает', AppUserTags(tags: user.ignore)),
-          if (user.subscriptions != null && user.subscriptions.isNotEmpty)
+          if (user.subscriptions != null && user.subscriptions!.isNotEmpty)
             _wrapWithTitle(
               'Темы постов',
               AppUserTags(

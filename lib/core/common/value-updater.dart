@@ -1,9 +1,9 @@
 class ValueUpdater<T> {
   final T Function(T oldValue, T newValue) onUpdate;
   T value;
-  T lastResult;
+  T? lastResult;
 
-  ValueUpdater(this.onUpdate, {this.value});
+  ValueUpdater(this.onUpdate, this.value);
 
   T update(T newValue) {
     T updated = onUpdate(value, newValue);

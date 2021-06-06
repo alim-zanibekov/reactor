@@ -4,16 +4,16 @@ import '../../core/parsers/types/module.dart';
 import '../common/open.dart';
 
 class AppCategoriesComments extends StatelessWidget {
-  final List<StatsComment> comments;
+  final List<StatsComment>? comments;
 
-  const AppCategoriesComments({Key key, this.comments = const []})
+  const AppCategoriesComments({Key? key, this.comments = const []})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     int index = 0;
     return Column(children: <Widget>[
-      ...comments.map((e) => _children(context, e, ++index))
+      ...comments!.map((e) => _children(context, e, ++index))
     ]);
   }
 
@@ -43,12 +43,9 @@ class AppCategoriesComments extends StatelessWidget {
               SizedBox(
                 height: 25,
                 width: 100,
-                child: OutlineButton(
-                  highlightedBorderColor: Theme.of(context).accentColor,
+                child: OutlinedButton(
                   onPressed: () {
-                    if (comment.username != null) {
-                      openUser(context, comment.username, comment.userLink);
-                    }
+                    openUser(context, comment.username, comment.userLink);
                   },
                   child: Text(
                     comment.username,

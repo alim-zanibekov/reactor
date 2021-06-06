@@ -22,7 +22,7 @@ class NotificationsManager {
         .catchError((err) => print(err));
   }
 
-  Future<void> push(int id, String title, String body, {int progress}) async {
+  Future<void> push(int id, String title, String body, {int? progress}) async {
     final packageInfo = await PackageInfo.fromPlatform();
     await _flutterLocalNotificationsPlugin.show(
       id,
@@ -37,7 +37,7 @@ class NotificationsManager {
           playSound: false,
           enableVibration: false,
           maxProgress: 100,
-          progress: progress,
+          progress: progress ?? 0,
         ),
         iOS: IOSNotificationDetails(
           presentSound: false,
@@ -58,7 +58,7 @@ class AppNotification {
   int _id;
   String _title;
   String _body;
-  int _progress;
+  late int _progress;
   bool _showed = false;
 
   AppNotification(String title, String body)

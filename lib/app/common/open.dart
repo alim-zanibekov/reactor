@@ -14,7 +14,7 @@ import 'page-wrapper.dart';
 
 final _duration = const Duration(milliseconds: 200);
 
-openTag(BuildContext context, Tag tag, {bool animate = true}) {
+openTag(BuildContext context, Tag? tag, {bool animate = true}) {
   Navigator.push(
     context,
     PageTransition(
@@ -30,7 +30,7 @@ openTag(BuildContext context, Tag tag, {bool animate = true}) {
   );
 }
 
-openPost(BuildContext context, Post post, Function loadContent,
+openPost(BuildContext context, Post? post, Function? loadContent,
     {bool scrollToComments = false}) {
   Navigator.push(
     context,
@@ -49,8 +49,8 @@ openPost(BuildContext context, Post post, Function loadContent,
   );
 }
 
-openPostById(BuildContext context, int postId,
-    {int commentId, bool animate = true}) {
+openPostById(BuildContext context, int? postId,
+    {int? commentId, bool animate = true}) {
   Navigator.push(
     context,
     PageTransition(
@@ -114,7 +114,7 @@ openSearch(BuildContext context, {bool animate = true}) {
 }
 
 openSearchList(
-    BuildContext context, String query, String author, List<String> tags,
+    BuildContext context, String query, String author, List<String?>? tags,
     {bool animate = true}) {
   Navigator.push(
     context,

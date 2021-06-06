@@ -7,7 +7,7 @@ class AppTag extends StatelessWidget {
   final ExtendedTag tag;
   final double size;
 
-  const AppTag({Key key, this.tag, this.size = 50}) : super(key: key);
+  const AppTag({Key? key, required this.tag, this.size = 50}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class AppTag extends StatelessWidget {
             child: ClipRRect(
               child: Image(
                 fit: BoxFit.cover,
-                image: AppNetworkImageWithRetry(tag.icon),
+                image: AppNetworkImageWithRetry(tag.icon!),
               ),
               borderRadius: BorderRadius.circular(4),
             ),
@@ -36,20 +36,19 @@ class AppTag extends StatelessWidget {
                 style:
                     DefaultTextStyle.of(context).style.copyWith(fontSize: 12),
                 children: <InlineSpan>[
-                  if (tag.value != null)
-                    TextSpan(
-                      text: '${tag.value}\n',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 15,
-                      ),
+                  TextSpan(
+                    text: '${tag.value}\n',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15,
                     ),
+                  ),
                   if (tag.subscribersCount != null) ...[
                     TextSpan(
                       text: 'Подписчиков: ',
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
-                        height: tag.value != null ? 2 : 1,
+                        height: 2,
                       ),
                     ),
                     TextSpan(text: '${tag.subscribersCount}'),
@@ -59,7 +58,7 @@ class AppTag extends StatelessWidget {
                       text: 'Подписчиков: ',
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
-                        height: tag.value != null ? 2 : 1,
+                        height: 2,
                       ),
                     ),
                     TextSpan(text: '+${tag.subscribersDeltaCount}'),

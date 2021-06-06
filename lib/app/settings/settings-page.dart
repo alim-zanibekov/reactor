@@ -6,7 +6,7 @@ import '../../core/preferences/preferences.dart';
 import '../../main.dart';
 
 class AppSettingsPage extends StatefulWidget {
-  const AppSettingsPage({Key key}) : super(key: key);
+  const AppSettingsPage({Key? key}) : super(key: key);
 
   @override
   _AppSettingsPageState createState() => _AppSettingsPageState();
@@ -14,12 +14,12 @@ class AppSettingsPage extends StatefulWidget {
 
 class _AppSettingsPageState extends State<AppSettingsPage> {
   Preferences _preferences = Preferences();
-  AppTheme _theme;
-  AppPostsType _postsType;
-  String _host;
-  bool _sfw;
-  bool _sendErrorStatistics;
-  bool _gifAutoPlay;
+  late AppTheme _theme;
+  late AppPostsType _postsType;
+  String? _host;
+  bool? _sfw;
+  bool? _sendErrorStatistics;
+  bool? _gifAutoPlay;
 
   @override
   void initState() {
@@ -60,9 +60,9 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
                   DropdownButton<String>(
                     hint: Text('Хост'),
                     value: _host,
-                    onChanged: (String value) async {
+                    onChanged: (String? value) async {
                       setState(() => _host = value);
-                      await _preferences.setHost(_host);
+                      await _preferences.setHost(_host!);
                       ReloadService.reload();
                       Api().sethHost(value);
                     },
@@ -75,7 +75,7 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
                     }).toList(),
                   ),
                   Expanded(child: SizedBox()),
-                  FlatButton(
+                  TextButton(
                     child: Text('Добавить'),
                     onPressed: () async {
                       final host = await _displayAddHostDialog(context);
@@ -141,7 +141,7 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
           ),
           SwitchListTile(
             title: const Text('SFW'),
-            value: _sfw,
+            value: _sfw!,
             activeColor: Theme.of(context).accentColor,
             onChanged: (bool sfw) async {
               setState(() => _sfw = sfw);
@@ -150,7 +150,7 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
           ),
           SwitchListTile(
             title: const Text('Воспроизводить гифки автоматически'),
-            value: _gifAutoPlay,
+            value: _gifAutoPlay!,
             activeColor: Theme.of(context).accentColor,
             onChanged: (bool gifAutoPlay) async {
               setState(() => _gifAutoPlay = gifAutoPlay);
@@ -159,7 +159,7 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
           ),
           SwitchListTile(
             title: const Text('Отправлять отчеты об ошибках'),
-            value: _sendErrorStatistics,
+            value: _sendErrorStatistics!,
             activeColor: Theme.of(context).accentColor,
             onChanged: (bool sendErrorStatistics) async {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -179,13 +179,13 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
     );
   }
 
-  Future<String> _displayAddHostDialog(BuildContext context) async {
-    String result;
+  Future<String?> _displayAddHostDialog(BuildContext context) async {
+    String? result;
     await showDialog(
       context: context,
       builder: (context) {
         TextEditingController _textFieldController = TextEditingController();
-        String errorText;
+        String? errorText;
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             return SingleChildScrollView(
@@ -208,18 +208,17 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
                       ),
                     ),
                     actions: <Widget>[
-                      FlatButton(
+                      TextButton(
                         child: Text('Отмена'),
                         onPressed: () => Navigator.pop(context),
                       ),
-                      FlatButton(
+                      TextButton(
                         child: Text('Сохранить'),
                         onPressed: () async {
                           if (_preferences.hostList
                               .contains(_textFieldController.text)) {
                             errorText = 'Такой хост уже существует';
-                          } else if (_textFieldController.text == null ||
-                              _textFieldController.text == '') {
+                          } else if (_textFieldController.text.isEmpty) {
                             errorText = 'Введите хост';
                           } else {
                             final isValid = await Api()
@@ -249,27 +248,27 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
 
 class LabeledRadio<T> extends StatelessWidget {
   const LabeledRadio({
+    required this.value,
+    required this.groupValue,
     this.label,
     this.padding,
-    this.groupValue,
-    this.value,
     this.onChanged,
   });
 
-  final String label;
-  final EdgeInsets padding;
+  final String? label;
+  final EdgeInsets? padding;
   final T groupValue;
   final T value;
-  final void Function(T) onChanged;
+  final void Function(T)? onChanged;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        if (value != groupValue) onChanged(value);
+        if (value != groupValue && onChanged != null) onChanged!(value);
       },
       child: Padding(
-        padding: padding,
+        padding: padding!,
         child: Row(children: <Widget>[
           SizedBox(
             height: 35,
@@ -277,12 +276,12 @@ class LabeledRadio<T> extends StatelessWidget {
               activeColor: Theme.of(context).accentColor,
               groupValue: groupValue,
               value: value,
-              onChanged: (T newValue) {
-                onChanged(newValue);
+              onChanged: (T? newValue) {
+                if (onChanged != null && newValue != null) onChanged!(newValue);
               },
             ),
           ),
-          Text(label, style: const TextStyle(fontSize: 12)),
+          Text(label!, style: const TextStyle(fontSize: 12)),
         ]),
       ),
     );

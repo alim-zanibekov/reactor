@@ -13,8 +13,8 @@ class AppTabsWrapper extends StatefulWidget {
   final String title;
   final bool main;
   final List<String> tabs;
-  final List<Widget> actions;
-  final int initialIndex;
+  final List<Widget>? actions;
+  final int? initialIndex;
   final Widget Function(
       BuildContext context,
       int index,
@@ -22,17 +22,14 @@ class AppTabsWrapper extends StatefulWidget {
       ChangeNotifier onReload) builder;
 
   const AppTabsWrapper({
-    Key key,
-    @required this.title,
-    @required this.tabs,
-    @required this.builder,
+    Key? key,
+    required this.title,
+    required this.tabs,
+    required this.builder,
     this.main = false,
     this.actions,
     this.initialIndex,
-  })  : assert(tabs != null),
-        assert(builder != null),
-        assert(title != null),
-        super(key: key);
+  }) : super(key: key);
 
   @override
   _AppTabsWrapperState createState() => _AppTabsWrapperState();
@@ -43,8 +40,8 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
   double _appBarHeight = 100;
   double _minAppBarHeight = 48;
   double _maxAppBarHeight = 100;
-  TabController _tabController;
-  List<_ReloadNotifier> _reloadNotifiers;
+  TabController? _tabController;
+  late List<_ReloadNotifier> _reloadNotifiers;
 
   @override
   void initState() {
@@ -62,7 +59,7 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
       AppPages.appBottomBarState.add(AppBottomBarState.VISIBLE);
     }
     _reloadNotifiers.forEach((e) => e.dispose());
-    _tabController.dispose();
+    _tabController!.dispose();
     super.dispose();
   }
 
@@ -125,7 +122,7 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
       child: IconButton(
         padding: EdgeInsets.zero,
         onPressed: () {
-          _reloadNotifiers[_tabController.index].notify();
+          _reloadNotifiers[_tabController!.index].notify();
         },
         icon: const Icon(Icons.refresh, size: 22),
       ),
@@ -140,7 +137,7 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
       ),
     );
 
-    Widget leading;
+    Widget? leading;
     final offset = Offset(0, (_appBarHeight - _maxAppBarHeight) * 1.5);
 
     if (Navigator.canPop(context) && !widget.main) {
@@ -159,7 +156,7 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
       leading: leading,
       title: Transform.translate(
         offset: offset,
-        child: Text(widget.title ?? ''),
+        child: Text(widget.title),
       ),
       actions: <Widget>[
         Transform.translate(
@@ -167,7 +164,7 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
           child: Row(children: <Widget>[
             if (widget.main) searchButton,
             reloadButton,
-            if (widget.actions != null) ...widget.actions.map((e) => e)
+            if (widget.actions != null) ...widget.actions!.map((e) => e)
           ]),
         ),
       ],
@@ -178,7 +175,7 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
           child: TabBar(
             controller: _tabController,
             isScrollable: true,
-            tabs: widget.tabs.map((e) => Tab(text: e ?? '')).toList(),
+            tabs: widget.tabs.map((e) => Tab(text: e)).toList(),
           ),
         ),
       ),

@@ -5,11 +5,11 @@ import '../../core/parsers/types/module.dart';
 import '../common/open.dart';
 
 class AppUserTags extends StatefulWidget {
-  final List<Tag> tags;
-  final TextStyle textStyle;
+  final List<Tag>? tags;
+  final TextStyle? textStyle;
   final bool canHide;
 
-  AppUserTags({Key key, this.tags, this.textStyle, this.canHide = true})
+  AppUserTags({Key? key, this.tags, this.textStyle, this.canHide = true})
       : super(key: key);
 
   @override
@@ -18,12 +18,12 @@ class AppUserTags extends StatefulWidget {
 
 class _AppUserTagsState extends State<AppUserTags> {
   bool _opened = true;
-  List<Tag> tags;
+  List<Tag>? tags;
 
   @override
   void initState() {
-    if (widget.tags.length > 30 && widget.canHide) {
-      tags = widget.tags.sublist(0, 30);
+    if (widget.tags!.length > 30 && widget.canHide) {
+      tags = widget.tags!.sublist(0, 30);
       _opened = false;
     } else {
       tags = widget.tags;
@@ -38,7 +38,7 @@ class _AppUserTagsState extends State<AppUserTags> {
       text: TextSpan(
         style: DefaultTextStyle.of(context).style.copyWith(height: 1.5),
         children: <InlineSpan>[
-          ...tags.map((e) => TextSpan(children: <InlineSpan>[
+          ...tags!.map((e) => TextSpan(children: <InlineSpan>[
                 TextSpan(
                   text: e.value,
                   recognizer: TapGestureRecognizer()
@@ -46,7 +46,7 @@ class _AppUserTagsState extends State<AppUserTags> {
                   style: TextStyle(
                     fontSize: 14 *
                         (e is UserTag && e.weight != null
-                            ? e.weight * 0.8
+                            ? e.weight! * 0.8
                             : 1.0),
                     decoration: TextDecoration.underline,
                   ),

@@ -9,7 +9,7 @@ import 'main.dart';
 import 'tags.dart';
 
 class AppCategoriesPage extends StatefulWidget {
-  const AppCategoriesPage({Key key}) : super(key: key);
+  const AppCategoriesPage({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _AppCategoriesPageState();
@@ -36,14 +36,14 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
                   const AppCategoriesMain(),
                 ]),
               ),
-              if (stats.trends != null)
-                SliverToBoxAdapter(child: _trends(stats)),
-              if (stats.twoDayTags != null)
-                SliverToBoxAdapter(child: _tags(stats)),
-              if (stats.twoDayComments != null)
-                SliverToBoxAdapter(child: _comments(stats)),
-              if (stats.weekUsers != null)
-                SliverToBoxAdapter(child: _users(stats)),
+              if (stats?.trends != null)
+                SliverToBoxAdapter(child: _trends(stats!)),
+              if (stats?.twoDayTags != null)
+                SliverToBoxAdapter(child: _tags(stats!)),
+              if (stats?.twoDayComments != null)
+                SliverToBoxAdapter(child: _comments(stats!)),
+              if (stats?.weekUsers != null)
+                SliverToBoxAdapter(child: _users(stats!)),
             ],
           );
         },
@@ -64,7 +64,7 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
           ),
         ),
         SizedBox(
-          height: stats.twoDayTags.length * 60.0,
+          height: stats.twoDayTags!.length * 60.0,
           child: TabBarView(
             children: <Widget>[
               AppCategoriesTags(tags: stats.twoDayTags),
@@ -90,7 +90,7 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
           ),
         ),
         SizedBox(
-          height: stats.twoDayComments.length * 40.0,
+          height: stats.twoDayComments!.length * 40.0,
           child: TabBarView(
             children: <Widget>[
               AppCategoriesComments(comments: stats.twoDayComments),
@@ -109,9 +109,9 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
         children: <Widget>[
           ..._title('Тренды'),
           SizedBox(
-            height: stats.trends.length * 60.0,
+            height: stats.trends!.length * 60.0,
             child: AppCategoriesTags(
-              tags: stats.trends
+              tags: stats.trends!
                   .map((e) => ExtendedTag(
                         e.value,
                         icon: e.icon,
@@ -140,11 +140,11 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
           ),
         ),
         SizedBox(
-          height: stats.weekUsers.length * 40.0,
+          height: stats.weekUsers!.length * 40.0,
           child: TabBarView(
             children: <Widget>[
-              AppCategoriesUsers(users: stats.weekUsers),
-              AppCategoriesUsers(users: stats.monthUsers),
+              AppCategoriesUsers(users: stats.weekUsers ?? []),
+              AppCategoriesUsers(users: stats.monthUsers ?? []),
             ],
           ),
         ),

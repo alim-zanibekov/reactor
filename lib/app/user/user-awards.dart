@@ -4,9 +4,9 @@ import '../../core/common/retry-network-image.dart';
 import '../../core/parsers/types/module.dart';
 
 class AppUserAwards extends StatefulWidget {
-  final List<Award> awards;
+  final List<Award>? awards;
 
-  const AppUserAwards({Key key, this.awards}) : super(key: key);
+  const AppUserAwards({Key? key, this.awards}) : super(key: key);
 
   @override
   _AppUserAwards createState() => _AppUserAwards();
@@ -14,12 +14,12 @@ class AppUserAwards extends StatefulWidget {
 
 class _AppUserAwards extends State<AppUserAwards> {
   bool _opened = true;
-  List<Award> awards;
+  List<Award>? awards;
 
   @override
   void initState() {
-    if (widget.awards.length > 50) {
-      awards = widget.awards.sublist(0, 30);
+    if (widget.awards!.length > 50) {
+      awards = widget.awards!.sublist(0, 30);
       _opened = false;
     } else {
       awards = widget.awards;
@@ -36,17 +36,18 @@ class _AppUserAwards extends State<AppUserAwards> {
       spacing: 5,
       runSpacing: 5,
       children: <Widget>[
-        ...awards
+        ...awards!
             .map(
               (e) => GestureDetector(
                 onTap: () {
                   ScaffoldMessenger.of(context).removeCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      duration: Duration(seconds: 10), content: Text(e.title)));
+                      duration: Duration(seconds: 10),
+                      content: Text(e.title!)));
                 },
                 child: SizedBox(
                   child: Image(
-                    image: AppNetworkImageWithRetry(e.icon),
+                    image: AppNetworkImageWithRetry(e.icon!),
                   ),
                   width: 25,
                   height: 25,

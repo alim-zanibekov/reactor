@@ -7,10 +7,10 @@ import 'tag.dart';
 
 class AppTagHeader extends StatefulWidget {
   final PageInfo pageInfo;
-  final Function onBlock;
-  final String prefix;
+  final Function? onBlock;
+  final String? prefix;
 
-  AppTagHeader({Key key, this.pageInfo, this.onBlock, this.prefix})
+  AppTagHeader({Key? key, required this.pageInfo, this.onBlock, this.prefix})
       : super(key: key);
 
   @override
@@ -18,7 +18,7 @@ class AppTagHeader extends StatefulWidget {
 }
 
 class _AppTagHeaderState extends State<AppTagHeader> {
-  PageInfo _pageInfo;
+  late PageInfo _pageInfo;
   bool _loading = false;
 
   @override
@@ -66,7 +66,7 @@ class _AppTagHeaderState extends State<AppTagHeader> {
       _pageInfo.blocked = !_pageInfo.blocked;
       _pageInfo.subscribed = false;
       if (widget.onBlock != null) {
-        widget.onBlock();
+        widget.onBlock!();
       }
     } on Exception {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -88,7 +88,7 @@ class _AppTagHeaderState extends State<AppTagHeader> {
           aspectRatio: 846.0 / 179.0,
           child: Image(
             fit: BoxFit.cover,
-            image: AppNetworkImageWithRetry(_pageInfo.bg),
+            image: AppNetworkImageWithRetry(_pageInfo.bg!),
           ),
         ),
       Container(
@@ -112,15 +112,16 @@ class _AppTagHeaderState extends State<AppTagHeader> {
                   ),
                 ),
               )
-            else if (_pageInfo.tagId != null)
+            else
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   SizedBox(
                     height: 28,
-                    child: OutlineButton(
-                      padding: const EdgeInsets.only(right: 8, left: 5),
-                      highlightedBorderColor: Theme.of(context).accentColor,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.only(right: 8, left: 5),
+                      ),
                       onPressed: _toggleSubscribe,
                       child: Row(children: <Widget>[
                         Icon(
@@ -138,8 +139,10 @@ class _AppTagHeaderState extends State<AppTagHeader> {
                   const SizedBox(height: 4),
                   SizedBox(
                     height: 28,
-                    child: FlatButton(
-                      padding: const EdgeInsets.only(right: 10, left: 10),
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.only(right: 10, left: 10),
+                      ),
                       onPressed: _toggleBlock,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,

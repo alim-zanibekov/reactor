@@ -11,14 +11,14 @@ import '../common/future-page.dart';
 import 'post.dart';
 
 class AppPostList extends StatefulWidget {
-  final void Function(double delta) onScrollChange;
-  final PageStorageKey pageStorageKey;
+  final void Function(double delta)? onScrollChange;
+  final PageStorageKey? pageStorageKey;
   final PostLoader loader;
-  final ChangeNotifier reloadNotifier;
+  final ChangeNotifier? reloadNotifier;
 
   AppPostList({
-    Key key,
-    @required this.loader,
+    Key? key,
+    required this.loader,
     this.reloadNotifier,
     this.pageStorageKey,
     this.onScrollChange,
@@ -35,20 +35,20 @@ class _AppPostListState extends State<AppPostList>
   final List<MountInfo> _mounted = [];
   ScrollController _scrollController = ScrollController();
   GlobalKey _pageKey = GlobalKey();
-  AnimationController _animationController;
-  double _scrollPrevious;
+  late AnimationController _animationController;
+  late double _scrollPrevious;
 
-  List<Post> _posts;
-  List<Widget> _postWidgets;
+  List<Post>? _posts;
+  late List<Widget> _postWidgets;
 
-  bool _collapsing;
-  bool _showHeader;
+  late bool _collapsing;
+  late bool _showHeader;
 
-  StreamSubscription _subscription;
+  late StreamSubscription _subscription;
 
-  bool _isDark;
+  late bool _isDark;
 
-  int _showCollapsePostId;
+  int? _showCollapsePostId;
 
   @override
   void initState() {
@@ -65,7 +65,8 @@ class _AppPostListState extends State<AppPostList>
         setState(() {});
       }
       Future.microtask(() {
-        AppFuturePageState appFuturePageState = _pageKey.currentState;
+        AppFuturePageState? appFuturePageState =
+            _pageKey.currentState as AppFuturePageState<dynamic>?;
         appFuturePageState?.reload(hideContent: true);
       });
     });
@@ -86,7 +87,8 @@ class _AppPostListState extends State<AppPostList>
     _posts = null;
     _scrollController.jumpTo(0);
     Future.microtask(() {
-      AppFuturePageState appFuturePageState = _pageKey.currentState;
+      AppFuturePageState? appFuturePageState =
+          _pageKey.currentState as AppFuturePageState<dynamic>?;
       appFuturePageState?.reload();
     });
   }
@@ -126,10 +128,13 @@ class _AppPostListState extends State<AppPostList>
     }
   }
 
-  void _onPostCollapse(bool state, double diff) async {
+  void _onPostCollapse(bool state, double? diff) async {
     if (!state) {
       await Future.delayed(_collapseDuration);
       _onScrollChange();
+      return;
+    }
+    if (diff == null) {
       return;
     }
     _collapsing = true;
@@ -145,18 +150,20 @@ class _AppPostListState extends State<AppPostList>
 
   void _onScrollChange() {
     if (!_collapsing && widget.onScrollChange != null) {
-      widget.onScrollChange(_scrollController.offset - _scrollPrevious);
+      widget.onScrollChange!(_scrollController.offset - _scrollPrevious);
     }
     bool isCollapseShow = _showCollapsePostId != null;
-    int postId;
+    int? postId;
     _mounted.forEach((element) {
       if (element.post.expanded) {
-        RenderBox renderBoxTop = _pageKey.currentContext.findRenderObject();
-        RenderBox renderBox = element.key.currentContext.findRenderObject();
+        RenderBox renderBoxTop =
+            _pageKey.currentContext!.findRenderObject() as RenderBox;
+        RenderBox renderBox =
+            element.key!.currentContext!.findRenderObject() as RenderBox;
         final offset = renderBox.localToGlobal(Offset.zero) -
             renderBoxTop.localToGlobal(Offset.zero);
-        Size postSize = element.key.currentContext.size;
-        Size renderBoxWrapperSize = _pageKey.currentContext.size;
+        Size postSize = element.key!.currentContext!.size!;
+        Size renderBoxWrapperSize = _pageKey.currentContext!.size!;
         if (offset.dy + postSize.height - renderBoxWrapperSize.height - 60 >
                 0 &&
             offset.dy < renderBoxWrapperSize.height / 1.5) {
@@ -178,12 +185,14 @@ class _AppPostListState extends State<AppPostList>
   void _closePost() {
     _mounted.forEach((element) {
       if (element.post.expanded) {
-        RenderBox renderBox = element.key.currentContext.findRenderObject();
+        RenderBox renderBox =
+            element.key!.currentContext!.findRenderObject() as RenderBox;
         final offset = renderBox.localToGlobal(Offset.zero);
-        RenderBox renderBoxTop = _pageKey.currentContext.findRenderObject();
+        RenderBox renderBoxTop =
+            _pageKey.currentContext!.findRenderObject() as RenderBox;
         final offsetTop = renderBoxTop.localToGlobal(Offset.zero);
         _onPostCollapse(true, -offset.dy + offsetTop.dy);
-        element.collapse();
+        element.collapse!();
       }
     });
     _showCollapsePostId = null;
@@ -192,12 +201,16 @@ class _AppPostListState extends State<AppPostList>
 
   Widget _itemBuilder(context, index, hasError) {
     if (_showHeader && index == 0) {
+      if (widget.loader.firstPage.pageInfo == null) {
+        return SizedBox();
+      }
       return AppTagHeader(
         prefix: widget.loader.prefix,
-        pageInfo: widget.loader.firstPage.pageInfo,
+        pageInfo: widget.loader.firstPage.pageInfo!,
         onBlock: () {
           _posts = null;
-          AppFuturePageState appFuturePageState = _pageKey.currentState;
+          AppFuturePageState? appFuturePageState =
+              _pageKey.currentState as AppFuturePageState<dynamic>?;
           appFuturePageState?.reload();
         },
       );
@@ -209,7 +222,8 @@ class _AppPostListState extends State<AppPostList>
       if (hasError) {
         return AppOnErrorReloadExpanded(
           onReloadPressed: () {
-            AppFuturePageState appFuturePageState = _pageKey.currentState;
+            AppFuturePageState? appFuturePageState =
+                _pageKey.currentState as AppFuturePageState<dynamic>?;
             appFuturePageState?.reload();
           },
         );
@@ -226,7 +240,8 @@ class _AppPostListState extends State<AppPostList>
         );
       }
 
-      AppFuturePageState appFuturePageState = _pageKey.currentState;
+      AppFuturePageState? appFuturePageState =
+          _pageKey.currentState as AppFuturePageState<dynamic>?;
       appFuturePageState?.reload(withoutIndicator: true);
 
       return const SizedBox(
@@ -254,7 +269,7 @@ class _AppPostListState extends State<AppPostList>
             _posts = null;
             widget.loader.reset();
           }
-          final isFirst = _posts == null || _posts.isEmpty;
+          final isFirst = _posts == null || _posts!.isEmpty;
 
           final create =
               await (isFirst ? widget.loader.load() : widget.loader.loadNext());
@@ -274,14 +289,15 @@ class _AppPostListState extends State<AppPostList>
               create.map((e) => _getAppPostContent(index++, e)).toList());
 
           _posts = widget.loader.elements;
-          _showHeader = widget.loader?.firstPage?.pageInfo != null;
+          _showHeader = widget.loader.firstPage.pageInfo != null;
         },
         builder: (context, _, bool hasError) {
           if ((_posts?.isEmpty ?? true) && hasError) {
             return AppOnErrorReloadExpanded(
               onReloadPressed: () {
                 _posts = null;
-                AppFuturePageState appFuturePageState = _pageKey.currentState;
+                AppFuturePageState? appFuturePageState =
+                    _pageKey.currentState as AppFuturePageState<dynamic>?;
                 appFuturePageState?.reload(hideContent: true);
               },
             );
@@ -309,11 +325,11 @@ class _AppPostListState extends State<AppPostList>
             icon: const Icon(Icons.keyboard_arrow_up),
           ),
         ),
-        builder: (BuildContext context, Widget child) {
+        builder: (BuildContext context, Widget? child) {
           return Positioned(
             bottom: 10 - 100 * _animationController.value,
             right: 10,
-            child: child,
+            child: child!,
           );
         },
       )

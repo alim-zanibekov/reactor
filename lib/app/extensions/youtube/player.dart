@@ -12,12 +12,12 @@ import '../common/options.dart';
 import '../common/video-thumbnail.dart';
 
 class AppYouTubePlayer extends StatefulWidget {
-  final String videoId;
-  final OEmbedMetadata metadata;
-  final Future<OEmbedMetadata> futureMetadata;
+  final String? videoId;
+  final OEmbedMetadata? metadata;
+  final Future<OEmbedMetadata>? futureMetadata;
 
   AppYouTubePlayer(
-      {Key key, @required this.videoId, this.metadata, this.futureMetadata})
+      {Key? key, required this.videoId, this.metadata, this.futureMetadata})
       : super(key: key);
 
   @override
@@ -26,9 +26,9 @@ class AppYouTubePlayer extends StatefulWidget {
 
 class _AppYouTubePlayerState extends State<AppYouTubePlayer>
     with AutomaticKeepAliveClientMixin {
-  InAppWebViewController _webView;
-  OEmbedMetadata _metadata;
-  String _url;
+  late InAppWebViewController _webView;
+  OEmbedMetadata? _metadata;
+  String? _url;
   double _aspectRatio = 16.0 / 9.0;
   bool _webViewShow = false;
   bool _error = false;
@@ -38,11 +38,11 @@ class _AppYouTubePlayerState extends State<AppYouTubePlayer>
   void initState() {
     _metadata = widget.metadata;
     if (_metadata != null) {
-      _aspectRatio = _metadata.width / _metadata.height;
+      _aspectRatio = _metadata!.width! / _metadata!.height!;
     } else {
-      widget.futureMetadata.then((value) {
+      widget.futureMetadata!.then((value) {
         _metadata = value;
-        _aspectRatio = _metadata.width / _metadata.height;
+        _aspectRatio = _metadata!.width! / _metadata!.height!;
         if (mounted) {
           setState(() {});
         }
@@ -96,8 +96,9 @@ class _AppYouTubePlayerState extends State<AppYouTubePlayer>
             source:
                 'document.querySelector(\'iframe\')).contentWindow.postMessage({ type: \'pause\'}, \'*\');');
 
-        canLaunch(request.request.url.toString()).then(
-            (value) => value ? launch(request.request.url.toString()) : null);
+        canLaunch(request.request.url.toString()).then((value) => value
+            ? launch(request.request.url.toString())
+            : Future.value(false));
 
         return NavigationActionPolicy.CANCEL;
       },

@@ -12,10 +12,10 @@ import '../../core/widgets/gesture-detector.dart';
 import '../../core/widgets/safe-image.dart';
 
 class ImageGalleryScreen extends StatelessWidget {
-  final List<ImageProvider> imageProviders;
-  final int selectedIndex;
+  final List<ImageProvider>? imageProviders;
+  final int? selectedIndex;
 
-  ImageGalleryScreen({Key key, this.imageProviders, this.selectedIndex})
+  ImageGalleryScreen({Key? key, this.imageProviders, this.selectedIndex})
       : super(key: key);
 
   @override
@@ -24,8 +24,8 @@ class ImageGalleryScreen extends StatelessWidget {
       body: ColoredBox(
         color: Colors.black,
         child: ImageGallery(
-          imageProviders: imageProviders,
-          selectedIndex: selectedIndex,
+          imageProviders: imageProviders!,
+          selectedIndex: selectedIndex!,
           onClose: () {
             Navigator.pop(context);
           },
@@ -37,10 +37,11 @@ class ImageGalleryScreen extends StatelessWidget {
 
 class ImageGallery extends StatefulWidget {
   final List<ImageProvider> imageProviders;
-  final void Function() onClose;
+  final void Function()? onClose;
   final int selectedIndex;
 
-  ImageGallery({this.imageProviders, this.selectedIndex, this.onClose})
+  ImageGallery(
+      {required this.imageProviders, required this.selectedIndex, this.onClose})
       : assert(selectedIndex >= 0),
         assert(selectedIndex < imageProviders.length),
         super();
@@ -55,27 +56,29 @@ class _ImageGalleryState extends State<ImageGallery>
     with TickerProviderStateMixin {
   final _defaultDuration = Duration(milliseconds: 150);
 
-  double _maxWidth;
-  double _maxHeight;
-  List<ImageUnit> _images;
-  ScrollController _scrollController;
+  late double _maxWidth;
+  late double _maxHeight;
+  late List<ImageUnit> _images;
+  late ScrollController _scrollController;
+  late AnimationController _controllerImage;
+  late AnimationController _controllerMove;
+  late ImageUnit _activeImage;
 
-  AnimationController _controllerImage;
-  AnimationController _controllerMove;
+  bool calledBuild = false;
+
   bool _animating = false;
 
-  bool _dragVertical,
-      _dragHorizontal,
-      _canSlideLeft,
-      _canSlideRight,
-      _scaleChanged;
+  bool _dragVertical = false,
+      _dragHorizontal = false,
+      _canSlideLeft = false,
+      _canSlideRight = false,
+      _scaleChanged = false;
 
-  Offset _moveDirection;
-  Matrix4 _movingMatrix;
+  Offset? _moveDirection;
 
-  ImageUnit _activeImage;
+  Matrix4? _movingMatrix;
 
-  ValueUpdater<double> _scrollUpdater = ValueUpdater((a, b) => b - a);
+  ValueUpdater<double> _scrollUpdater = ValueUpdater((a, b) => b - a, 0);
 
   @override
   void dispose() {
@@ -100,25 +103,31 @@ class _ImageGalleryState extends State<ImageGallery>
         _animating = false;
       }
     });
+
     _controllerMove.addListener(() {
+      final md = _moveDirection;
+      if (md == null) return;
+
       final e = _controllerMove.value;
       _activeImage.transform = _movingMatrix
-        ..translate(-_moveDirection.dx * e * 4, -_moveDirection.dy * e * 4);
-      _activeImage.boxer.clamp(_activeImage.transform);
+        ?..translate(-md.dx * e * 4, -md.dy * e * 4);
+      _activeImage.boxer.clamp(_activeImage.transform!);
       _controllerImage.notifyListeners();
     });
+
     _scrollController = ScrollController();
+
     super.initState();
   }
 
   void _onStart(MatrixGestureDetectorDetails details) {
-    if (_animating || _activeImage == null || _activeImage.info == null) return;
+    if (_animating || _activeImage.info == null) return;
 
     _scaleChanged = _dragVertical = _dragHorizontal = false;
-    _activeImage.transformPrev = _activeImage.transform.clone();
+    _activeImage.transformPrev = _activeImage.transform!.clone();
     _scrollUpdater.value = details.position.dx;
 
-    final rect = _activeImage.boxer.getRect(_activeImage.transform);
+    final rect = _activeImage.boxer.getRect(_activeImage.transform!)!;
     _canSlideLeft = rect.left.round() == 0 && _images.indexOf(_activeImage) > 0;
     _canSlideRight = rect.right.round() == _maxWidth.round() &&
         _images.indexOf(_activeImage) < _images.length - 1;
@@ -127,12 +136,12 @@ class _ImageGalleryState extends State<ImageGallery>
   }
 
   void _onUpdate(MatrixGestureDetectorDetails details) {
-    if (_animating || _activeImage == null || _activeImage.info == null) return;
+    if (_animating || _activeImage.info == null) return;
     final decomposedValues =
-        MatrixGestureDetector.decomposeToValues(_activeImage.transform);
+        MatrixGestureDetector.decomposeToValues(_activeImage.transform!);
     if (details.scale == 1) {
       final canDragVertical = decomposedValues.right == 1;
-      final velocity = details.velocityEstimate;
+      final velocity = details.velocityEstimate!;
       if (velocity.offset == Offset.zero) {
         return;
       }
@@ -151,9 +160,9 @@ class _ImageGalleryState extends State<ImageGallery>
       } else if (canDragVertical && !_dragHorizontal) {
         _dragVertical = true;
         _activeImage.transform =
-            details.translateMatrix * _activeImage.transform;
+            details.translateMatrix! * _activeImage.transform;
         _activeImage.boxer
-            .restrictHorizontalMoveAndScale(_activeImage.transform);
+            .restrictHorizontalMoveAndScale(_activeImage.transform!);
         _controllerImage.notifyListeners();
         return;
       }
@@ -164,25 +173,25 @@ class _ImageGalleryState extends State<ImageGallery>
     if (!_dragHorizontal) {
       _canSlideLeft = false;
       _canSlideRight = false;
-      _activeImage.transform = details.scaleMatrix *
+      _activeImage.transform = details.scaleMatrix! *
           details.translateMatrix *
           _activeImage.transform;
-      _activeImage.boxer.clamp(_activeImage.transform);
+      _activeImage.boxer.clamp(_activeImage.transform!);
     }
     _controllerImage.notifyListeners();
   }
 
   void _onEnd(MatrixGestureDetectorDetails details) async {
-    if (_animating || _activeImage == null || _activeImage.info == null) return;
+    if (_animating || _activeImage.info == null) return;
 
     final velocity = details.velocityEstimate;
     if (_dragVertical) {
-      if (velocity.pixelsPerSecond.distance >= 100.0 &&
+      if (velocity!.pixelsPerSecond.distance >= 100.0 &&
           velocity.offset.dy.abs() > 40) {
-        widget.onClose();
+        widget.onClose!();
       } else {
         _animating = true;
-        _activeImage.transformPrev = _activeImage.transform.clone();
+        _activeImage.transformPrev = _activeImage.transform!.clone();
         _activeImage.transform = _activeImage.initialMatrix.clone();
         _controllerImage.forward(from: 0);
       }
@@ -190,7 +199,7 @@ class _ImageGalleryState extends State<ImageGallery>
       final imageIndex = _images.indexOf(_activeImage);
       var scroll = imageIndex * _maxWidth;
       final scrollDiff = _scrollController.offset - scroll;
-      final speed = velocity.pixelsPerSecond.dx;
+      final speed = velocity!.pixelsPerSecond.dx;
       if (speed.abs() > 50 || scrollDiff.abs() > _maxWidth * 0.6) {
         if (speed > 0 && scrollDiff > 0 && imageIndex < _images.length - 1) {
           _activeImage = _images[imageIndex + 1];
@@ -207,12 +216,12 @@ class _ImageGalleryState extends State<ImageGallery>
       await Future.delayed(_defaultDuration);
       _animating = false;
     } else {
-      final double magnitude = velocity?.pixelsPerSecond?.distance;
+      final double? magnitude = velocity?.pixelsPerSecond.distance;
 
       if (!_scaleChanged && magnitude != null && magnitude >= 400.0) {
-        _moveDirection = velocity.pixelsPerSecond / magnitude;
-        _activeImage.transformPrev = _activeImage.transform.clone();
-        _movingMatrix = _activeImage.transform.clone();
+        _moveDirection = velocity!.pixelsPerSecond / magnitude;
+        _activeImage.transformPrev = _activeImage.transform!.clone();
+        _movingMatrix = _activeImage.transform!.clone();
         _controllerMove.value = 1;
         _controllerMove.animateTo(0,
             curve: Curves.easeInOut, duration: Duration(milliseconds: 500));
@@ -221,24 +230,24 @@ class _ImageGalleryState extends State<ImageGallery>
   }
 
   void _onDoubleTap(MatrixGestureDetectorDetails details) {
-    if (_animating || _activeImage == null || _activeImage.info == null) return;
+    if (_animating || _activeImage.info == null) return;
     _animating = true;
 
     final decomposedValues =
-        MatrixGestureDetector.decomposeToValues(_activeImage.transform);
+        MatrixGestureDetector.decomposeToValues(_activeImage.transform!);
     if (decomposedValues.right > 1) {
-      _activeImage.transformPrev = _activeImage.transform.clone();
+      _activeImage.transformPrev = _activeImage.transform!.clone();
       _activeImage.transform = _activeImage.initialMatrix.clone();
       _controllerImage.forward(from: 0);
     } else {
-      _activeImage.transformPrev = _activeImage.transform.clone();
+      _activeImage.transformPrev = _activeImage.transform!.clone();
       final screenAspectRatio = _maxWidth / _maxHeight;
       _activeImage.boxer.fit(
-        _activeImage.transform,
+        _activeImage.transform!,
         details.position,
         scaleDelta: screenAspectRatio > _activeImage.aspectRatio ? 0 : 0.1,
       );
-      _activeImage.boxer.clamp(_activeImage.transform);
+      _activeImage.boxer.clamp(_activeImage.transform!);
       _controllerImage.forward(from: 0);
     }
   }
@@ -247,7 +256,7 @@ class _ImageGalleryState extends State<ImageGallery>
     final aspectRatio = info.image.width / info.image.height;
     final screenAspectRatio = _maxWidth / _maxHeight;
 
-    var width = _maxWidth, height = _maxWidth / aspectRatio;
+    double? width = _maxWidth, height = _maxWidth / aspectRatio;
     if (screenAspectRatio > aspectRatio) {
       height = _maxHeight;
       width = _maxHeight * aspectRatio;
@@ -256,16 +265,16 @@ class _ImageGalleryState extends State<ImageGallery>
     image.size = Size(width, height);
 
     image.transform = Matrix4.identity();
-    image.transform
+    image.transform!
         .leftTranslate((_maxWidth - width) / 2, (_maxHeight - height) / 2);
-    image.transformPrev = image.transform.clone();
-    image.initialMatrix = image.transform.clone();
+    image.transformPrev = image.transform!.clone();
+    image.initialMatrix = image.transform!.clone();
     image.boxer = Boxer(Rect.fromLTWH(0, 0, _maxWidth, _maxHeight),
         Rect.fromLTWH(0, 0, width, height));
     image.info = info;
     if (screenAspectRatio > aspectRatio) {
-      image.boxer.fit(image.transform, Offset(_maxWidth / 2, 0));
-      image.boxer.clamp(image.transform);
+      image.boxer.fit(image.transform!, Offset(_maxWidth / 2, 0));
+      image.boxer.clamp(image.transform!);
     }
     await Future.delayed(Duration(milliseconds: 0));
     _controllerImage.notifyListeners();
@@ -317,7 +326,8 @@ class _ImageGalleryState extends State<ImageGallery>
     _maxWidth = media.size.width;
     _maxHeight = media.size.height;
 
-    if (_images == null) {
+    if (!calledBuild) {
+      calledBuild = true;
       _images = widget.imageProviders
           .map((e) => ImageUnit(
                 size: Size(_maxWidth, _maxHeight),
@@ -327,7 +337,6 @@ class _ImageGalleryState extends State<ImageGallery>
 
       _activeImage = _images[widget.selectedIndex];
     }
-
     return Stack(children: <Widget>[
       MatrixGestureDetector(
         onDoubleTap: _onDoubleTap,
@@ -345,7 +354,7 @@ class _ImageGalleryState extends State<ImageGallery>
 
             _images.forEach((image) {
               if (image.info != null) {
-                _onInfo(image.info, image);
+                _onInfo(image.info!, image);
               }
             });
 
@@ -363,7 +372,7 @@ class _ImageGalleryState extends State<ImageGallery>
                       alignment: Alignment.topLeft,
                       child: AnimatedBuilder(
                         animation: _controllerImage,
-                        builder: (BuildContext context, Widget child) {
+                        builder: (BuildContext context, Widget? child) {
                           child = SizedBox(
                             width: image.size.width,
                             height: image.size.height,
@@ -383,9 +392,9 @@ class _ImageGalleryState extends State<ImageGallery>
                             transform: _animating
                                 ? MatrixScaleTranslate4Tween(
                                     begin: image.transformPrev,
-                                    end: image.transform,
+                                    end: image.transform!,
                                   ).evaluate(_controllerImage)
-                                : image.transform,
+                                : image.transform!,
                             child: child,
                           );
                         },
@@ -408,25 +417,24 @@ class _ImageGalleryState extends State<ImageGallery>
 
 class ImageUnit {
   final ImageProvider imageProvider;
-  ImageInfo info;
-  Matrix4 initialMatrix;
-  Boxer boxer;
-  Matrix4 transform;
-  Matrix4 transformPrev;
   Size size;
+
+  ImageInfo? info;
+  late Matrix4 initialMatrix;
+  late Boxer boxer;
+  late Matrix4 transformPrev;
+  Matrix4? transform;
 
   double get aspectRatio => size.width / size.height;
 
-  ImageUnit({this.imageProvider, this.size});
+  ImageUnit({required this.imageProvider, required this.size});
 }
 
 class MatrixScaleTranslate4Tween extends Tween<Matrix4> {
   MatrixScaleTranslate4Tween({
-    Matrix4 begin,
-    Matrix4 end,
-  })  : assert(begin != null),
-        assert(end != null),
-        super(begin: begin, end: end);
+    required Matrix4 begin,
+    required Matrix4 end,
+  }) : super(begin: begin, end: end);
   static final vector.Quaternion rotationTrash = vector.Quaternion.identity();
 
   @override
@@ -435,8 +443,8 @@ class MatrixScaleTranslate4Tween extends Tween<Matrix4> {
     final vector.Vector3 endTranslation = vector.Vector3.zero();
     final vector.Vector3 beginScale = vector.Vector3.zero();
     final vector.Vector3 endScale = vector.Vector3.zero();
-    begin.decompose(beginTranslation, rotationTrash, beginScale);
-    end.decompose(endTranslation, rotationTrash, endScale);
+    begin!.decompose(beginTranslation, rotationTrash, beginScale);
+    end!.decompose(endTranslation, rotationTrash, endScale);
 
     final vector.Vector3 lerpTranslation =
         beginTranslation * (1.0 - t) + endTranslation * t;

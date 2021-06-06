@@ -5,7 +5,7 @@ import '../../core/auth/types.dart';
 import '../home.dart';
 
 class AppAuthPage extends StatefulWidget {
-  const AppAuthPage({Key key}) : super(key: key);
+  const AppAuthPage({Key? key}) : super(key: key);
 
   @override
   _AppAuthPageState createState() => _AppAuthPageState();
@@ -18,7 +18,7 @@ class _AppAuthPageState extends State<AppAuthPage> {
 
   bool _loading = false;
   bool _error = false;
-  String _errorMessage;
+  String? _errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -75,9 +75,7 @@ class _AppAuthPageState extends State<AppAuthPage> {
                 const SizedBox(height: 35.0),
                 Container(
                   width: double.infinity,
-                  child: OutlineButton(
-                    highlightedBorderColor: Theme.of(context).accentColor,
-                    padding: const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                  child: OutlinedButton(
                     onPressed: () async {
                       if (_formKey.currentState?.validate() ?? false) {
                         FocusScope.of(context).requestFocus(FocusNode());

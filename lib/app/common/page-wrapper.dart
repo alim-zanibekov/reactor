@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class PageWrapper extends StatefulWidget {
-  final Widget child;
+  final Widget? child;
 
-  const PageWrapper({Key key, this.child}) : super(key: key);
+  const PageWrapper({Key? key, this.child}) : super(key: key);
 
   @override
   _PageWrapperState createState() => _PageWrapperState();

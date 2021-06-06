@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 import 'count-formatter.dart';
 
 class DateTimeFormatter {
@@ -14,7 +12,7 @@ class DateTimeFormatter {
   static final _formatDays =
       CountFormatter(one: 'день', two: 'дня', few: 'дней');
 
-  DateTimeFormatter({@required this.dateTime});
+  DateTimeFormatter({required this.dateTime});
 
   String format() {
     return formatDateTime(dateTime);

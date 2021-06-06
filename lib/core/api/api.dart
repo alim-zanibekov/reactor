@@ -45,7 +45,7 @@ class Api {
     return instance;
   }
 
-  void sethHost(String host) {
+  void sethHost(String? host) {
     _host = 'http://$host';
   }
 
@@ -62,7 +62,6 @@ class Api {
       case PostListType.NEW:
         return '/new';
     }
-    return null;
   }
 
   String _voteToString(VoteType type) {
@@ -72,7 +71,6 @@ class Api {
       case VoteType.DOWN:
         return 'minus';
     }
-    return null;
   }
 
   String _tagTypeToString(TagListType type) {
@@ -82,7 +80,6 @@ class Api {
       case TagListType.NEW:
         return '/subtags';
     }
-    return null;
   }
 
   Future<Post> loadPost(int id) async {
@@ -97,17 +94,16 @@ class Api {
 
   Future<ContentPage<Post>> _loadPage(String url) async {
     final res = await _session.get(url);
-    if (res.headers != null &&
-        !(res.headers[HttpHeaders.contentTypeHeader]?.first
-                ?.contains('text/html') ??
-            false)) {
+    if (!(res.headers[HttpHeaders.contentTypeHeader]?.first
+            .contains('text/html') ??
+        false)) {
       final err =
           UnimplementedError('url: $url; headers: ${jsonEncode(res.headers)}');
       ErrorReporter.reportError(err, err.stackTrace);
       return ContentPage.empty<Post>();
     }
     final page = _postsParser.parsePage(res.data);
-    if (_auth.authorized && !page.authorized) {
+    if (_auth.authorized && !page.authorized!) {
       Future.microtask(() {
         _auth.logout();
         InAppNotificationsManager.show(
@@ -160,7 +156,7 @@ class Api {
     return _contentParser.parseContent(res.data);
   }
 
-  Future<List<PostComment>> loadComments(int id) async {
+  Future<List<PostComment>?> loadComments(int id) async {
     final res = await _session.get('$_host/post/comments/$id');
     return _commentsParser.parseComments(res.data, id);
   }
@@ -170,7 +166,7 @@ class Api {
         '$_host/favorite/${state ? 'create' : 'delete'}/$postId?token=${_session.apiToken}');
   }
 
-  Future<Pair<double, bool>> votePost(int id, VoteType type) async {
+  Future<Pair<double?, bool>> votePost(int id, VoteType type) async {
     final res = await _session.get(
         '$_host/post_vote/add/$id/${_voteToString(type)}?token=${_session.apiToken}&abyss=0');
     final str = res.data.toString().replaceFirst('<span>', '');
@@ -178,7 +174,7 @@ class Api {
         res.data.toString().indexOf('vote-plus') != -1);
   }
 
-  Future<double> voteComment(int id, VoteType type) async {
+  Future<double?> voteComment(int id, VoteType type) async {
     final res = await _session.get(
         '$_host/comment_vote/add/$id/${_voteToString(type)}?token=${_session.apiToken}');
     final str = res.data.toString().replaceFirst('<span>', '');
@@ -186,13 +182,13 @@ class Api {
   }
 
   Future<void> setTagFavorite(int id, bool state) async {
-    return _session.get(
+    await _session.get(
       '$_host/favorite/${state ? 'create' : 'delete'}Blog/$id${state ? '/1' : ''}?token=${_session.apiToken}',
     );
   }
 
   Future<void> setTagBlock(int id, bool state) async {
-    return _session.get(
+    await _session.get(
         '$_host/favorite/${state ? 'create' : 'delete'}Blog/$id${state ? '/-1' : ''}?token=${_session.apiToken}');
   }
 
@@ -235,8 +231,8 @@ class Api {
     int postId,
     int parentId,
     String text,
-    File picture, {
-    ProgressCallback onSendProgress,
+    File? picture, {
+    ProgressCallback? onSendProgress,
   }) async {
     final file =
         picture != null ? (await MultipartFile.fromFile(picture.path)) : null;
@@ -250,7 +246,7 @@ class Api {
       'comment_picture_url': null,
     });
 
-    return _session.post(
+    await _session.post(
       '$_host/post_comment/create',
       formData,
       onSendProgress: onSendProgress,
@@ -273,7 +269,7 @@ class Api {
   }
 
   Future<ContentPage<Post>> search(
-      {String query, String author, List<String> tags}) async {
+      {String? query, String? author, List<String?>? tags}) async {
     final queryParams = {
       if (query != null && query.isNotEmpty) 'q': query,
       if (author != null && author.isNotEmpty) 'user': author,
@@ -284,7 +280,7 @@ class Api {
   }
 
   Future<ContentPage<Post>> searchByPageId(int pageId,
-      {String query, String author, List<String> tags}) async {
+      {String? query, String? author, List<String?>? tags}) async {
     final queryParams = {
       if (author != null && author.isNotEmpty) 'user': author,
       if (tags != null && tags.isNotEmpty) 'tags': tags.join(',')
@@ -308,10 +304,10 @@ class Api {
     return _quizParser.parseQuizResponse(res.data);
   }
 
-  Future<Uint8List> downloadFile(
+  Future<Uint8List?> downloadFile(
     String url, {
-    ProgressCallback onReceiveProgress,
-    Map<String, dynamic> headers,
+    ProgressCallback? onReceiveProgress,
+    Map<String, dynamic>? headers,
   }) async {
     final res = await _dio.get<Uint8List>(
       url,

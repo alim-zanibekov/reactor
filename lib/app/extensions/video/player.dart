@@ -10,10 +10,10 @@ import '../../../core/widgets/onerror-reload.dart';
 import '../../../variables.dart';
 
 class AppVideoPlayer extends StatefulWidget {
-  final String url;
+  final String? url;
   final double aspectRatio;
 
-  AppVideoPlayer({Key key, @required this.url, this.aspectRatio = 16.0 / 9.0})
+  AppVideoPlayer({Key? key, required this.url, this.aspectRatio = 16.0 / 9.0})
       : super(key: key);
 
   @override
@@ -22,8 +22,8 @@ class AppVideoPlayer extends StatefulWidget {
 
 class _AppVideoPlayerState extends State<AppVideoPlayer> {
   final preferences = Preferences();
-  static List<VideoPlayerController> _cache = [];
-  VideoPlayerController _controller;
+  static List<VideoPlayerController?> _cache = [];
+  VideoPlayerController? _controller;
   bool _isPlaying = false;
   bool _controllerDestroyed = false;
   bool _initialized = false;
@@ -54,16 +54,16 @@ class _AppVideoPlayerState extends State<AppVideoPlayer> {
     } on StateError {}
 
     if (_controller != null) {
-      _controller.removeListener(_onChangeVideoState);
-      _controller.dispose();
+      _controller!.removeListener(_onChangeVideoState);
+      _controller!.dispose();
       _controller = null;
     }
   }
 
-  void _removeFromCacheAndNotify(VideoPlayerController ctrl) {
+  void _removeFromCacheAndNotify(VideoPlayerController? ctrl) {
     if (_cache.length >= 9) {
       _cache.remove(ctrl);
-      ctrl.setLooping(false);
+      ctrl!.setLooping(false);
     }
   }
 
@@ -88,7 +88,7 @@ class _AppVideoPlayerState extends State<AppVideoPlayer> {
 
     if (mounted) {
       _controller = VideoPlayerController.network(
-        widget.url,
+        widget.url!,
         httpHeaders: Headers.videoHeaders,
         maxCacheSize: 200 << 20,
         maxFileSize: 10 << 20,
@@ -98,8 +98,8 @@ class _AppVideoPlayerState extends State<AppVideoPlayer> {
         ..initialize();
 
       _cache.add(_controller);
-      _controller.addListener(_onChangeVideoState);
-      _initialized = _controller.value.isInitialized;
+      _controller!.addListener(_onChangeVideoState);
+      _initialized = _controller!.value.isInitialized;
 
       _notify();
     }
@@ -116,21 +116,21 @@ class _AppVideoPlayerState extends State<AppVideoPlayer> {
       return;
     }
 
-    if (_isPlaying != _controller.value.isPlaying) {
-      _isPlaying = _controller.value.isPlaying;
+    if (_isPlaying != _controller!.value.isPlaying) {
+      _isPlaying = _controller!.value.isPlaying;
       _notify();
     }
 
-    if (_initialized != _controller.value.isInitialized) {
-      _initialized = _controller.value.isInitialized;
+    if (_initialized != _controller!.value.isInitialized) {
+      _initialized = _controller!.value.isInitialized;
       if (preferences.gifAutoPlay) {
-        _controller.play();
+        _controller!.play();
       }
       _notify();
     }
 
-    if (_controller.value.hasError) {
-      _hasError = _controller.value.hasError;
+    if (_controller!.value.hasError) {
+      _hasError = _controller!.value.hasError;
       await _safeRemoveController();
     }
   }
@@ -161,13 +161,13 @@ class _AppVideoPlayerState extends State<AppVideoPlayer> {
       key: ValueKey(widget.url),
       child: _initialized
           ? Stack(children: <Widget>[
-              ClipRect(child: VideoPlayer(_controller)),
+              ClipRect(child: VideoPlayer(_controller!)),
               GestureDetector(
                 onTap: () {
                   if (!_isPlaying) {
-                    _controller.play();
+                    _controller!.play();
                   } else {
-                    _controller.pause();
+                    _controller!.pause();
                   }
                 },
                 child: AnimatedOpacity(
@@ -193,8 +193,8 @@ class _AppVideoPlayerState extends State<AppVideoPlayer> {
                   top: 0,
                   child: GestureDetector(
                     onTap: () {
-                      _controller.seekTo(Duration.zero);
-                      _controller.play();
+                      _controller!.seekTo(Duration.zero);
+                      _controller!.play();
                     },
                     child: Container(
                       color: Colors.transparent,

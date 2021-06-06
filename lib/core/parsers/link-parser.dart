@@ -3,8 +3,8 @@ import 'types/module.dart';
 class _Link {}
 
 class PostLink extends _Link {
-  final int id;
-  final int commentId;
+  final int? id;
+  final int? commentId;
 
   PostLink(this.id, this.commentId);
 }
@@ -36,36 +36,36 @@ class LinkParser {
 
   static _Link parse(String link) {
     if (_postLinkRegex.hasMatch(link)) {
-      final match = _postLinkRegex.firstMatch(link);
-      final postId = int.tryParse(match.group(1));
+      final match = _postLinkRegex.firstMatch(link)!;
+      final postId = int.tryParse(match.group(1)!);
       final commentId = match.groupCount > 2 && match.group(3) != null
-          ? int.tryParse(match.group(3))
+          ? int.tryParse(match.group(3)!)
           : null;
       return PostLink(postId, commentId);
     } else if (_tagLinkRegex.hasMatch(link)) {
-      final match = _tagLinkRegex.firstMatch(link);
+      final match = _tagLinkRegex.firstMatch(link)!;
       return TagLink(
         Tag(
-          Uri.decodeComponent(match.group(2)).replaceAll('+', ' '),
+          Uri.decodeComponent(match.group(2)!).replaceAll('+', ' '),
           prefix: match.group(1) != 'joy'
-              ? match.group(1).replaceAll('.', '')
+              ? match.group(1)!.replaceAll('.', '')
               : null,
           isMain: match.group(3) != null,
           link: match.group(2),
         ),
       );
     } else if (_fanLinkRegex.hasMatch(link)) {
-      final match = _tagLinkRegex.firstMatch(link);
+      final match = _tagLinkRegex.firstMatch(link)!;
       return TagLink(
         Tag(
-          match.group(1),
+          match.group(1) ?? '-//-',
           prefix: match.group(1),
           isMain: false,
           link: '',
         ),
       );
     } else if (_userLinkRegex.hasMatch(link)) {
-      final userLink = _postLinkRegex.firstMatch(link).group(1);
+      final userLink = _postLinkRegex.firstMatch(link)!.group(1)!;
       return UserLink(
         Uri.decodeComponent(userLink).replaceAll('+', ' '),
         userLink,

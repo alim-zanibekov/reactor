@@ -9,12 +9,12 @@ import '../common/options.dart';
 import '../common/video-thumbnail.dart';
 
 class AppSoundCloudPlayer extends StatefulWidget {
-  final String url;
-  final OEmbedMetadata metadata;
-  final Future<OEmbedMetadata> futureMetadata;
+  final String? url;
+  final OEmbedMetadata? metadata;
+  final Future<OEmbedMetadata>? futureMetadata;
 
   AppSoundCloudPlayer(
-      {Key key, @required this.url, this.metadata, this.futureMetadata})
+      {Key? key, required this.url, this.metadata, this.futureMetadata})
       : super(key: key);
 
   @override
@@ -22,8 +22,8 @@ class AppSoundCloudPlayer extends StatefulWidget {
 }
 
 class _AppSoundCloudPlayerState extends State<AppSoundCloudPlayer> {
-  String _url;
-  OEmbedMetadata metadata;
+  late String _url;
+  OEmbedMetadata? metadata;
   bool webViewShow = false;
 
   bool error = false;
@@ -33,7 +33,7 @@ class _AppSoundCloudPlayerState extends State<AppSoundCloudPlayer> {
     super.initState();
     metadata = widget.metadata;
     if (metadata == null) {
-      widget.futureMetadata.then((value) {
+      widget.futureMetadata!.then((value) {
         metadata = value;
         if (mounted) {
           setState(() {});
@@ -43,7 +43,7 @@ class _AppSoundCloudPlayerState extends State<AppSoundCloudPlayer> {
       });
     }
     _url = 'https://w.soundcloud.com/player/'
-        '?url=${Uri.encodeQueryComponent(widget.url)}';
+        '?url=${Uri.encodeQueryComponent(widget.url!)}';
   }
 
   Widget getVideo(BuildContext context) {
@@ -65,8 +65,9 @@ class _AppSoundCloudPlayerState extends State<AppSoundCloudPlayer> {
             );
           },
           shouldOverrideUrlLoading: (controller, request) async {
-            canLaunch(request.request.url.toString()).then((value) =>
-                value ? launch(request.request.url.toString()) : null);
+            canLaunch(request.request.url.toString()).then((value) => value
+                ? launch(request.request.url.toString())
+                : Future.value(false));
 
             return NavigationActionPolicy.CANCEL;
           },

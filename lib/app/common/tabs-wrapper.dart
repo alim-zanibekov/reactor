@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../home.dart';
 import 'open.dart';
-
-class _ReloadNotifier extends ChangeNotifier {
-  void notify() {
-    notifyListeners();
-  }
-}
+import 'reload-notifier.dart';
 
 class AppTabsWrapper extends StatefulWidget {
   final String title;
@@ -41,11 +36,11 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
   double _minAppBarHeight = 48;
   double _maxAppBarHeight = 100;
   TabController? _tabController;
-  late List<_ReloadNotifier> _reloadNotifiers;
+  late List<ReloadNotifier> _reloadNotifiers;
 
   @override
   void initState() {
-    _reloadNotifiers = widget.tabs.map((_) => _ReloadNotifier()).toList();
+    _reloadNotifiers = widget.tabs.map((_) => ReloadNotifier()).toList();
     _tabController = TabController(
         initialIndex: widget.initialIndex ?? 0,
         length: widget.tabs.length,

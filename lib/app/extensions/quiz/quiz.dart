@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 import '../../../core/api/api.dart';
+import '../../../core/common/snack-bar.dart';
 import '../../../core/parsers/types/module.dart';
 
 class AppQuiz extends StatefulWidget {
@@ -30,9 +30,7 @@ class _AppQuizState extends State<AppQuiz> {
       final quiz = await _api.voteQuiz(id);
       widget.quizUpdated(quiz);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Не удалось проголосовать')),
-      );
+      SnackBarHelper.show(context, 'Не удалось проголосовать');
     } finally {
       _loading = false;
     }
@@ -60,7 +58,7 @@ class _AppQuizState extends State<AppQuiz> {
                 SizedBox(
                   height: 35,
                   child: Radio<bool>(
-                    activeColor: Theme.of(context).accentColor,
+                    activeColor: Theme.of(context).colorScheme.secondary,
                     groupValue: false,
                     value: true,
                     onChanged: (_) {},

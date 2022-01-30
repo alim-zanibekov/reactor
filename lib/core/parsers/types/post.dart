@@ -121,7 +121,7 @@ class PageInfo extends ExtendedTag {
 }
 
 class ContentPage<T> {
-  final int? id;
+  final int id;
   final List<T> content;
   final PageInfo? pageInfo;
   final bool? isLast;
@@ -129,7 +129,7 @@ class ContentPage<T> {
   final bool? reversedPagination;
 
   ContentPage({
-    this.id,
+    required this.id,
     required this.content,
     this.pageInfo,
     this.isLast,

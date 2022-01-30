@@ -1,11 +1,10 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as parser;
-import 'package:reactor/core/parsers/utils.dart';
 
 import './types/module.dart';
 import '../common/pair.dart';
 import 'content-parser.dart';
-import 'types/post.dart';
+import 'utils.dart';
 
 class CommentsParser {
   final _contentParser = ContentParser();
@@ -105,12 +104,12 @@ class CommentsParser {
       time: time,
       rating: double.tryParse(ratingText?.trim() ?? ''),
       hidden: hidden,
-      user: (username != null && userLink != null)
+      user: username != null
           ? UserShort(
               id: creatorId,
               avatar: avatar,
               username: username,
-              link: userLink,
+              link: userLink ?? username,
             )
           : null,
       content:

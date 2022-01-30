@@ -3,6 +3,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../core/api/api.dart';
 import '../../core/auth/auth.dart';
+import '../../core/common/snack-bar.dart';
 import '../../core/parsers/types/module.dart';
 import '../../core/widgets/fade-icon.dart';
 import '../comments/comment-answer.dart';
@@ -56,7 +57,7 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
 
   Color? _getColor(int? commentId) {
     if (commentId == widget.commentId) {
-      return Theme.of(context).accentColor.withOpacity(0.2);
+      return Theme.of(context).colorScheme.secondary.withOpacity(0.2);
     }
     return null;
   }
@@ -133,10 +134,9 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
                 _post = post;
                 if (mounted) setState(() {});
               } on Exception {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Не удалось загрзить содержимое поста'),
-                  ),
+                SnackBarHelper.show(
+                  context,
+                  'Не удалось загрузить содержимое поста',
                 );
               }
             },

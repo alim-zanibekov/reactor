@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 
 import '../../core/common/pair.dart';
 import '../../core/parsers/types/module.dart';
@@ -54,6 +53,7 @@ class _AppPostContentState extends State<AppPostContent>
   final _postKey = GlobalKey();
   final _wrapKey = GlobalKey();
   late Post _post;
+  late AppContentLoader _loader;
 
   double _postMaxHeight = 500;
   double? _realPostHeight;
@@ -74,16 +74,22 @@ class _AppPostContentState extends State<AppPostContent>
           _currentMaxHeight = _post.height;
         }
         if (widget.onPage) {
-          SchedulerBinding.instance!.addPostFrameCallback(_postFrameCallback);
+          SchedulerBinding.instance?.addPostFrameCallback(_postFrameCallback);
         }
       } else {
-        SchedulerBinding.instance!.addPostFrameCallback(_postFrameCallback);
+        SchedulerBinding.instance?.addPostFrameCallback(_postFrameCallback);
       }
     }
     if (widget.onMountInfo != null) {
       widget.onMountInfo!(MountInfo(
           state: true, key: _wrapKey, post: _post, collapse: collapse));
     }
+    _loader = AppContentLoader(
+      content: (!_post.censored && !_post.hidden && !_post.unsafe)
+          ? _post.content
+          : [],
+      onLoad: _onLoad,
+    );
     super.initState();
   }
 
@@ -92,6 +98,7 @@ class _AppPostContentState extends State<AppPostContent>
     if (widget.onMountInfo != null) {
       widget.onMountInfo!(MountInfo(state: false, post: _post));
     }
+    _loader.destroy();
     super.dispose();
   }
 
@@ -139,8 +146,7 @@ class _AppPostContentState extends State<AppPostContent>
               child: ClipRect(
                 child: AppContent(
                   key: ObjectKey(_post),
-                  content: _post.content,
-                  onLoad: _onLoad,
+                  loader: _loader,
                   children: _post.quiz != null
                       ? <Widget>[
                           Container(

@@ -1,8 +1,10 @@
 import 'dart:convert';
 
-import 'package:dio/dio.dart';
+import '../http/dio-instance.dart';
 
 class OEmbedMetadata {
+  static final _dio = getDioInstance();
+
   // TODO: check required fields
   String? authorName;
   String? providerName;
@@ -36,25 +38,25 @@ class OEmbedMetadata {
   });
 
   static Future<OEmbedMetadata> loadYouTube(String videoId) async {
-    final dynamic result = await Dio().get(
+    final dynamic result = await _dio.get(
         'https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=$videoId&format=json');
     return _load(result.data);
   }
 
   static Future<OEmbedMetadata> loadCoub(String videoId) async {
-    final dynamic result = await Dio().get(
+    final dynamic result = await _dio.get(
         'http://coub.com/api/oembed.json?url=http://coub.com/view/$videoId');
     return _load(result.data);
   }
 
   static Future<OEmbedMetadata> loadVimeo(String videoId) async {
-    final dynamic result = await Dio().get(
+    final dynamic result = await _dio.get(
         'https://vimeo.com/api/oembed.json?url=https://vimeo.com/video/$videoId');
     return _load(result.data);
   }
 
   static Future<OEmbedMetadata> loadSoundCloud(String url) async {
-    final dynamic result = await Dio().get(
+    final dynamic result = await _dio.get(
         'https://soundcloud.com/oembed?format=json&url=${Uri.encodeQueryComponent(url)}');
     return _load(result.data);
   }

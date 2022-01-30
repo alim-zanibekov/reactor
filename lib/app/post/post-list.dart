@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/tag/tag-header.dart';
 import '../../core/auth/auth.dart';
+import '../../core/common/snack-bar.dart';
 import '../../core/content/post-loader.dart';
 import '../../core/parsers/types/module.dart';
 import '../../core/widgets/onerror-reload.dart';
@@ -14,7 +15,7 @@ class AppPostList extends StatefulWidget {
   final void Function(double delta)? onScrollChange;
   final PageStorageKey? pageStorageKey;
   final PostLoader loader;
-  final ChangeNotifier? reloadNotifier;
+  final Listenable? reloadNotifier;
 
   AppPostList({
     Key? key,
@@ -106,10 +107,7 @@ class _AppPostListState extends State<AppPostList>
           _postWidgets = List.from(_postWidgets);
           if (mounted) setState(() {});
         } on Exception {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Не удалось загрзить содержимое поста')),
-          );
+          SnackBarHelper.show(context, 'Не удалось загрузить содержимое поста');
         }
       },
       collapseDuration: _collapseDuration);
@@ -317,7 +315,7 @@ class _AppPostListState extends State<AppPostList>
           height: 40,
           width: 40,
           decoration: BoxDecoration(
-            color: Theme.of(context).accentColor,
+            color: Theme.of(context).colorScheme.secondary,
             borderRadius: BorderRadius.circular(40),
           ),
           child: IconButton(
@@ -326,11 +324,13 @@ class _AppPostListState extends State<AppPostList>
           ),
         ),
         builder: (BuildContext context, Widget? child) {
-          return Positioned(
-            bottom: 10 - 100 * _animationController.value,
-            right: 10,
-            child: child!,
-          );
+          return child != null
+              ? Positioned(
+                  bottom: 10 - 100 * _animationController.value,
+                  right: 10,
+                  child: child,
+                )
+              : SizedBox();
         },
       )
     ]);

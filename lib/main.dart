@@ -2,32 +2,24 @@ import 'dart:async';
 
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'app/home.dart';
 import 'core/auth/auth.dart';
 import 'core/common/in-app-notifications-manager.dart';
+import 'core/common/user-agent/user-agent.dart';
 import 'core/external/error-reporter.dart';
 import 'core/external/sentry.dart';
 import 'core/preferences/preferences.dart';
 import 'variables.dart';
 
 final StreamController<AppTheme> _appTheme = StreamController<AppTheme>();
-const platform = const MethodChannel('channel:reactor');
 
 class EmptyBehavior extends ScrollBehavior {
   @override
   Widget buildViewportChrome(
       BuildContext context, Widget child, AxisDirection axisDirection) {
     return child;
-  }
-}
-
-class UserAgent {
-  static String? userAgent;
-
-  static Future<void> init() async {
-    userAgent = await platform.invokeMethod('getUserAgent');
   }
 }
 
@@ -113,6 +105,13 @@ class _AppState extends State<App> {
       builder: (context, child) {
         return ScrollConfiguration(behavior: EmptyBehavior(), child: child!);
       },
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate
+      ],
+      supportedLocales: const [
+        Locale('ru', 'RU'),
+      ],
       home: Scaffold(
         body: DoubleBackToCloseApp(
           child: Builder(builder: (context) {
@@ -121,7 +120,7 @@ class _AppState extends State<App> {
             }
             _notificationsSubscription =
                 InAppNotificationsManager.messages$.listen((String text) {
-                  ScaffoldMessenger.of(context)
+              ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text(text)));
             });
             return AppPages();
@@ -188,8 +187,8 @@ class ThemeInfo {
         primarySwatch: ThemeInfo.primary,
         accentColor: Color.fromRGBO(253, 207, 93, 1),
       ),
+      indicatorColor: Color.fromRGBO(253, 207, 93, 1),
       primaryColor: Color.fromRGBO(253, 178, 1, 1),
-      accentColor: Color.fromRGBO(253, 207, 93, 1),
       outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(primary: Colors.black87)
               .copyWith(side: outlinedButtonSide)),
@@ -205,8 +204,8 @@ class ThemeInfo {
         accentColor: Color.fromRGBO(253, 207, 93, 1),
         brightness: Brightness.dark,
       ),
+      indicatorColor: Color.fromRGBO(253, 207, 93, 1),
       brightness: Brightness.dark,
-      accentColor: Color.fromRGBO(253, 207, 93, 1),
       outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(primary: Colors.white)
               .copyWith(side: outlinedButtonSide)),

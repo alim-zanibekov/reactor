@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/api/api.dart';
 import '../../core/common/retry-network-image.dart';
+import '../../core/common/snack-bar.dart';
 import '../../core/parsers/types/module.dart';
 import 'tag.dart';
 
@@ -47,10 +48,11 @@ class _AppTagHeaderState extends State<AppTagHeader> {
       _pageInfo.subscribed = !_pageInfo.subscribed;
       _pageInfo.blocked = false;
     } on Exception {
-      ScaffoldMessenger.of(context).showSnackBar(
+      SnackBarHelper.show(
+        context,
         _pageInfo.subscribed
-            ? const SnackBar(content: Text('Не удалось отписаться'))
-            : const SnackBar(content: Text('Не удалось подписаться')),
+            ? 'Не удалось отписаться'
+            : 'Не удалось подписаться',
       );
     } finally {
       _setNotLoading();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/api/api.dart';
 import '../../core/common/reload-service.dart';
+import '../../core/common/snack-bar.dart';
 import '../../core/preferences/preferences.dart';
 import '../../main.dart';
 
@@ -142,7 +143,7 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
           SwitchListTile(
             title: const Text('SFW'),
             value: _sfw!,
-            activeColor: Theme.of(context).accentColor,
+            activeColor: Theme.of(context).colorScheme.secondary,
             onChanged: (bool sfw) async {
               setState(() => _sfw = sfw);
               await _preferences.setSFW(sfw);
@@ -151,7 +152,7 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
           SwitchListTile(
             title: const Text('Воспроизводить гифки автоматически'),
             value: _gifAutoPlay!,
-            activeColor: Theme.of(context).accentColor,
+            activeColor: Theme.of(context).colorScheme.secondary,
             onChanged: (bool gifAutoPlay) async {
               setState(() => _gifAutoPlay = gifAutoPlay);
               await _preferences.setGifAutoPlay(gifAutoPlay);
@@ -160,15 +161,10 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
           SwitchListTile(
             title: const Text('Отправлять отчеты об ошибках'),
             value: _sendErrorStatistics!,
-            activeColor: Theme.of(context).accentColor,
+            activeColor: Theme.of(context).colorScheme.secondary,
             onChanged: (bool sendErrorStatistics) async {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Пока что нельзя это выключить, подождите более стабильной версии',
-                  ),
-                ),
-              );
+              SnackBarHelper.show(context,
+                  'Пока что нельзя это выключить, подождите более стабильной версии');
               _sendErrorStatistics = true;
               // setState(() => _sendErrorStatistics = sendErrorStatistics);
               // await _preferences.setSendErrorStatistics(sendErrorStatistics);
@@ -273,7 +269,7 @@ class LabeledRadio<T> extends StatelessWidget {
           SizedBox(
             height: 35,
             child: Radio<T>(
-              activeColor: Theme.of(context).accentColor,
+              activeColor: Theme.of(context).colorScheme.secondary,
               groupValue: groupValue,
               value: value,
               onChanged: (T? newValue) {

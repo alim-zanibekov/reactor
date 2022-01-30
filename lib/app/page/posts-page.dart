@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../core/api/types.dart';
+import '../../core/common/menu.dart';
 import '../../core/content/post-loader.dart';
 import '../../core/content/tag-loader.dart';
 import '../../core/parsers/types/module.dart';
 import '../../core/preferences/preferences.dart';
+import '../common/reload-notifier.dart';
 import '../common/tabs-wrapper.dart';
 import '../post/post-list.dart';
 import '../tag/tag-list.dart';
@@ -24,6 +26,8 @@ class _AppPagePostsState extends State<AppPage> {
   late List<PostLoader> _postLoaders;
   late String _title;
   Preferences _preferences = Preferences();
+  bool _reversed = false;
+  final _reloadNotifier = ReloadNotifier();
 
   @override
   void initState() {
@@ -62,17 +66,39 @@ class _AppPagePostsState extends State<AppPage> {
 
   @override
   Widget build(BuildContext context) {
+    final menu = Menu(context, items: [
+      MenuItem(
+          text: _reversed ? 'В прямом порядке' : 'В обратном порядке',
+          onSelect: () {
+            _postLoaders.forEach((it) {
+              it.toggleReverse(startPageId: _reversed ? null : 1);
+            });
+            _reversed = !_reversed;
+            _reloadNotifier.notify();
+          })
+    ]);
     return AppTabsWrapper(
       initialIndex: _preferences.postsType.index,
       main: widget.main,
       tabs: ['Все', 'Хорошее', 'Лучшее', 'Бездна'],
       title: _title,
+      actions: <Widget>[
+        Builder(
+          builder: (context) => PopupMenuButton<int>(
+            offset: const Offset(0, 50),
+            icon: const Icon(Icons.more_vert),
+            tooltip: 'Настройки',
+            onSelected: (int? index) => menu.process(index),
+            itemBuilder: (context) => menu.rawItems,
+          ),
+        )
+      ],
       builder:
           (BuildContext context, int index, onScrollChange, onReloadPress) {
         return AppPostList(
           pageStorageKey: PageStorageKey<String>(_title + index.toString()),
           onScrollChange: onScrollChange,
-          reloadNotifier: onReloadPress,
+          reloadNotifier: Listenable.merge([onReloadPress, _reloadNotifier]),
           loader: _postLoaders[index],
         );
       },
@@ -82,7 +108,7 @@ class _AppPagePostsState extends State<AppPage> {
 
 class _AppPageTagsState extends State<AppPage> {
   late List<TagLoader> _tagLoaders;
-  String? _title;
+  late String _title;
 
   @override
   void initState() {
@@ -98,7 +124,7 @@ class _AppPageTagsState extends State<AppPage> {
         tagListType: TagListType.NEW,
       ),
     ];
-    _title = widget.tag?.value;
+    _title = widget.tag?.value ?? '';
     super.initState();
   }
 
@@ -113,11 +139,12 @@ class _AppPageTagsState extends State<AppPage> {
     return AppTabsWrapper(
       main: widget.main,
       tabs: ['Лучшие', 'Новые'],
-      title: _title!,
+      title: _title,
       builder:
           (BuildContext context, int index, onScrollChange, onReloadPress) {
         return AppTagList(
-          pageStorageKey: PageStorageKey<String>(_title! + index.toString()),
+          pageStorageKey:
+              PageStorageKey<String>('tag-' + _title + index.toString()),
           onScrollChange: onScrollChange,
           reloadNotifier: onReloadPress,
           loader: _tagLoaders[index],

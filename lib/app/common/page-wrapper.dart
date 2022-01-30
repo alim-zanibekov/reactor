@@ -18,8 +18,11 @@ class _PageWrapperState extends State<PageWrapper> {
       final double statusBarHeight = MediaQuery.of(context).padding.top;
       _statusBarHeight = statusBarHeight;
     }
+    final theme = Theme.of(context);
     return Container(
-      color: Theme.of(context).primaryColor,
+      color: theme.brightness == Brightness.dark
+          ? theme.bottomAppBarColor
+          : theme.primaryColor,
       padding: EdgeInsets.only(top: _statusBarHeight),
       child: widget.child,
     );

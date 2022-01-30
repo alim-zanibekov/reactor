@@ -1,15 +1,25 @@
 import 'dart:async';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
+import '../../core/common/menu.dart';
 import '../../core/common/retry-network-image.dart';
 import '../../core/common/save-file.dart';
+import '../../core/common/snack-bar.dart';
 import '../../core/common/value-updater.dart';
 import '../../core/widgets/gesture-detector.dart';
 import '../../core/widgets/safe-image.dart';
+
+class _AnimationControllerInner extends AnimationController {
+  _AnimationControllerInner({
+    Duration? duration,
+    required TickerProvider vsync,
+  }) : super(vsync: vsync, duration: duration);
+
+  void notifyAll() => this.notifyListeners();
+}
 
 class ImageGalleryScreen extends StatelessWidget {
   final List<ImageProvider>? imageProviders;
@@ -60,8 +70,8 @@ class _ImageGalleryState extends State<ImageGallery>
   late double _maxHeight;
   late List<ImageUnit> _images;
   late ScrollController _scrollController;
-  late AnimationController _controllerImage;
-  late AnimationController _controllerMove;
+  late _AnimationControllerInner _controllerImage;
+  late _AnimationControllerInner _controllerMove;
   late ImageUnit _activeImage;
 
   bool calledBuild = false;
@@ -82,19 +92,20 @@ class _ImageGalleryState extends State<ImageGallery>
 
   @override
   void dispose() {
-    SystemChrome.setEnabledSystemUIOverlays(
-        [SystemUiOverlay.bottom, SystemUiOverlay.top]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
     super.dispose();
   }
 
   @override
   void initState() {
-    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
-    _controllerImage = AnimationController(
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.bottom]);
+    _controllerImage = _AnimationControllerInner(
       duration: _defaultDuration,
       vsync: this,
     );
-    _controllerMove = AnimationController(
+    _controllerMove = _AnimationControllerInner(
       duration: _defaultDuration,
       vsync: this,
     );
@@ -112,7 +123,7 @@ class _ImageGalleryState extends State<ImageGallery>
       _activeImage.transform = _movingMatrix
         ?..translate(-md.dx * e * 4, -md.dy * e * 4);
       _activeImage.boxer.clamp(_activeImage.transform!);
-      _controllerImage.notifyListeners();
+      _controllerImage.notifyAll();
     });
 
     _scrollController = ScrollController();
@@ -163,7 +174,7 @@ class _ImageGalleryState extends State<ImageGallery>
             details.translateMatrix! * _activeImage.transform;
         _activeImage.boxer
             .restrictHorizontalMoveAndScale(_activeImage.transform!);
-        _controllerImage.notifyListeners();
+        _controllerImage.notifyAll();
         return;
       }
     } else {
@@ -178,7 +189,7 @@ class _ImageGalleryState extends State<ImageGallery>
           _activeImage.transform;
       _activeImage.boxer.clamp(_activeImage.transform!);
     }
-    _controllerImage.notifyListeners();
+    _controllerImage.notifyAll();
   }
 
   void _onEnd(MatrixGestureDetectorDetails details) async {
@@ -277,46 +288,39 @@ class _ImageGalleryState extends State<ImageGallery>
       image.boxer.clamp(image.transform!);
     }
     await Future.delayed(Duration(milliseconds: 0));
-    _controllerImage.notifyListeners();
+    _controllerImage.notifyAll();
   }
 
   Widget copyLinkPopup() {
+    final menu = Menu(context, items: [
+      MenuItem(
+          text: 'Сохранить в загрузки',
+          onSelect: () async {
+            if (_activeImage.info == null) {
+              SnackBarHelper.show(context, 'Дождитесь загрузки изображения');
+              return;
+            }
+            final rawBytes =
+                await (_activeImage.imageProvider as AppNetworkImageWithRetry)
+                    .loadFromDiskCache();
+            final url =
+                (_activeImage.imageProvider as AppNetworkImageWithRetry).url;
+            try {
+              await SaveFile.save(url, rawBytes);
+              SnackBarHelper.show(context, 'Сохранено');
+            } on Exception {
+              SnackBarHelper.show(context, 'Не удалось сохранить изображение');
+            }
+          })
+    ]);
+
     return PopupMenuButton<int>(
-      offset: const Offset(0, 100),
+      offset: const Offset(0, 50),
       padding: EdgeInsets.zero,
       tooltip: 'Меню',
       icon: Icon(Icons.more_vert, color: Colors.grey[300]),
-      itemBuilder: (context) => const [
-        PopupMenuItem(
-          value: 0,
-          child: Text('Сохранить в загрузки'),
-        ),
-      ],
-      onSelected: (selected) async {
-        if (_activeImage.info == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Дождитесь загрузки изображения'),
-            ),
-          );
-          return;
-        }
-        final rawBytes =
-            await (_activeImage.imageProvider as AppNetworkImageWithRetry)
-                .loadFromDiskCache();
-        final url =
-            (_activeImage.imageProvider as AppNetworkImageWithRetry).url;
-        try {
-          await SaveFile.save(url, rawBytes);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Сохранено')),
-          );
-        } on Exception {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Не удалось сохранить изображение')),
-          );
-        }
-      },
+      itemBuilder: (context) => menu.rawItems,
+      onSelected: (index) => menu.process(index),
     );
   }
 
@@ -358,10 +362,9 @@ class _ImageGalleryState extends State<ImageGallery>
               }
             });
 
-            (() async {
-              await Future.delayed(Duration(milliseconds: 1));
+            Future.microtask(() {
               _scrollController.jumpTo(widget.selectedIndex * _maxWidth);
-            })();
+            });
 
             return Row(
               children: _images

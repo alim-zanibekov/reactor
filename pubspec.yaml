@@ -3,7 +3,7 @@ description: JoyReactor client.
 version: 0.6.0
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=2.14.0 <3.0.0'
 
 dependencies:
   video_player:
@@ -11,33 +11,35 @@ dependencies:
       url: https://github.com/AlimZanibekov/plugins.git
       ref: videoplayer_headers_cache
       path: packages/video_player/video_player
-  dio: ^4.0.0
-  html: ^0.15.0
-  page_transition: ^2.0.2
-  flutter_inappwebview: ^5.3.2
-  url_launcher: ^6.0.6
-  decorated_icon: ^1.2.0
-  shared_preferences: ^2.0.6
   advanced_image:
-    git: https://github.com/AlimZanibekov/advanced_image.git
-  permission_handler: ^8.0.1
-  double_back_to_close_app: ^2.0.1
-  scrollable_positioned_list: ^0.2.0-nullsafety.0
+    git:
+      url: https://github.com/AlimZanibekov/advanced_image.git
+      ref: master
+  dio: ^4.0.4
+  html: ^0.15.0
+  page_transition: ^2.0.5
+  flutter_inappwebview: ^5.3.2
+  url_launcher: ^6.0.18
+  decorated_icon: ^1.2.1
+  shared_preferences: ^2.0.12
+  permission_handler: ^8.3.0
+  double_back_to_close_app: ^2.1.0
+  scrollable_positioned_list: ^0.2.3
   uni_links: ^0.5.1
-  sentry: ^5.0.0
-  file_picker: ^3.0.2+2
-  device_info: ^2.0.2
-  package_info: ^2.0.2
-  path_provider: ^2.0.2
-  flutter_local_notifications: ^6.0.0
+  sentry: ^6.2.2
+  file_picker: ^4.3.3
+  device_info_plus: ^3.2.1
+  package_info_plus: ^1.3.0
+  path_provider: ^2.0.8
+  flutter_local_notifications: ^9.2.0
   flutter:
     sdk: flutter
-
+  flutter_localizations:
+    sdk: flutter
 dev_dependencies:
-  test: ^1.15.7
+  test: ^1.17.10
   flutter_test:
     sdk: flutter
-
 
 flutter:
   assets:

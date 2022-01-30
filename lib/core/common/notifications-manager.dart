@@ -1,5 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class NotificationsManager {
   static final NotificationsManager _notificationsManager =
@@ -32,7 +32,7 @@ class NotificationsManager {
         android: AndroidNotificationDetails(
           "reactor",
           packageInfo.packageName,
-          "Reactor notifications",
+          channelDescription: "Reactor notifications",
           showProgress: progress != null,
           playSound: false,
           enableVibration: false,

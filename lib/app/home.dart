@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:reactor/main.dart';
 import 'package:uni_links/uni_links.dart';
 
 import '../core/auth/auth.dart';
 import '../core/common/reload-service.dart';
 import '../core/preferences/preferences.dart';
+import '../main.dart';
 import 'auth/auth.dart';
 import 'categories/categories-page.dart';
 import 'common/open.dart';
@@ -60,13 +60,15 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    _initUniLink().then((link) {
-      if (link != null) {
-        SchedulerBinding.instance!.addPostFrameCallback(
-          (_) => _postFrameCallback(context, link),
-        );
-      }
-    });
+    if (!kIsWeb) {
+      _initUniLink().then((link) {
+        if (link != null) {
+          SchedulerBinding.instance?.addPostFrameCallback(
+            (_) => _postFrameCallback(context, link),
+          );
+        }
+      });
+    }
 
     _tabController = TabController(length: 4, vsync: this)
       ..addListener(() {
@@ -101,12 +103,13 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
           });
         }
       }),
-      linkStream.listen(
-        (link) => goToLink(context, link!),
-        onError: (err) {
-          print(err);
-        },
-      )
+      if (!kIsWeb)
+        linkStream.listen(
+          (link) => goToLink(context, link!),
+          onError: (err) {
+            print(err);
+          },
+        )
     ];
     _reloadSubscription = ReloadService.onReload$.stream.listen((bool _) {
       setState(() {});
@@ -164,18 +167,10 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
                 unselectedLabelColor: ThemeInfo.colors.shade200,
                 indicatorColor: Colors.transparent,
                 tabs: const <Tab>[
-                  Tab(
-                    icon: Icon(Icons.view_stream),
-                  ),
-                  Tab(
-                    icon: Icon(Icons.category),
-                  ),
-                  Tab(
-                    icon: Icon(Icons.portrait),
-                  ),
-                  Tab(
-                    icon: Icon(Icons.settings),
-                  ),
+                  Tab(icon: Icon(Icons.view_stream)),
+                  Tab(icon: Icon(Icons.category)),
+                  Tab(icon: Icon(Icons.portrait)),
+                  Tab(icon: Icon(Icons.settings)),
                 ],
               ),
             ),

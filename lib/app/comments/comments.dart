@@ -4,6 +4,7 @@ import '../../app/comments/comment-answer.dart';
 import '../../core/api/api.dart';
 import '../../core/api/types.dart';
 import '../../core/auth/auth.dart';
+import '../../core/common/snack-bar.dart';
 import '../../core/parsers/types/module.dart';
 import '../common/open.dart';
 import '../content/content.dart';
@@ -43,6 +44,7 @@ class _AppCommentState extends State<AppComment>
   bool _showAnswer = false;
   late AnimationController _controller;
   late Animation<double> _heightFactor;
+  late AppContentLoader _loader;
 
   @override
   void initState() {
@@ -50,11 +52,17 @@ class _AppCommentState extends State<AppComment>
     _controller =
         AnimationController(duration: Duration(milliseconds: 150), vsync: this);
     _heightFactor = _controller.drive(CurveTween(curve: Curves.easeIn));
+
+    _loader = AppContentLoader(
+        content: (!widget.comment.hidden && widget.comment.content != null)
+            ? widget.comment.content!
+            : []);
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _loader.destroy();
     super.dispose();
   }
 
@@ -76,10 +84,9 @@ class _AppCommentState extends State<AppComment>
       final value = await Api().loadComment(widget.comment.id);
       widget.comment.content = value;
       widget.comment.hidden = false;
+      _loader = AppContentLoader(content: value);
     } on Exception {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Не удалось загрузить комментарий')),
-      );
+      SnackBarHelper.show(context, 'Не удалось загрузить комментарий');
     } finally {
       _setNotLoading();
     }
@@ -98,9 +105,7 @@ class _AppCommentState extends State<AppComment>
       _loading = false;
       if (mounted) setState(() {});
     } on Exception {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Не удалось проголосовать')),
-      );
+      SnackBarHelper.show(context, 'Не удалось проголосовать');
       _loading = false;
     }
   }
@@ -116,9 +121,7 @@ class _AppCommentState extends State<AppComment>
         widget.onDelete!();
       }
     } on Exception {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Не удалось удалить комментарий')),
-      );
+      SnackBarHelper.show(context, 'Не удалось удалить комментарий');
       _setNotLoading();
     }
   }
@@ -225,7 +228,7 @@ class _AppCommentState extends State<AppComment>
       if (!widget.comment.hidden && widget.comment.content != null) {
         content = AppContent(
           key: ValueKey(widget.comment.id.toString() + 'content'),
-          content: widget.comment.content!,
+          loader: _loader,
           noHorizontalPadding: true,
         );
       } else if (widget.comment.hidden) {

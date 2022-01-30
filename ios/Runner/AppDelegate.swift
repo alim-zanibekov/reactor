@@ -16,7 +16,7 @@ import Flutter
                 result(FlutterMethodNotImplemented)
                 return
             }
-            result(UserAgent.getUserAgenet())
+            result(UserAgent.getUserAgent())
         })
 
         GeneratedPluginRegistrant.register(with: self)

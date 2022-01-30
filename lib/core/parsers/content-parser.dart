@@ -1,9 +1,9 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as parser;
-import 'package:reactor/core/parsers/types/utils.dart';
 
 import './types/module.dart';
 import '../common/pair.dart';
+import 'types/utils.dart';
 
 class ContentParser {
   List<ContentUnit> parseContent(String? c) {

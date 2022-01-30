@@ -11,9 +11,9 @@ class AppCategoriesUsers extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int index = 0;
-    return Column(children: <Widget>[
-      ...users.map((e) => _children(context, e, ++index))
-    ]);
+    return Column(
+      children: users.map((e) => _children(context, e, ++index)).toList(),
+    );
   }
 
   Widget _children(context, StatsUser user, int index) {
@@ -58,7 +58,7 @@ class DashedLinePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     double dashWidth = 4, dashSpace = 2, startX = 0;
     final paint = Paint()
-      ..color = Colors.grey[500]!
+      ..color = Colors.grey.shade500
       ..strokeWidth = 0.5;
 
     while (startX < size.width) {

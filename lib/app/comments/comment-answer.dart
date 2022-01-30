@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/api/api.dart';
+import '../../core/common/snack-bar.dart';
 import '../../core/parsers/types/module.dart';
 
 class AppCommentAnswer extends StatefulWidget {
@@ -44,9 +45,7 @@ class _AppCommentAnswerState extends State<AppCommentAnswer> {
       }
       _controller.text = '';
     } on Exception {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: const Text('Произошла ошибка при загрузке')),
-      );
+      SnackBarHelper.show(context, 'Произошла ошибка при загрузке');
     }
     setState(() {
       _progressSend = 0.000001;

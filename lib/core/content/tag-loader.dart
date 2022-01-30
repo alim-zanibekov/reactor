@@ -50,7 +50,7 @@ class TagLoader extends Loader<ExtendedTag> {
     if (_pages.last.isLast! || _complete) {
       return [];
     }
-    int id = _pages.last.id! + 1;
+    int id = _pages.last.id + 1;
     final page = await _api.loadMainTagByPageId(id, path, tagListType);
     if (page.id == _pages.last.id) {
       _complete = true;

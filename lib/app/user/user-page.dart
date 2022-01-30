@@ -1,12 +1,12 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:reactor/core/widgets/onerror-reload.dart';
 
 import '../../core/api/api.dart';
 import '../../core/auth/auth.dart';
+import '../../core/common/clipboard.dart';
+import '../../core/common/menu.dart';
 import '../../core/content/post-loader.dart';
 import '../../core/parsers/types/module.dart';
+import '../../core/widgets/onerror-reload.dart';
 import '../common/future-page.dart';
 import '../common/tabs-wrapper.dart';
 import '../home.dart';
@@ -65,6 +65,24 @@ class _AppUserPageState extends State<AppUserPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final menu = Menu(context, items: [
+      MenuItem(
+        text: 'Скопировать ссылку',
+        onSelect: () => ClipboardHelper.setClipboardData(
+          context,
+          'http://joyreactor.cc/user/${widget.link}',
+        ),
+      ),
+      if (widget.main)
+        MenuItem(
+          text: 'Выход',
+          onSelect: () {
+            Auth().logout();
+            AppPages.appBottomBarPage.add(AppBottomBarPage.PROFILE);
+          },
+        ),
+    ]);
+
     return AppTabsWrapper(
       tabs: [
         'Профиль',
@@ -76,29 +94,12 @@ class _AppUserPageState extends State<AppUserPage>
       title: widget.username,
       actions: <Widget>[
         Builder(
-          builder: (context) => PopupMenuButton(
-            offset: const Offset(0, 100),
+          builder: (context) => PopupMenuButton<int>(
+            offset: const Offset(0, 50),
             icon: const Icon(Icons.more_vert),
             tooltip: 'Меню профиля',
-            onSelected: (dynamic selected) {
-              if (selected == 0) {
-                Clipboard.setData(
-                  ClipboardData(
-                      text: 'http://joyreactor.cc/user/${widget.link}'),
-                );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Скопировано')),
-                );
-              } else {
-                Auth().logout();
-                AppPages.appBottomBarPage.add(AppBottomBarPage.PROFILE);
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(child: Text('Скопировать ссылку'), value: 0),
-              if (widget.main)
-                const PopupMenuItem(child: Text('Выход'), value: 1),
-            ],
+            onSelected: (index) => menu.process(index),
+            itemBuilder: (context) => menu.rawItems,
           ),
         )
       ],

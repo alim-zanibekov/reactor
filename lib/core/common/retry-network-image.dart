@@ -1,20 +1,26 @@
 import 'package:advanced_image/cache.dart';
 import 'package:advanced_image/provider.dart';
+
 // ignore: implementation_imports
 import 'package:advanced_image/src/provider/_advanced_network_image_io.dart'
+    if (dart.library.html) 'package:advanced_image/src/provider/_advanced_network_image_web.dart'
     as io;
 import 'package:flutter/widgets.dart';
+
+import '../http/dio-instance.dart';
 
 class AppNetworkImageWithRetry extends io.AdvancedNetworkImage {
   static final RetryOptions _retryOptions = const RetryOptions(maxAttempts: 3);
   static final CacheManager _cacheManager =
       CacheManager(config: CacheConfig(maxBytes: 200 << 20));
+  static final _dio = getDioInstance();
 
   AppNetworkImageWithRetry(String url, {Map<String, String>? headers})
       : super(url,
             headers: headers,
             retryOptions: _retryOptions,
-            cacheManager: _cacheManager);
+            cacheManager: _cacheManager,
+            dio: _dio);
 
   @override
   Future<bool> evict(

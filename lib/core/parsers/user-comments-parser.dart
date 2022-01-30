@@ -1,9 +1,9 @@
 import 'package:html/parser.dart' as parser;
-import 'package:reactor/core/parsers/utils.dart';
 
 import './types/module.dart';
 import 'comments-parser.dart';
 import 'types/post.dart';
+import 'utils.dart';
 
 class UserCommentsParser {
   final _commentsParser = CommentsParser();

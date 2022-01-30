@@ -1,13 +1,12 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as parser;
-import 'package:reactor/core/parsers/utils.dart';
 
 import './types/module.dart';
 import 'comments-parser.dart';
 import 'content-parser.dart';
 import 'quiz-parser.dart';
 import 'tag-parser.dart';
-import 'types/post.dart';
+import 'utils.dart';
 
 class PostsParser {
   final _quizParser = QuizParser();
@@ -88,22 +87,31 @@ class PostsParser {
 
   ContentPage<Post> parsePage(String? c) {
     final parsedPage = parser.parse(c);
-    final current = parsedPage.querySelector('.pagination_expanded .current');
-    final pageId = current != null
-        ? Utils.getNumberInt(
-              parsedPage.querySelector('.pagination_expanded .current')?.text,
-            ) ??
-            0
-        : 0;
+    var current = parsedPage.querySelector('.pagination_expanded .current');
+
+    if (current == null) {
+      final currents = parsedPage
+          .querySelectorAll('.pagination .current')
+          .where((it) => Utils.getNumberInt(it.text) != null);
+      if (currents.isNotEmpty) {
+        current = currents.first;
+      }
+    }
+
+    final pageId = current != null ? Utils.getNumberInt(current.text) ?? 0 : 0;
     bool reversedPagination = false;
     int lastPageId = 0;
 
-    final paginationBlock = parsedPage.querySelector('.pagination_expanded');
-    if (current != null && paginationBlock != null) {
-      lastPageId = Utils.getNumberInt(paginationBlock.children.last.text) ?? 0;
-      reversedPagination = paginationBlock.children.length > 1 &&
-          (int.tryParse(paginationBlock.children[0].text) ?? 0) >
-              (int.tryParse(paginationBlock.children[1].text) ?? 0);
+    if (current != null) {
+      final pages = parsedPage
+          .querySelectorAll('.pagination a, .pagination span.current')
+          .where((it) => Utils.getNumberInt(it.text) != null);
+      if (pages.isNotEmpty) {
+        lastPageId = Utils.getNumberInt(pages.last.text) ?? 0;
+        reversedPagination = pages.length > 1 &&
+            (int.tryParse(pages.first.text) ?? 0) >
+                (int.tryParse(pages.last.text) ?? 0);
+      }
     }
 
     final pageInfo =

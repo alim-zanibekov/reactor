@@ -104,7 +104,9 @@ class _AppSafeImageState extends State<AppSafeImage> {
           if (mounted) {
             setState(() {});
           }
-        }, onError: (obj, stack) {
+        }, onError: (error, stack) {
+          print(error);
+          print(stack);
           _error = true;
           _animate = false;
           if (mounted) {

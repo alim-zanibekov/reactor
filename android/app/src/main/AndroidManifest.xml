@@ -36,6 +36,7 @@
                     android:host="joyreactor.cc"
                     android:scheme="http" />
             </intent-filter>
+
         </activity>
 
         <!-- Don't delete the meta-data below.
@@ -44,6 +45,11 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+    <queries>
+        <intent>
+            <action android:name="android.support.customtabs.action.CustomTabsService" />
+        </intent>
+    </queries>
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />

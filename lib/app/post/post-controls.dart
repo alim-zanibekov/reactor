@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/api/api.dart';
 import '../../core/api/types.dart';
 import '../../core/auth/auth.dart';
+import '../../core/common/snack-bar.dart';
 import '../../core/parsers/types/module.dart';
 
 class AppPostControls extends StatefulWidget {
@@ -47,11 +48,11 @@ class _AppPostControlsState extends State<AppPostControls> {
       await Api().setFavorite(widget.post.id, !widget.post.favorite);
       widget.post.favorite = !widget.post.favorite;
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        widget.post.favorite
-            ? const SnackBar(content: Text('Не удалось удалить из закладок'))
-            : const SnackBar(content: Text('Не удалось добавить в закладки')),
-      );
+      SnackBarHelper.show(
+          context,
+          widget.post.favorite
+              ? 'Не удалось удалить из закладок'
+              : 'Не удалось добавить в закладки');
     } finally {
       _setNotLoading();
     }
@@ -106,7 +107,7 @@ class _AppPostControlsState extends State<AppPostControls> {
                   child: widget.post.favorite
                       ? Icon(
                           Icons.star,
-                          color: Theme.of(context).accentColor,
+                          color: Theme.of(context).colorScheme.secondary,
                           size: 22,
                         )
                       : Icon(Icons.star_border, size: 22),

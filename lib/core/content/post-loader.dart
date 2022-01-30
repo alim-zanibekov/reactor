@@ -35,7 +35,7 @@ class PostLoader extends Loader<Post> {
   final List<Post> _posts = [];
   final Set<int?> _postIds = Set();
 
-  bool get complete => (_pages.last.isLast ?? false) || _complete;
+  bool get complete => _complete;
 
   ContentPage<Post> get firstPage => _pages.first;
 
@@ -45,8 +45,10 @@ class PostLoader extends Loader<Post> {
 
   bool _complete = false;
   bool _destroyed = false;
-  bool? _reversedPagination = false;
+  bool _reversedPagination = false;
+  bool _reversedLoading = false;
   int _postsPerPage = 10;
+  int? _startPageId;
 
   void destroy() {
     _destroyed = true;
@@ -61,7 +63,13 @@ class PostLoader extends Loader<Post> {
     _postIds.clear();
   }
 
-  Future<ContentPage<Post>> _loader() {
+  void toggleReverse({int? startPageId}) {
+    reset();
+    _reversedLoading = !_reversedLoading;
+    _startPageId = startPageId;
+  }
+
+  Future<ContentPage<Post>> _loadPage() {
     if (search) {
       return _api.search(query: query, author: author, tags: tags);
     } else if (favorite != null) {
@@ -77,7 +85,7 @@ class PostLoader extends Loader<Post> {
     }
   }
 
-  Future<ContentPage<Post>> _loaderNext(int id) {
+  Future<ContentPage<Post>> _loadPageById(int id) {
     if (search) {
       return _api.searchByPageId(id, query: query, author: author, tags: tags);
     } else if (favorite != null) {
@@ -93,19 +101,26 @@ class PostLoader extends Loader<Post> {
     }
   }
 
-  Future<List<Post>> load() async {
-    final page = await _loader();
+  Future<List<Post>> _load() async {
+    final pageId = _startPageId;
+    final page = await (pageId != null ? _loadPageById(pageId) : _loadPage());
 
-    _reversedPagination = page.reversedPagination;
+    _reversedPagination = page.reversedPagination ?? false;
     _pages.add(page);
-    page.content.forEach((post) => _postIds.add(post.id));
-    _posts.addAll(page.content);
-    if (_posts.isEmpty) {
-      _complete = true;
-    }
+    final posts = _reversedLoading ? page.content.reversed : page.content;
+
+    posts.forEach((post) => _postIds.add(post.id));
+    _posts.addAll(posts);
+    _complete = (_posts.isEmpty ||
+        ((_pages.last.isLast ?? false) && !_reversedLoading));
     _loadCount += 1;
-    _postsPerPage = page.content.length;
-    return List.of(page.content);
+    _postsPerPage = posts.length;
+
+    return List.of(posts);
+  }
+
+  Future<List<Post>> load() async {
+    return _load();
   }
 
   Future<List<Post>> loadNext() async {
@@ -114,7 +129,10 @@ class PostLoader extends Loader<Post> {
     }
     final List<Post> newPosts = [];
 
-    int id = _reversedPagination! ? _pages.last.id! - 1 : _pages.last.id! + 1;
+    final reverse = _reversedPagination ? !_reversedLoading : _reversedLoading;
+
+    int id = reverse ? _pages.last.id - 1 : _pages.last.id + 1;
+
     int i;
 
     for (i = 0;
@@ -133,21 +151,22 @@ class PostLoader extends Loader<Post> {
           Duration(milliseconds: i * 400 > 2500 ? 2500 : i * 400),
         );
 
-        final page = await _loaderNext(id);
+        final page = await _loadPageById(id);
         _postsPerPage = max(page.content.length, _postsPerPage);
         _pages.add(page);
 
-        if (page.isLast!) {
+        if (page.content.isEmpty || (page.isLast ?? false)) {
           _complete = true;
         }
+        final posts = _reversedLoading ? page.content.reversed : page.content;
 
         final pagePosts =
-            page.content.where((page) => !_postIds.contains(page.id)).toList();
+            posts.where((page) => !_postIds.contains(page.id)).toList();
         newPosts.addAll(pagePosts);
 
-        page.content.forEach((post) => _postIds.add(post.id));
+        posts.forEach((post) => _postIds.add(post.id));
 
-        id = _reversedPagination! ? id - 1 : id + 1;
+        id = reverse ? id - 1 : id + 1;
       }
     }
 

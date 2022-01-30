@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/common/clipboard.dart';
+import '../../core/common/menu.dart';
 import '../../core/parsers/types/module.dart';
 import '../comments/comments.dart';
 import '../common/open.dart';
 import '../user/user-short.dart';
 
 class PostTopControls extends StatelessWidget {
+  static InAppBrowser? browser;
+
   const PostTopControls({
     Key? key,
     required this.post,
@@ -23,6 +27,27 @@ class PostTopControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final menu = Menu(context, items: [
+      MenuItem(
+        text: 'Скопировать ссылку',
+        onSelect: () => ClipboardHelper.setClipboardData(context, post.link),
+      ),
+      MenuItem(
+        text: 'Открыть в браузере',
+        onSelect: () {
+          if (browser == null) {
+            browser = InAppBrowser();
+          }
+          browser!.openUrlRequest(
+              urlRequest: URLRequest(url: Uri.parse(post.link)));
+        },
+      ),
+      MenuItem(
+        text: 'Открыть в системном браузере',
+        onSelect: () => launch(post.link),
+      ),
+    ]);
+
     return GestureDetector(
       onTap: () {
         if (canOpenPost) {
@@ -39,33 +64,15 @@ class PostTopControls extends StatelessWidget {
               dateTime: post.dateTime,
             ),
           PopupMenuButton<int>(
-            offset: Offset(0, 100),
+            offset: const Offset(0, 50),
             padding: EdgeInsets.zero,
             tooltip: 'Меню',
             icon: Icon(
               Icons.more_vert,
               color: isDark ? Colors.grey[300] : Colors.black38,
             ),
-            itemBuilder: (context) => const [
-              PopupMenuItem(
-                value: 0,
-                child: Text('Скопировать ссылку'),
-              ),
-              PopupMenuItem(
-                value: 1,
-                child: Text('Открыть в браузере'),
-              ),
-            ],
-            onSelected: (selected) {
-              if (selected == 0) {
-                Clipboard.setData(ClipboardData(text: post.link));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Скопировано')),
-                );
-              } else {
-                ChromeSafariBrowser().open(url: post.link);
-              }
-            },
+            itemBuilder: (context) => menu.rawItems,
+            onSelected: (index) => menu.process(index),
           )
         ], mainAxisAlignment: MainAxisAlignment.spaceBetween),
       ),
@@ -154,17 +161,21 @@ class PostExpandCollapseButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: 35,
-      child: TextButton(
-        style: TextButton.styleFrom(
-          primary: isDark ? Colors.white : Colors.grey[100],
+      child: DefaultTextStyle(
+        style: TextStyle(
+          color: isDark ? Colors.white : Colors.grey[100],
         ),
-        onPressed: toggle as void Function()?,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Text(expanded ? 'Свернуть' : 'Развернуть'),
-            Icon(expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down)
-          ],
+        child: TextButton(
+          onPressed: toggle as void Function()?,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Text(expanded ? 'Свернуть' : 'Развернуть'),
+              Icon(expanded
+                  ? Icons.keyboard_arrow_up
+                  : Icons.keyboard_arrow_down)
+            ],
+          ),
         ),
       ),
     );

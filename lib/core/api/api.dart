@@ -8,6 +8,7 @@ import '../auth/auth.dart';
 import '../common/in-app-notifications-manager.dart';
 import '../common/pair.dart';
 import '../external/error-reporter.dart';
+import '../http/dio-instance.dart';
 import '../http/session.dart';
 import '../parsers/comments-parser.dart';
 import '../parsers/content-parser.dart';
@@ -32,7 +33,7 @@ class Api {
   static final _userCommentsParser = UserCommentsParser();
   static final _session = Session();
   static final _auth = Auth();
-  static final _dio = Dio();
+  static final _dio = getDioInstance();
   String _host = 'http://joyreactor.cc';
 
   factory Api() {

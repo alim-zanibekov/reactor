@@ -40,7 +40,7 @@ class UserAgent {
         return "\(appNameAndVersion()) \(deviceName()) \(deviceVersion()) \(CFNetworkVersion()) \(DarwinVersion())"
     }
     
-    static func getUserAgenet() -> String {
+    static func getUserAgent() -> String {
         return UAString().addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
     }
 }

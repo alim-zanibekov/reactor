@@ -44,7 +44,7 @@ class CommentsLoader extends Loader<PostComment> {
     if (_pages.last.isLast! || _complete) {
       return [];
     }
-    int id = _pages.last.id! + 1;
+    int id = _pages.last.id + 1;
     final page = await _api.loadUserCommentsByPageId(id, username);
     if (page.id == _pages.last.id) {
       _complete = true;

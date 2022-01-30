@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 
+import 'dio-instance.dart';
+
 class Session {
   static final Session _session = Session._internal();
 
@@ -16,7 +18,7 @@ class Session {
   String? _authToken;
   bool? _sfw = false;
 
-  Dio _dio = Dio();
+  Dio _dio = getDioInstance();
   Map<String, dynamic>? _headers;
 
   void setToken(String? token) {
@@ -72,8 +74,12 @@ class Session {
     return res;
   }
 
-  Future<Response> post(String url, dynamic data,
-      {ProgressCallback? onSendProgress, bool withoutAuth = false}) async {
+  Future<Response> post(
+    String url,
+    dynamic data, {
+    ProgressCallback? onSendProgress,
+    bool withoutAuth = false,
+  }) async {
     return _dio.post(
       url,
       data: data,
@@ -81,7 +87,7 @@ class Session {
       options: Options(
         followRedirects: false,
         validateStatus: (status) {
-          return status! < 400;
+          return status != null ? status < 400 : false;
         },
         headers: withoutAuth ? {} : _headers ?? {},
       ),

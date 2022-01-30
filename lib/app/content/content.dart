@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+import '../../core/common/clipboard.dart';
+import '../../core/common/menu.dart';
 import '../../core/common/metadata.dart';
 import '../../core/common/pair.dart';
 import '../../core/common/retry-network-image.dart';
@@ -15,27 +19,15 @@ import '../extensions/video/player.dart';
 import '../extensions/vimeo/player.dart';
 import '../extensions/youtube/player.dart';
 
-class AppContent extends StatefulWidget {
+class AppContentLoader {
   final List<ContentUnit> content;
   final void Function(List<Pair<double, Size>>)? onLoad;
-  final bool noHorizontalPadding;
-  final List<Widget>? children;
 
-  const AppContent({
-    Key? key,
+  AppContentLoader({
     required this.content,
     this.onLoad,
-    this.noHorizontalPadding = false,
-    this.children,
-  }) : super(key: key);
+  });
 
-  @override
-  _AppContentState createState() => _AppContentState();
-}
-
-class _AppContentState extends State<AppContent> {
-  static final _defaultPadding =
-      EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0);
   List<Future<OEmbedMetadata>?> _futures = [];
   List<AppNetworkImageWithRetry> _images = [];
   List<AppNetworkImageWithRetry> _imagesForGallery = [];
@@ -44,41 +36,43 @@ class _AppContentState extends State<AppContent> {
 
   late List<Future<OEmbedMetadata>> _filteredFutures;
 
-  @override
-  void initState() {
-    _getFutures();
-    super.initState();
+  bool _initialized = false;
+
+  List<Future<OEmbedMetadata>?> get futures => _futures;
+
+  List<AppNetworkImageWithRetry> get images => _images;
+
+  List<AppNetworkImageWithRetry> get imagesForGallery => _imagesForGallery;
+
+  init() {
+    if (!_initialized) {
+      _initialized = true;
+      _initialize();
+    }
+  }
+
+  destroy() {
+    if (_initialized) {
+      _initialized = false;
+      [..._images, ..._imagesForGallery].forEach((it) {
+        it.cancel();
+      });
+    }
   }
 
   _onLoad(List<Pair<double, Size>> arg) {
-    if (widget.onLoad != null) {
-      widget.onLoad!(arg);
+    if (onLoad != null) {
+      onLoad!(arg);
     }
   }
 
-  _fillGalleryImage(index) {
-    if (index != null) {
-      List<ContentUnitImage> images = widget.content
-          .where((element) => element is ContentUnitImage)
-          .toList()
-          .cast();
-      if (images[index].prettyImageLink != null &&
-          _imagesForGallery[index].url != images[index].prettyImageLink) {
-        _imagesForGallery[index] = AppNetworkImageWithRetry(
-          images[index].prettyImageLink!,
-          headers: Headers.reactorHeaders,
-        );
-      }
-    }
-  }
-
-  _getFutures() async {
+  _initialize() {
     _images = [];
     _futures = [];
     _undefinedSizeImagesCount = 0;
     _undefinedSizeImages = [];
 
-    for (final entry in widget.content) {
+    for (final entry in content) {
       if (entry is ContentUnitImage) {
         final imageProvider = AppNetworkImageWithRetry(
           entry.value,
@@ -131,12 +125,11 @@ class _AppContentState extends State<AppContent> {
     _imagesForGallery = List.from(_images);
   }
 
-  void _onImageInfo(ImageInfo imageInfo, ContentUnitImage image) {
+  bool onImageInfo(ImageInfo imageInfo, ContentUnitImage image) {
     if (_undefinedSizeImages.isNotEmpty &&
         _undefinedSizeImages.contains(image)) {
       image.height = imageInfo.image.height.toDouble();
       image.width = imageInfo.image.width.toDouble();
-      if (mounted) setState(() {});
       _undefinedSizeImagesCount -= 1;
       if (_undefinedSizeImagesCount == 0) {
         final imageSizes = _undefinedSizeImages
@@ -156,7 +149,52 @@ class _AppContentState extends State<AppContent> {
           _onLoad(imageSizes);
         }
       }
+      return true;
     }
+    return false;
+  }
+
+  fillGalleryImage(index) {
+    if (index != null) {
+      List<ContentUnitImage> images = content
+          .where((element) => element is ContentUnitImage)
+          .toList()
+          .cast();
+      if (images[index].prettyImageLink != null &&
+          _imagesForGallery[index].url != images[index].prettyImageLink) {
+        _imagesForGallery[index] = AppNetworkImageWithRetry(
+          images[index].prettyImageLink!,
+          headers: Headers.reactorHeaders,
+        );
+      }
+    }
+  }
+}
+
+class AppContent extends StatefulWidget {
+  final bool noHorizontalPadding;
+  final List<Widget>? children;
+  final AppContentLoader loader;
+
+  AppContent({
+    Key? key,
+    required this.loader,
+    this.noHorizontalPadding = false,
+    this.children,
+  }) : super(key: key);
+
+  @override
+  _AppContentState createState() => _AppContentState();
+}
+
+class _AppContentState extends State<AppContent> {
+  static final _defaultPadding =
+      EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0);
+
+  @override
+  void initState() {
+    widget.loader.init();
+    super.initState();
   }
 
   @override
@@ -171,7 +209,7 @@ class _AppContentState extends State<AppContent> {
     int imagesIndex = 0;
     int futuresIndex = 0;
 
-    for (final entry in widget.content) {
+    for (final entry in widget.loader.content) {
       if (entry is ContentUnitText) {
         textStack.add(entry);
       } else if (textStack.isNotEmpty) {
@@ -182,7 +220,7 @@ class _AppContentState extends State<AppContent> {
         textStack.clear();
       }
 
-      if (widget.content.last == entry && textStack.isEmpty) {
+      if (widget.loader.content.last == entry && textStack.isEmpty) {
         dPadding = dPadding.copyWith(bottom: 0);
       }
 
@@ -208,7 +246,7 @@ class _AppContentState extends State<AppContent> {
           child: AppYouTubePlayer(
             videoId: entry.value,
             metadata: entry.metadata,
-            futureMetadata: _futures[futuresIndex],
+            futureMetadata: widget.loader.futures[futuresIndex],
           ),
         ));
 
@@ -220,7 +258,7 @@ class _AppContentState extends State<AppContent> {
           child: AppCoubPlayer(
             videoId: entry.value,
             metadata: entry.metadata,
-            futureMetadata: _futures[futuresIndex],
+            futureMetadata: widget.loader.futures[futuresIndex],
           ),
         ));
 
@@ -232,7 +270,7 @@ class _AppContentState extends State<AppContent> {
           child: AppVimeoPlayer(
             videoId: entry.value,
             metadata: entry.metadata,
-            futureMetadata: _futures[futuresIndex],
+            futureMetadata: widget.loader.futures[futuresIndex],
           ),
         ));
 
@@ -265,35 +303,23 @@ class _AppContentState extends State<AppContent> {
   }
 
   Widget _buildGif(ContentUnitGif entry, BuildContext context) {
-    final RenderBox? overlay =
-        Overlay.of(context)!.context.findRenderObject() as RenderBox?;
     Offset pos = Offset.zero;
+    final menu = Menu(context, items: [
+      if (entry.gifUrl != null)
+        MenuItem(
+            text: "Скачать как гиф",
+            onSelect: () {
+              SaveFile.downloadAndSave(context, entry.gifUrl!);
+            }),
+      MenuItem(
+          text: "Скачать как видео",
+          onSelect: () {
+            SaveFile.downloadAndSave(context, entry.value);
+          }),
+    ]);
     return GestureDetector(
       onLongPress: () {
-        showMenu(
-          position: RelativeRect.fromRect(
-            pos & Size(40, 40), // smaller rect, the touch area
-            Offset.zero & overlay!.size, // Bigger rect, the entire screen
-          ),
-          context: context,
-          items: [
-            if (entry.gifUrl != null)
-              PopupMenuItem(
-                child: Text("Скачать как гиф"),
-                value: 1,
-              ),
-            PopupMenuItem(
-              child: Text("Скачать как видео"),
-              value: 2,
-            ),
-          ],
-          elevation: 8.0,
-        ).then<void>((dynamic delta) async {
-          if (delta != null) {
-            final String url = (delta == 1) ? entry.gifUrl! : entry.value;
-            SaveFile.downloadAndSave(context, url);
-          }
-        });
+        menu.openUnderTap(pos);
       },
       onTapDown: (TapDownDetails e) {
         pos = e.globalPosition;
@@ -307,53 +333,42 @@ class _AppContentState extends State<AppContent> {
   }
 
   Widget _buildImage(ContentUnitImage image, BuildContext context, int index) {
-    final RenderBox? overlay =
-        Overlay.of(context)!.context.findRenderObject() as RenderBox?;
     Offset pos = Offset.zero;
+    final menu = Menu(context, items: [
+      MenuItem(
+          text: "Открыть в хорошем качестве",
+          onSelect: () {
+            widget.loader.fillGalleryImage(index);
+            openImage(context, widget.loader.imagesForGallery, index);
+          }),
+      MenuItem(
+          text: "Скачать",
+          onSelect: () {
+            SaveFile.downloadAndSave(
+                context, image.prettyImageLink ?? image.value);
+          }),
+    ]);
     return GestureDetector(
       onLongPress: () {
-        showMenu(
-          position: RelativeRect.fromRect(
-            pos & Size(40, 40), // smaller rect, the touch area
-            Offset.zero & overlay!.size, // Bigger rect, the entire screen
-          ),
-          context: context,
-          items: [
-            PopupMenuItem(
-              child: Text("Открыть в хорошем качестве"),
-              value: 1,
-            ),
-            PopupMenuItem(
-              child: Text("Скачать"),
-              value: 2,
-            ),
-          ],
-          elevation: 8.0,
-        ).then<void>((dynamic delta) {
-          if (delta == 1) {
-            _fillGalleryImage(index);
-            openImage(context, _imagesForGallery, index);
-          } else if (delta == 2) {
-            SaveFile.downloadAndSave(
-              context,
-              image.prettyImageLink ?? image.value,
-            );
-          }
-        });
+        menu.openUnderTap(pos);
       },
       onTapDown: (TapDownDetails e) {
         pos = e.globalPosition;
       },
       onTap: () {
-        openImage(context, _imagesForGallery, index);
+        openImage(context, widget.loader.imagesForGallery, index);
       },
       child: AspectRatio(
         aspectRatio: (image.width != null && image.height != null)
             ? image.width! / image.height!
             : 9.0 / 16.0,
         child: AppSafeImage(
-          imageProvider: _images[index],
-          onInfo: (e) => _onImageInfo(e, image),
+          imageProvider: widget.loader.images[index],
+          onInfo: (e) {
+            if (widget.loader.onImageInfo(e, image)) {
+              if (mounted) setState(() {});
+            }
+          },
         ),
       ),
     );
@@ -388,8 +403,27 @@ class _AppContentState extends State<AppContent> {
 
       TapGestureRecognizer? recognizer;
       if (text is ContentUnitLink) {
+        Timer? timer;
+        final menu = Menu(context, items: [
+          MenuItem(
+            text: "Скопировать",
+            onSelect: () {
+              ClipboardHelper.setClipboardData(context, text.link);
+            },
+          )
+        ]);
         recognizer = TapGestureRecognizer()
-          ..onTap = () => goToLinkOrOpen(context, text.link!);
+          ..onTapDown = (e) {
+            timer = Timer(Duration(milliseconds: 350), () {
+              menu.openUnderTap(e.globalPosition);
+            });
+          }
+          ..onTapUp = (_) {
+            if (timer?.isActive == true) {
+              timer!.cancel();
+              goToLinkOrOpen(context, text.link!);
+            }
+          };
       }
 
       TextDecoration decoration = TextDecoration.none;
@@ -422,12 +456,13 @@ class _AppContentState extends State<AppContent> {
     }
     return Align(
       alignment: Alignment.centerLeft,
-      child: RichText(
-        text: TextSpan(
+      child: SelectableText.rich(
+        TextSpan(
           text: '',
           style: DefaultTextStyle.of(context).style,
           children: result,
         ),
+        scrollPhysics: const NeverScrollableScrollPhysics(),
       ),
     );
   }

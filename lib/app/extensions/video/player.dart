@@ -10,7 +10,7 @@ import '../../../core/widgets/onerror-reload.dart';
 import '../../../variables.dart';
 
 class AppVideoPlayer extends StatefulWidget {
-  final String? url;
+  final String url;
   final double aspectRatio;
 
   AppVideoPlayer({Key? key, required this.url, this.aspectRatio = 16.0 / 9.0})
@@ -88,7 +88,7 @@ class _AppVideoPlayerState extends State<AppVideoPlayer> {
 
     if (mounted) {
       _controller = VideoPlayerController.network(
-        widget.url!,
+        widget.url,
         httpHeaders: Headers.videoHeaders,
         maxCacheSize: 200 << 20,
         maxFileSize: 10 << 20,

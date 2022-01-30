@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/common/snack-bar.dart';
 import '../../core/parsers/link-parser.dart';
 import '../../core/parsers/types/module.dart';
 import '../image-gallery/image-gallery.dart';
@@ -151,8 +152,6 @@ goToLink(BuildContext context, String link) {
   } else if (parsed is UserLink) {
     openUser(context, parsed.username, parsed.link, animate: false);
   } else {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Ссылка не распознана'),
-    ));
+    SnackBarHelper.show(context, 'Ссылка не распознана');
   }
 }

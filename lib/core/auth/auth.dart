@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../external/sentry.dart';
+import '../http/dio-instance.dart';
 import '../http/session.dart';
 import 'types.dart';
 
@@ -21,7 +22,7 @@ class Auth {
 
   Auth._internal();
 
-  final _dio = Dio();
+  final _dio = getDioInstance();
 
   String? _token;
   String? _username;

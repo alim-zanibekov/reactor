@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -55,7 +57,7 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
     super.dispose();
   }
 
-  Color? _getColor(int? commentId) {
+  Color? _getColor(int commentId) {
     if (commentId == widget.commentId) {
       return Theme.of(context).colorScheme.secondary.withOpacity(0.2);
     }
@@ -72,7 +74,7 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
   Widget _list() {
     List<Widget> children = [];
     late List<AppComment> comments;
-    if (_post!.comments == null) {
+    if (_post?.comments == null) {
       children.add(SizedBox(
         height: MediaQuery.of(context).size.height,
         child: FadeIcon(
@@ -82,7 +84,7 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
       ));
     } else {
       comments = AppComments.getCommentsList(
-        comments: _post!.comments ?? [],
+        comments: _post?.comments ?? [],
         showAnswer: true,
         goTo: (e) {
           int i = comments.indexWhere((element) => element.comment.id == e);
@@ -128,8 +130,7 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
             onPage: true,
             loadContent: () async {
               try {
-                if (widget.loadContent != null) widget.loadContent!();
-
+                widget.loadContent?.call();
                 final post = await Api().loadPostContent(_post!.id);
                 _post = post;
                 if (mounted) setState(() {});
@@ -155,7 +156,8 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
       body: Column(
         children: [
           AppBar(
-            primary: false,
+            primary: Platform.isIOS,
+            // https://github.com/flutter/flutter/issues/70165
             title: const Text('Пост'),
           ),
           Expanded(

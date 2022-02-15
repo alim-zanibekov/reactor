@@ -67,9 +67,7 @@ class _AppTagHeaderState extends State<AppTagHeader> {
       await Api().setTagBlock(_pageInfo.tagId, !_pageInfo.blocked);
       _pageInfo.blocked = !_pageInfo.blocked;
       _pageInfo.subscribed = false;
-      if (widget.onBlock != null) {
-        widget.onBlock!();
-      }
+      widget.onBlock?.call();
     } on Exception {
       ScaffoldMessenger.of(context).showSnackBar(
         _pageInfo.blocked

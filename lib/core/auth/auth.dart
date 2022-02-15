@@ -39,11 +39,15 @@ class Auth {
   Future init() {
     return SharedPreferences.getInstance().then((prefs) {
       if (prefs.getBool('auth') ?? false) {
-        _token = prefs.getString('auth-token');
-        _username = prefs.getString('username');
-        _sentryReporter.setUserContext(_username!);
-        _session.setToken(_token);
-        _authorized = true;
+        final token = prefs.getString('auth-token');
+        final username = prefs.getString('username');
+        if (token != null && username != null) {
+          _token = token;
+          _username = username;
+          _sentryReporter.setUserContext(username);
+          _session.setToken(token);
+          _authorized = true;
+        }
       }
     });
   }
@@ -73,7 +77,7 @@ class Auth {
       final token = _parseTokenHeader(res);
       if (token != null && token != _token) {
         _token = token;
-        _session.setToken(_token);
+        _session.setToken(token);
         SharedPreferences.getInstance()
             .then((prefs) => prefs.setString('auth-token', token));
       }
@@ -115,7 +119,7 @@ class Auth {
       final res = await _dio.get(
         'http://joyreactor.cc/login',
         options: Options(
-          validateStatus: (status) => status! < 400,
+          validateStatus: (status) => (status ?? 0) < 400,
           headers: {
             'Connection': 'keep-alive',
             'Cookie': 'joyreactor_sess3=$sessionToken; jr_jwt=$jwt'
@@ -138,7 +142,7 @@ class Auth {
 
       _token = token;
       _authorized = true;
-      _session.setToken(_token);
+      _session.setToken(token);
       _username = username;
       _authState.add(authorized);
 

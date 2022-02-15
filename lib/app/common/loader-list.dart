@@ -10,14 +10,14 @@ class AppLoaderList<T> extends StatefulWidget {
   final void Function(double delta)? onScrollChange;
   final PageStorageKey? pageStorageKey;
   final ChangeNotifier? reloadNotifier;
-  final Widget Function(BuildContext context, T element)? builder;
+  final Widget Function(BuildContext context, T element) builder;
 
   const AppLoaderList({
     Key? key,
     required this.loader,
     this.pageStorageKey,
     this.onScrollChange,
-    this.builder,
+    required this.builder,
     this.reloadNotifier,
   }) : super(key: key);
 
@@ -29,7 +29,7 @@ class _AppLoaderListState<T> extends State<AppLoaderList<T>>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final _pageKey = GlobalKey();
 
-  ScrollController? _scrollController;
+  late ScrollController _scrollController;
   double _scrollPrevious = 0;
 
   List<T>? _elements;
@@ -40,21 +40,21 @@ class _AppLoaderListState<T> extends State<AppLoaderList<T>>
   @override
   void initState() {
     _scrollController = ScrollController();
-    _scrollController!.addListener(_onScrollChange);
+    _scrollController.addListener(_onScrollChange);
     widget.reloadNotifier?.addListener(_reload);
     super.initState();
   }
 
   @override
   void dispose() {
-    _scrollController!.dispose();
+    _scrollController.dispose();
     widget.reloadNotifier?.removeListener(_reload);
     super.dispose();
   }
 
   void _reload() {
     _elements = null;
-    _scrollController!.jumpTo(0);
+    _scrollController.jumpTo(0);
     Future.microtask(() {
       AppFuturePageState? appFuturePageState =
           _pageKey.currentState as AppFuturePageState<dynamic>?;
@@ -63,8 +63,8 @@ class _AppLoaderListState<T> extends State<AppLoaderList<T>>
   }
 
   void _onScrollChange() {
-    widget.onScrollChange!(_scrollController!.offset - _scrollPrevious);
-    _scrollPrevious = _scrollController!.offset;
+    widget.onScrollChange?.call(_scrollController.offset - _scrollPrevious);
+    _scrollPrevious = _scrollController.offset;
   }
 
   Widget _itemBuilder(context, index, error) {
@@ -83,8 +83,8 @@ class _AppLoaderListState<T> extends State<AppLoaderList<T>>
       );
     }
     if (_showHeader) index = index - 1;
-    if (index < _elements!.length) {
-      return widget.builder!(context, _elements![index]);
+    if (index < (_elements?.length ?? 0)) {
+      return widget.builder(context, _elements![index]);
     } else {
       if (error) {
         return AppOnErrorReloadExpanded(
@@ -101,7 +101,7 @@ class _AppLoaderListState<T> extends State<AppLoaderList<T>>
           padding: EdgeInsets.all(10),
           child: Center(
             child: Text(
-              _elements!.isNotEmpty
+              _elements?.isNotEmpty ?? false
                   ? 'Больше тут ничего нет'
                   : 'Тут ничего нет',
             ),
@@ -142,8 +142,8 @@ class _AppLoaderListState<T> extends State<AppLoaderList<T>>
 
         await (isFirst ? widget.loader.load() : widget.loader.loadNext());
 
-        if (isFirst && _scrollController!.hasClients) {
-          _scrollController!.jumpTo(0);
+        if (isFirst && _scrollController.hasClients) {
+          _scrollController.jumpTo(0);
         }
 
         _elements = widget.loader.elements;
@@ -165,7 +165,7 @@ class _AppLoaderListState<T> extends State<AppLoaderList<T>>
           controller: _scrollController,
           physics: const ClampingScrollPhysics(),
           itemBuilder: (ctx, i) => _itemBuilder(ctx, i, hasError),
-          itemCount: _elements!.length + (_showHeader ? 2 : 1),
+          itemCount: (_elements?.length ?? 0) + (_showHeader ? 2 : 1),
         );
       },
     );

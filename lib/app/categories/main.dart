@@ -88,7 +88,7 @@ class AppCategoriesMain extends StatelessWidget {
             padding: const EdgeInsets.only(left: 5, top: 2),
             child: Text(title, style: style.copyWith(fontSize: 18)),
           ),
-          if (!tag.isMain! && tag.value != 'anon' && tag.value != 'политота')
+          if (!tag.isMain && tag.value != 'anon' && tag.value != 'политота')
             SizedBox(
               height: 30,
               child: OutlinedButton(

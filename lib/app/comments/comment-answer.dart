@@ -40,9 +40,7 @@ class _AppCommentAnswerState extends State<AppCommentAnswer> {
           print(_progressSend);
         }),
       );
-      if (widget.onSend != null) {
-        widget.onSend!();
-      }
+      widget.onSend?.call();
       _controller.text = '';
     } on Exception {
       SnackBarHelper.show(context, 'Произошла ошибка при загрузке');
@@ -116,7 +114,7 @@ class _AppCommentAnswerState extends State<AppCommentAnswer> {
 
                   final result = await FilePicker.platform
                       .pickFiles(type: FileType.image, allowMultiple: false);
-                  if (result != null) {
+                  if (result != null && result.files.single.path != null) {
                     _file = File(result.files.single.path!);
                   }
                   setState(() {});

@@ -132,7 +132,7 @@ class UserParser {
       (element?.querySelectorAll('a') ?? [])
           .map((e) => UserTag(
                 e.text.trim(),
-                weight: -Utils.getNumberDouble(e.attributes['style'])!,
+                weight: Utils.getNumberDouble(e.attributes['style']),
                 isMain: Tag.parseIsMain(e.attributes['href']),
                 prefix: Tag.parsePrefix(e.attributes['href']),
                 link: Tag.parseLink(e.attributes['href']),

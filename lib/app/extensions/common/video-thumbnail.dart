@@ -11,7 +11,7 @@ class VideoThumbnail extends StatelessWidget {
 
   const VideoThumbnail({
     Key? key,
-    required this.imageUrl,
+    this.imageUrl,
     required this.aspectRatio,
     required this.icon,
     required this.onPlay,
@@ -32,7 +32,7 @@ class VideoThumbnail extends StatelessWidget {
           color: const Color.fromRGBO(0, 0, 0, 0.1),
           child: Center(
             child: GestureDetector(
-              onTap: onPlay as void Function()?,
+              onTap: () => onPlay(),
               child: Image(image: icon, width: 64, height: 64),
             ),
           ),

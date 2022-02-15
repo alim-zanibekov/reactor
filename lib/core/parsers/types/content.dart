@@ -103,8 +103,8 @@ class ContentTextInfo {
 }
 
 class ContentUnitLink extends ContentUnitText {
-  String? link;
+  String link;
 
-  ContentUnitLink(String value, {style, size, this.link})
+  ContentUnitLink(String value, {style, size, required this.link})
       : super(value, style: style, size: size);
 }

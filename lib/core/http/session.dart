@@ -16,17 +16,17 @@ class Session {
   get apiToken => _apiToken;
 
   String? _authToken;
-  bool? _sfw = false;
+  bool _sfw = false;
 
   Dio _dio = getDioInstance();
   Map<String, dynamic>? _headers;
 
-  void setToken(String? token) {
+  void setToken(String token) {
     _authToken = token;
     _generateCookie();
   }
 
-  void setSFW(bool? state) {
+  void setSFW(bool state) {
     _sfw = state;
     _generateCookie();
   }
@@ -43,7 +43,7 @@ class Session {
       cookie = 'joyreactor_sess3=$_authToken';
     }
 
-    if (_sfw!) {
+    if (_sfw) {
       cookie += (_authToken != null ? ';' : '') + 'sfw=1';
     }
 

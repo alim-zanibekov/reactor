@@ -7,7 +7,9 @@ import 'utils.dart';
 class StatsParser {
   Stats parse(String content) {
     final parsedPage = parser.parse(content);
-    final sidebar = parsedPage.getElementById('sidebar')!;
+    final sidebar = parsedPage.getElementById('sidebar');
+
+    if (sidebar == null) throw Exception("Invalid page without sidebar");
 
     final tagsWeekBlock = sidebar.querySelector('#blogs_week_content');
     final tagsAllTimeBlock = sidebar.querySelector('#blogs_alltime_content');
@@ -45,20 +47,10 @@ class StatsParser {
     return Stats(
       weekComments: weekComments,
       weekTags: weekTags,
-      weekUsers: weekUsers != null
-          ? [
-              for (var i in weekUsers)
-                if (i != null) i
-            ]
-          : null,
+      weekUsers: weekUsers?.whereType<StatsUser>().toList(),
       twoDayComments: twoDayComments,
       twoDayTags: twoDayTags,
-      monthUsers: monthUsers != null
-          ? [
-              for (var i in monthUsers)
-                if (i != null) i
-            ]
-          : null,
+      monthUsers: monthUsers?.whereType<StatsUser>().toList(),
       allTimeTags: allTimeTags,
       trends: trends,
     );
@@ -110,8 +102,8 @@ class StatsParser {
         if (e.localName == 'div') {
           final href =
               (e.querySelector('a')?.attributes ?? {})['href']?.split('#');
-          final id = Utils.getNumberInt(href?.last)!.toInt();
-          final postId = Utils.getNumberInt(href?.first)!.toInt();
+          final id = Utils.getNumberInt(href?.last);
+          final postId = Utils.getNumberInt(href?.first);
           final rating = Utils.getNumberDouble(element.nodes[i + 1].text);
           final linkElement =
               (element.nodes[i + 2] as Element).querySelector('a');
@@ -148,6 +140,7 @@ class StatsParser {
         ratingDelta: rating,
       );
     }
+    return null;
   }
 
   static Element? getBlockByName(List<Element> elements, String header) {

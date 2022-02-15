@@ -136,13 +136,16 @@ class _AppUserPageState extends State<AppUserPage>
             loader: _loaderUserFavorite,
           );
 
-        return AppPostList(
-          pageStorageKey:
-              PageStorageKey<String>(widget.username + index.toString()),
-          onScrollChange: onScrollChange,
-          reloadNotifier: onReloadPress,
-          loader: _loaderUserSubs!,
-        );
+        if (index == 4 && _loaderUserSubs != null)
+          return AppPostList(
+            pageStorageKey:
+                PageStorageKey<String>(widget.username + index.toString()),
+            onScrollChange: onScrollChange,
+            reloadNotifier: onReloadPress,
+            loader: _loaderUserSubs!,
+          );
+
+        return Container();
       },
     );
   }
@@ -169,17 +172,15 @@ class _AppUserLoader extends StatefulWidget {
 class _AppUserLoaderState extends State<_AppUserLoader>
     with AutomaticKeepAliveClientMixin {
   final _pageKey = GlobalKey();
-  ScrollController? _scrollController;
+  late ScrollController _scrollController;
   double _scrollPrevious = 0;
 
   @override
   void initState() {
     _scrollController = ScrollController();
-    _scrollController!.addListener(() {
-      if (widget.onScrollChange != null) {
-        widget.onScrollChange!(_scrollController!.offset - _scrollPrevious);
-      }
-      _scrollPrevious = _scrollController!.offset;
+    _scrollController.addListener(() {
+      widget.onScrollChange?.call(_scrollController.offset - _scrollPrevious);
+      _scrollPrevious = _scrollController.offset;
     });
     widget.reloadNotifier?.addListener(_reload);
     super.initState();
@@ -187,7 +188,7 @@ class _AppUserLoaderState extends State<_AppUserLoader>
 
   @override
   void dispose() {
-    _scrollController!.dispose();
+    _scrollController.dispose();
     widget.reloadNotifier?.removeListener(_reload);
     super.dispose();
   }
@@ -196,7 +197,7 @@ class _AppUserLoaderState extends State<_AppUserLoader>
   bool get wantKeepAlive => true;
 
   void _reload() {
-    _scrollController!.jumpTo(0);
+    _scrollController.jumpTo(0);
     Future.microtask(() {
       AppFuturePageState? appFuturePageState =
           _pageKey.currentState as AppFuturePageState<dynamic>?;
@@ -271,37 +272,46 @@ class _AppUserState extends State<AppUser> {
             child: AppShortUser(user: user.toShort(), size: 50),
           ),
           const Divider(),
-          Padding(
-            padding: _defaultPadding,
-            child: AppUserAwards(
-              awards: user.awards,
+          if (user.awards?.isNotEmpty == true)
+            Padding(
+              padding: _defaultPadding,
+              child: AppUserAwards(
+                awards: user.awards ?? const [],
+              ),
             ),
-          ),
           Padding(padding: _defaultPadding, child: AppUserRating(user: user)),
-          if (user.activeIn != null && user.activeIn!.isNotEmpty)
+          if (user.activeIn?.isNotEmpty == true)
             _wrapWithTitle(
               'Активный участник',
               AppUserMainTags(
-                tags: user.activeIn,
+                tags: user.activeIn ?? const [],
                 defaultPadding: _defaultPadding,
               ),
               childPadding: false,
             ),
-          if (user.moderating != null && user.moderating!.isNotEmpty)
-            _wrapWithTitle('Модерирует', AppUserTags(tags: user.moderating)),
-          if (user.subscriptions != null && user.subscriptions!.isNotEmpty)
-            _wrapWithTitle('Читает', AppUserTags(tags: user.subscriptions)),
-          if (user.ignore != null && user.ignore!.isNotEmpty)
-            _wrapWithTitle('Не читает', AppUserTags(tags: user.ignore)),
-          if (user.subscriptions != null && user.subscriptions!.isNotEmpty)
+          if (user.moderating?.isNotEmpty == true)
+            _wrapWithTitle(
+              'Модерирует',
+              AppUserTags(tags: user.moderating ?? const []),
+            ),
+          if (user.subscriptions?.isNotEmpty == true)
+            _wrapWithTitle(
+              'Читает',
+              AppUserTags(tags: user.subscriptions ?? const []),
+            ),
+          if (user.ignore?.isNotEmpty == true)
+            _wrapWithTitle(
+              'Не читает',
+              AppUserTags(tags: user.ignore ?? const []),
+            ),
+          if (user.subscriptions?.isNotEmpty == true && user.tagCloud != null)
             _wrapWithTitle(
               'Темы постов',
-              AppUserTags(
-                tags: user.tagCloud,
-                canHide: false,
-              ),
+              AppUserTags(tags: user.tagCloud ?? const [], canHide: false),
             ),
-          _wrapWithTitle('Статистика', AppUserStats(stats: user.stats)),
+          if (user.stats != null)
+            _wrapWithTitle(
+                'Статистика', AppUserStats(stats: user.stats!)),
           const SizedBox(height: 20)
         ],
       ),

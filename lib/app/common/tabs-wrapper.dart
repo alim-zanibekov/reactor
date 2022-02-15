@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../home.dart';
@@ -35,7 +37,7 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
   double _appBarHeight = 100;
   double _minAppBarHeight = 48;
   double _maxAppBarHeight = 100;
-  TabController? _tabController;
+  late TabController _tabController;
   late List<ReloadNotifier> _reloadNotifiers;
 
   @override
@@ -54,7 +56,7 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
       AppPages.appBottomBarState.add(AppBottomBarState.VISIBLE);
     }
     _reloadNotifiers.forEach((e) => e.dispose());
-    _tabController!.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -90,7 +92,8 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
       initialIndex: widget.initialIndex ?? 0,
       length: widget.tabs.length,
       child: Scaffold(
-        primary: false,
+        primary: Platform.isIOS,
+        // https://github.com/flutter/flutter/issues/70165
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(_appBarHeight),
           child: buildAppBar(context),
@@ -117,7 +120,7 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
       child: IconButton(
         padding: EdgeInsets.zero,
         onPressed: () {
-          _reloadNotifiers[_tabController!.index].notify();
+          _reloadNotifiers[_tabController.index].notify();
         },
         icon: const Icon(Icons.refresh, size: 22),
       ),
@@ -146,7 +149,8 @@ class _AppTabsWrapperState extends State<AppTabsWrapper>
     }
 
     return AppBar(
-      primary: false,
+      primary: Platform.isIOS,
+      // https://github.com/flutter/flutter/issues/70165
       automaticallyImplyLeading: false,
       leading: leading,
       title: Transform.translate(

@@ -35,7 +35,7 @@ class ChipsInput<T> extends StatefulWidget {
     required this.findSuggestions,
     required this.onChanged,
     this.onChipTapped,
-    this.maxChips,
+    required this.maxChips,
     this.textStyle,
     this.suggestionsBoxMaxHeight,
     this.inputType = TextInputType.text,
@@ -50,7 +50,7 @@ class ChipsInput<T> extends StatefulWidget {
     this.allowChipEditing = false,
     this.focusNode,
     this.initialSuggestions,
-  })  : assert(maxChips == null || initialValue.length <= maxChips),
+  })  : assert(initialValue.length <= maxChips),
         super(key: key);
 
   final InputDecoration decoration;
@@ -63,7 +63,7 @@ class ChipsInput<T> extends StatefulWidget {
   final ChipsBuilder<T> chipBuilder;
   final ChipsBuilder<T> suggestionBuilder;
   final List<T> initialValue;
-  final int? maxChips;
+  final int maxChips;
   final double? suggestionsBoxMaxHeight;
   final TextInputType inputType;
   final TextOverflow textOverflow;
@@ -109,8 +109,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
 
   bool get _hasInputConnection => _textInputConnection?.attached ?? false;
 
-  bool get _hasReachedMaxChips =>
-      widget.maxChips != null && _chips.length >= widget.maxChips!;
+  bool get _hasReachedMaxChips => _chips.length >= widget.maxChips;
 
   late FocusNode _focusNode;
   late FocusAttachment _nodeAttachment;
@@ -205,7 +204,8 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
           stream: _suggestionsStreamController.stream,
           initialData: _suggestions,
           builder: (context, snapshot) {
-            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+            final data = snapshot.data;
+            if (snapshot.hasData && data != null && data.isNotEmpty) {
               final suggestionsListView = Material(
                 elevation: 0,
                 child: ConstrainedBox(
@@ -215,7 +215,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
                   child: ListView.builder(
                     shrinkWrap: true,
                     padding: EdgeInsets.zero,
-                    itemCount: snapshot.data!.length,
+                    itemCount: data.length,
                     itemBuilder: (BuildContext context, int index) {
                       return widget.suggestionBuilder(
                         context,
@@ -278,7 +278,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
   void _openInputConnection() {
     if (!_hasInputConnection) {
       _textInputConnection = TextInput.attach(this, textInputConfiguration);
-      _textInputConnection!.show();
+      _textInputConnection?.show();
       _updateTextInputState();
     } else {
       _textInputConnection?.show();
@@ -308,7 +308,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
 
   void _closeInputConnectionIfNeeded() {
     if (_hasInputConnection) {
-      _textInputConnection!.close();
+      _textInputConnection?.close();
       _textInputConnection = null;
     }
   }
@@ -370,7 +370,7 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
       case TextInputAction.go:
       case TextInputAction.send:
       case TextInputAction.search:
-        if (_suggestions != null && _suggestions!.isNotEmpty) {
+        if (_suggestions != null && _suggestions?.isNotEmpty == true) {
           selectSuggestion(_suggestions!.first);
         } else {
           _focusNode.unfocus();
@@ -508,7 +508,7 @@ class SuggestionsBoxController {
     // debugPrint("Closing suggestion box");
     if (!_isOpened) return;
     assert(overlayEntry != null);
-    overlayEntry!.remove();
+    overlayEntry?.remove();
     _isOpened = false;
   }
 

@@ -15,12 +15,16 @@ class PostsParser {
 
   Post parsePost(int id, String c) {
     final parsedPage = parser.parse(c);
-    return _parse(id, parsedPage.querySelector('.postContainer')!, true);
+    final body = parsedPage.querySelector('.postContainer');
+    if (body == null) throw Exception("Invalid post page");
+    return _parse(id, body, true);
   }
 
   Post parseInner(int id, String c) {
     final parsedPage = parser.parse(c);
-    return _parse(id, parsedPage.body!, false);
+    final body = parsedPage.body;
+    if (body == null) throw Exception("Invalid post page");
+    return _parse(id, body, false);
   }
 
   Post _parse(int id, Element parsedPage, bool parseComments) {
@@ -33,17 +37,18 @@ class PostsParser {
     } else {
       content = _contentParser.parse(contentBlock);
     }
-    final footer = parsedPage.querySelector('.ufoot')!;
+    final footer = parsedPage.querySelector('.ufoot');
 
-    final ratingContainer = footer.querySelector('.post_rating')!;
+    final ratingContainer = footer?.querySelector('.post_rating');
 
-    final rating = _parseRating(ratingContainer);
+    final rating =
+        ratingContainer != null ? _parseRating(ratingContainer) : null;
     final quiz = _quizParser.parseQuizFromPost(parsedPage);
     final votedUp =
-        ratingContainer.querySelector('.vote-minus.vote-change') != null;
+        ratingContainer?.querySelector('.vote-minus.vote-change') != null;
     final votedDown =
-        ratingContainer.querySelector('.vote-plus.vote-change') != null;
-    final canVote = ratingContainer.querySelector('.vote-plus') != null;
+        ratingContainer?.querySelector('.vote-plus.vote-change') != null;
+    final canVote = ratingContainer?.querySelector('.vote-plus') != null;
     final comments = parseComments
         ? _commentsParser.parsePostComments(parsedPage, id)
         : null;
@@ -51,17 +56,17 @@ class PostsParser {
     final user = _parseUser(parsedPage);
     final dateTime = _parseDate(parsedPage);
     final favorite = _parseFavorite(parsedPage);
-    final commentsCount = int.parse(parsedPage
-        .querySelector('.toggleComments')!
-        .text
+    final commentsCount = Utils.getNumberInt(parsedPage
+        .querySelector('.toggleComments')
+        ?.text
         .replaceAll(RegExp(r'[^0-9]+'), ''));
 
     final hidden =
-        (footer.querySelector('.hidden_link a')?.attributes ?? {})['href']
+        (footer?.querySelector('.hidden_link a')?.attributes ?? {})['href']
             ?.contains('delete');
 
     final unsafe = contentBlock?.children.length == 1 &&
-        (contentBlock!.children[0].attributes['src']?.contains('unsafe') ??
+        (contentBlock?.children[0].attributes['src']?.contains('unsafe') ??
             false);
 
     return Post(
@@ -125,8 +130,8 @@ class PostsParser {
       reversedPagination: reversedPagination,
       isLast: reversedPagination ? pageId <= 1 : pageId == lastPageId,
       content: parsedPage.querySelectorAll('.postContainer').map((e) {
-        final id =
-            int.tryParse(e.attributes['id']!.replaceAll('postContainer', ''));
+        final id = Utils.getNumberInt(
+            e.attributes['id']?.replaceAll('postContainer', ''));
         return _parse(id ?? 0, e, false);
       }).toList(),
       id: pageId,
@@ -153,7 +158,7 @@ class PostsParser {
 
   UserShort? _parseUser(Element parsedPage) {
     final nick = parsedPage.querySelector('.uhead_nick');
-    final img = nick?.querySelector('img')!;
+    final img = nick?.querySelector('img');
     final avatar = img?.attributes['src'];
     final username = img?.attributes['alt'];
     final userLink =
@@ -172,10 +177,12 @@ class PostsParser {
     return false;
   }
 
-  DateTime _parseDate(Element parsedPage) {
-    final date = parsedPage.querySelector('.date > span')!;
-    final timestamp = int.parse(date.attributes['data-time']!);
-    return DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
+  DateTime? _parseDate(Element parsedPage) {
+    final date = parsedPage.querySelector('.date > span');
+    final timestamp = Utils.getNumberInt(date?.attributes['data-time']);
+    return timestamp != null
+        ? DateTime.fromMillisecondsSinceEpoch(timestamp * 1000)
+        : null;
   }
 
   double? _parseRating(Element ratingContainer) {

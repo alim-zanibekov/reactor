@@ -1,4 +1,5 @@
 import 'package:html/parser.dart' as parser;
+import 'package:reactor/core/common/pair.dart';
 
 import './types/module.dart';
 import 'comments-parser.dart';
@@ -11,26 +12,24 @@ class UserCommentsParser {
   ContentPage<PostComment> parsePage(String c) {
     final parsedPage = parser.parse(c);
     final current = parsedPage.querySelector('.pagination_expanded .current');
-    final pageId = current != null
-        ? Utils.getNumberInt(parsedPage
-                .querySelector('.pagination_expanded .current')
-                ?.text) ??
-            0
-        : 0;
+    final pageIdText =
+        parsedPage.querySelector('.pagination_expanded .current')?.text;
+
+    final pageId = current != null ? Utils.getNumberInt(pageIdText) ?? 0 : 0;
+
+    final content = parsedPage
+        .querySelectorAll('.post_comment_list > .comment')
+        .map((it) => Pair(it, Utils.getNumberInt(it.attributes['parent'])))
+        .where((it) => it.right != null)
+        .map((it) => _commentsParser.parseComment(it.left, it.right!))
+        .toList();
 
     return ContentPage<PostComment>(
       authorized: parsedPage.querySelector('#topbar .login #settings') != null,
       isLast: current == null ||
           pageId == 0 ||
           parsedPage.querySelector('.pagination_main.pLeft') != null,
-      content: parsedPage
-          .querySelectorAll('.post_comment_list > .comment')
-          .where((element) =>
-              Utils.getNumberInt(element.attributes['parent']) != null)
-          .map((element) {
-        final id = Utils.getNumberInt(element.attributes['parent'])!;
-        return _commentsParser.parseComment(element, id);
-      }).toList(),
+      content: content,
       id: pageId,
     );
   }

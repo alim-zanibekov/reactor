@@ -7,7 +7,7 @@ import '../widgets/fade-icon.dart';
 import 'onerror-reload.dart';
 
 class AppSafeImage extends StatefulWidget {
-  final ImageProvider? imageProvider;
+  final ImageProvider imageProvider;
   final BoxFit fit;
   final void Function(ImageInfo)? onInfo;
   final bool showAnimation;
@@ -15,7 +15,7 @@ class AppSafeImage extends StatefulWidget {
 
   const AppSafeImage({
     Key? key,
-    this.imageProvider,
+    required this.imageProvider,
     this.fit = BoxFit.cover,
     this.onInfo,
     this.showAnimation = true,
@@ -34,8 +34,8 @@ class _AppSafeImageState extends State<AppSafeImage> {
   bool _withoutFades = false;
   bool _animated = false;
   bool _hasAlphaChannel = false;
-  AnimationController? _controller;
-  ui.Image? image;
+
+  late ui.Image image;
 
   @override
   void initState() {
@@ -60,9 +60,8 @@ class _AppSafeImageState extends State<AppSafeImage> {
   @override
   void dispose() {
     if (_error) {
-      widget.imageProvider!.evict();
+      widget.imageProvider.evict();
     }
-    _controller?.dispose();
     super.dispose();
   }
 
@@ -80,7 +79,7 @@ class _AppSafeImageState extends State<AppSafeImage> {
       setState(() {
         _error = false;
       });
-      await widget.imageProvider!.evict();
+      await widget.imageProvider.evict();
     }
 
     if (widget.imageProvider is AppNetworkImageWithRetry && _animate) {
@@ -89,13 +88,13 @@ class _AppSafeImageState extends State<AppSafeImage> {
       _withoutFades = !_animate;
     }
 
-    widget.imageProvider!
+    widget.imageProvider
         .resolve(ImageConfiguration())
         .addListener(ImageStreamListener((imageInfo, bool _) async {
           image = imageInfo.image;
-          if (widget.onInfo != null && !_loaded) {
+          if (!_loaded) {
             _loaded = true;
-            widget.onInfo!(imageInfo);
+            widget.onInfo?.call(imageInfo);
           }
           if (_animate) {
             await Future.delayed(_fadeInDuration);
@@ -123,7 +122,7 @@ class _AppSafeImageState extends State<AppSafeImage> {
     return Container(
       decoration: BoxDecoration(color: Colors.white),
       child: Image(
-        image: widget.imageProvider!,
+        image: widget.imageProvider,
         fit: widget.fit,
       ),
     );
@@ -146,7 +145,7 @@ class _AppSafeImageState extends State<AppSafeImage> {
       return _buildImageOnCanvas();
     }
     return Image(
-      image: widget.imageProvider!,
+      image: widget.imageProvider,
       fit: widget.fit,
     );
   }
@@ -157,7 +156,7 @@ class _AppSafeImageState extends State<AppSafeImage> {
       return AppOnErrorReload(
         text: 'При загрузке изображения произошла ошибка',
         onReloadPressed: () async {
-          await widget.imageProvider!.evict();
+          await widget.imageProvider.evict();
           _load();
         },
       );
@@ -191,7 +190,7 @@ class _AppSafeImageState extends State<AppSafeImage> {
 
 class CustomImagePainter extends CustomPainter {
   final Color backgroundColor;
-  final ui.Image? image;
+  final ui.Image image;
   final BoxFit fit;
 
   CustomImagePainter(
@@ -203,7 +202,7 @@ class CustomImagePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final outputRect = Rect.fromLTWH(0, 0, size.width, size.height);
     final Size imageSize =
-        Size(image!.width.toDouble(), image!.height.toDouble());
+        Size(image.width.toDouble(), image.height.toDouble());
     final FittedSizes sizes = applyBoxFit(
       fit,
       imageSize,
@@ -213,7 +212,7 @@ class CustomImagePainter extends CustomPainter {
         Alignment.center.inscribe(sizes.source, Offset.zero & imageSize);
     final Rect outputSubRect =
         Alignment.center.inscribe(sizes.destination, outputRect);
-    canvas.drawImageRect(image!, inputSubRect, outputSubRect, new Paint());
+    canvas.drawImageRect(image, inputSubRect, outputSubRect, new Paint());
   }
 
   @override

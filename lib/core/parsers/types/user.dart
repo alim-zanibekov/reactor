@@ -65,7 +65,7 @@ class UserFull {
   final String? avatar;
   final List<Award>? awards;
   final double? rating;
-  final int? stars;
+  final int stars;
   final List<UserTag>? tagCloud;
   final List<UserTag>? activeIn;
   final List<Tag>? moderating;
@@ -83,7 +83,7 @@ class UserFull {
     this.avatar,
     this.awards,
     this.rating,
-    this.stars,
+    this.stars = 0,
     this.tagCloud,
     this.mainTag,
     this.ignore,

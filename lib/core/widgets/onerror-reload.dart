@@ -73,11 +73,7 @@ class AppOnErrorReloadExpanded extends StatelessWidget {
         button: Padding(
           padding: const EdgeInsets.only(top: 10),
           child: OutlinedButton(
-            onPressed: () {
-              if (onReloadPressed != null) {
-                onReloadPressed!();
-              }
-            },
+            onPressed: () => onReloadPressed?.call(),
             child: const Text('Попробовать снова'),
           ),
         ),

@@ -25,9 +25,11 @@ class QuizParser {
     );
   }
 
-  Quiz parseQuizResponse(String? page) {
+  Quiz parseQuizResponse(String page) {
     final parsedPage = parser.parse(page);
-    return parseQuiz(parsedPage.body!);
+    final body = parsedPage.body;
+    if (body == null) throw Exception("Invalid quiz response");
+    return parseQuiz(body);
   }
 
   List<QuizAnswer> _parseQuizList(List<Element> elements) {
@@ -36,9 +38,8 @@ class QuizParser {
       int? id;
       final link = element.children.length > 0 ? element.children.first : null;
 
-      final idMatch =
-          _voteIdRegex.firstMatch((link?.attributes ?? {})['href'])!;
-      if (idMatch.groupCount > 0) {
+      final idMatch = _voteIdRegex.firstMatch((link?.attributes ?? {})['href']);
+      if (idMatch != null && idMatch.groupCount > 0) {
         id = Utils.getNumberInt(idMatch.group(1));
       }
       answers.add(QuizAnswer(
@@ -64,8 +65,8 @@ class QuizParser {
             td != null && td.nodes.length > 0 ? td.nodes.last.text : null);
 
         answers.add(QuizAnswer(
-          text: text,
-          percent: percent,
+          text: text ?? '',
+          percent: percent ?? 0,
           count: count,
         ));
       }

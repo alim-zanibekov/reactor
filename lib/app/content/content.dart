@@ -61,9 +61,7 @@ class AppContentLoader {
   }
 
   _onLoad(List<Pair<double, Size>> arg) {
-    if (onLoad != null) {
-      onLoad!(arg);
-    }
+    onLoad?.call(arg);
   }
 
   _initialize() {
@@ -102,21 +100,18 @@ class AppContentLoader {
       }
     }
 
-    _filteredFutures = [
-      for (var i in _futures)
-        if (i != null) i
-    ];
+    _filteredFutures = _futures.where((it) => it != null).map((it) => it!).toList();
 
     if (_undefinedSizeImages.isEmpty) {
       if (_filteredFutures.isNotEmpty) {
-        Future.wait(_filteredFutures).then(((value) => _onLoad(
+        Future.wait(_filteredFutures).then((value) => _onLoad(
               value
                   .map((e) => Pair(
                         16.0 / 9.0,
-                        Size(e.width!.toDouble(), e.height!.toDouble()),
+                        Size(e.width.toDouble(), e.height.toDouble()),
                       ))
                   .toList(),
-            )));
+            ));
       } else {
         _onLoad([]);
       }
@@ -140,7 +135,7 @@ class AppContentLoader {
             _onLoad([
               ...value.map((e) => Pair(
                     16.0 / 9.0,
-                    Size(e.width!.toDouble(), e.height!.toDouble()),
+                    Size(e.width.toDouble(), e.height.toDouble()),
                   )),
               ...imageSizes
             ]);
@@ -418,10 +413,15 @@ class _AppContentState extends State<AppContent> {
               menu.openUnderTap(e.globalPosition);
             });
           }
+          ..onTapCancel = () {
+            if (timer?.isActive == true) {
+              timer!.cancel();
+            }
+          }
           ..onTapUp = (_) {
             if (timer?.isActive == true) {
               timer!.cancel();
-              goToLinkOrOpen(context, text.link!);
+              goToLinkOrOpen(context, text.link);
             }
           };
       }

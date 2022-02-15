@@ -18,9 +18,9 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
   late AppTheme _theme;
   late AppPostsType _postsType;
   String? _host;
-  bool? _sfw;
-  bool? _sendErrorStatistics;
-  bool? _gifAutoPlay;
+  late bool _sfw;
+  late bool _sendErrorStatistics;
+  late bool _gifAutoPlay;
 
   @override
   void initState() {
@@ -62,8 +62,9 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
                     hint: Text('Хост'),
                     value: _host,
                     onChanged: (String? value) async {
+                      if (value == null) return;
                       setState(() => _host = value);
-                      await _preferences.setHost(_host!);
+                      await _preferences.setHost(value);
                       ReloadService.reload();
                       Api().sethHost(value);
                     },
@@ -142,7 +143,7 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
           ),
           SwitchListTile(
             title: const Text('SFW'),
-            value: _sfw!,
+            value: _sfw,
             activeColor: Theme.of(context).colorScheme.secondary,
             onChanged: (bool sfw) async {
               setState(() => _sfw = sfw);
@@ -151,7 +152,7 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
           ),
           SwitchListTile(
             title: const Text('Воспроизводить гифки автоматически'),
-            value: _gifAutoPlay!,
+            value: _gifAutoPlay,
             activeColor: Theme.of(context).colorScheme.secondary,
             onChanged: (bool gifAutoPlay) async {
               setState(() => _gifAutoPlay = gifAutoPlay);
@@ -160,7 +161,7 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
           ),
           SwitchListTile(
             title: const Text('Отправлять отчеты об ошибках'),
-            value: _sendErrorStatistics!,
+            value: _sendErrorStatistics,
             activeColor: Theme.of(context).colorScheme.secondary,
             onChanged: (bool sendErrorStatistics) async {
               SnackBarHelper.show(context,
@@ -261,10 +262,10 @@ class LabeledRadio<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        if (value != groupValue && onChanged != null) onChanged!(value);
+        if (value != groupValue) onChanged?.call(value);
       },
       child: Padding(
-        padding: padding!,
+        padding: padding ?? EdgeInsets.zero,
         child: Row(children: <Widget>[
           SizedBox(
             height: 35,
@@ -273,11 +274,11 @@ class LabeledRadio<T> extends StatelessWidget {
               groupValue: groupValue,
               value: value,
               onChanged: (T? newValue) {
-                if (onChanged != null && newValue != null) onChanged!(newValue);
+                if (newValue != null) onChanged?.call(newValue);
               },
             ),
           ),
-          Text(label!, style: const TextStyle(fontSize: 12)),
+          Text(label ?? '', style: const TextStyle(fontSize: 12)),
         ]),
       ),
     );

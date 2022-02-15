@@ -67,10 +67,11 @@ class AppPostUser extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            CircleAvatar(
-              radius: size / 2.0,
-              backgroundImage: AppNetworkImageWithRetry(user.avatar!),
-            ),
+            if (user.avatar != null)
+              CircleAvatar(
+                radius: size / 2.0,
+                backgroundImage: AppNetworkImageWithRetry(user.avatar!),
+              ),
             Container(
               height: size,
               padding: const EdgeInsets.only(left: 10),
@@ -88,6 +89,7 @@ class AppPostUser extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (dateTime != null)
                   Text(
                     DateTimeFormatter.formatDateTime(dateTime!),
                     style: TextStyle(

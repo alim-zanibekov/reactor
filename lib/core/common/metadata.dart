@@ -18,8 +18,8 @@ class OEmbedMetadata {
 
   int? thumbnailHeight;
   int? thumbnailWidth;
-  int? width;
-  int? height;
+  int width;
+  int height;
 
   OEmbedMetadata({
     this.authorName,
@@ -33,8 +33,8 @@ class OEmbedMetadata {
     this.providerUrl,
     this.thumbnailHeight,
     this.thumbnailWidth,
-    this.width,
-    this.height,
+    required this.width,
+    required this.height,
   });
 
   static Future<OEmbedMetadata> loadYouTube(String videoId) async {
@@ -72,9 +72,9 @@ class OEmbedMetadata {
         ? OEmbedMetadata(
             authorName: metadata['author_name'],
             providerName: metadata['provider_name'],
-            width: toInt(metadata['width']),
+            width: toInt(metadata['width']) ?? 160,
             authorUrl: metadata['author_url'],
-            height: toInt(metadata['height']),
+            height: toInt(metadata['height']) ?? 90,
             title: metadata['title'],
             type: metadata['type'],
             version: metadata['version'].toString(),

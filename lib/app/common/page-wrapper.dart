@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 class PageWrapper extends StatefulWidget {
-  final Widget? child;
+  final Widget child;
 
-  const PageWrapper({Key? key, this.child}) : super(key: key);
+  const PageWrapper({Key? key, required this.child}) : super(key: key);
 
   @override
   _PageWrapperState createState() => _PageWrapperState();
@@ -18,13 +20,17 @@ class _PageWrapperState extends State<PageWrapper> {
       final double statusBarHeight = MediaQuery.of(context).padding.top;
       _statusBarHeight = statusBarHeight;
     }
-    final theme = Theme.of(context);
-    return Container(
-      color: theme.brightness == Brightness.dark
-          ? theme.bottomAppBarColor
-          : theme.primaryColor,
-      padding: EdgeInsets.only(top: _statusBarHeight),
-      child: widget.child,
-    );
+    if (Platform.isIOS) {
+      return widget.child;
+    } else {
+      final theme = Theme.of(context);
+      return Container(
+        color: theme.brightness == Brightness.dark
+            ? theme.bottomAppBarColor
+            : theme.primaryColor,
+        padding: EdgeInsets.only(top: _statusBarHeight),
+        child: widget.child,
+      );
+    }
   }
 }

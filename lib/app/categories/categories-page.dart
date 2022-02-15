@@ -37,13 +37,14 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
                 ]),
               ),
               if (stats?.trends != null)
-                SliverToBoxAdapter(child: _trends(stats!)),
+                SliverToBoxAdapter(child: _trends(stats!.trends!)),
               if (stats?.twoDayTags != null)
-                SliverToBoxAdapter(child: _tags(stats!)),
+                SliverToBoxAdapter(child: _tags(stats!, stats.twoDayTags!)),
               if (stats?.twoDayComments != null)
-                SliverToBoxAdapter(child: _comments(stats!)),
+                SliverToBoxAdapter(
+                    child: _comments(stats!, stats.twoDayComments!)),
               if (stats?.weekUsers != null)
-                SliverToBoxAdapter(child: _users(stats!)),
+                SliverToBoxAdapter(child: _users(stats!, stats.weekUsers!)),
             ],
           );
         },
@@ -51,7 +52,7 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
     );
   }
 
-  Widget _tags(Stats stats) {
+  Widget _tags(Stats stats, List<ExtendedTag> twoDayTags) {
     return DefaultTabController(
       length: 3,
       child: Column(children: <Widget>[
@@ -64,12 +65,14 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
           ),
         ),
         SizedBox(
-          height: stats.twoDayTags!.length * 60.0,
+          height: twoDayTags.length * 60.0,
           child: TabBarView(
             children: <Widget>[
-              AppCategoriesTags(tags: stats.twoDayTags),
-              AppCategoriesTags(tags: stats.weekTags),
-              AppCategoriesTags(tags: stats.allTimeTags),
+              AppCategoriesTags(tags: twoDayTags),
+              if (stats.weekTags != null)
+                AppCategoriesTags(tags: stats.weekTags ?? const []),
+              if (stats.weekTags != null)
+                AppCategoriesTags(tags: stats.allTimeTags ?? const []),
             ],
           ),
         ),
@@ -77,7 +80,7 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
     );
   }
 
-  Widget _comments(Stats stats) {
+  Widget _comments(Stats stats, List<StatsComment> twoDayComments) {
     return DefaultTabController(
       length: 2,
       child: Column(children: <Widget>[
@@ -90,11 +93,12 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
           ),
         ),
         SizedBox(
-          height: stats.twoDayComments!.length * 40.0,
+          height: twoDayComments.length * 40.0,
           child: TabBarView(
             children: <Widget>[
-              AppCategoriesComments(comments: stats.twoDayComments),
-              AppCategoriesComments(comments: stats.weekComments),
+              AppCategoriesComments(comments: twoDayComments),
+              if (stats.weekComments != null)
+                AppCategoriesComments(comments: stats.weekComments ?? const []),
             ],
           ),
         ),
@@ -102,16 +106,16 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
     );
   }
 
-  Widget _trends(Stats stats) {
+  Widget _trends(List<IconTag> trends) {
     return DefaultTabController(
       length: 2,
       child: Column(
         children: <Widget>[
           ..._title('Тренды'),
           SizedBox(
-            height: stats.trends!.length * 60.0,
+            height: trends.length * 60.0,
             child: AppCategoriesTags(
-              tags: stats.trends!
+              tags: trends
                   .map((e) => ExtendedTag(
                         e.value,
                         icon: e.icon,
@@ -127,7 +131,7 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
     );
   }
 
-  Widget _users(Stats stats) {
+  Widget _users(Stats stats, List<StatsUser> weekUsers) {
     return DefaultTabController(
       length: 2,
       child: Column(children: <Widget>[
@@ -140,11 +144,12 @@ class _AppCategoriesPageState extends State<AppCategoriesPage>
           ),
         ),
         SizedBox(
-          height: stats.weekUsers!.length * 40.0,
+          height: weekUsers.length * 40.0,
           child: TabBarView(
             children: <Widget>[
-              AppCategoriesUsers(users: stats.weekUsers ?? []),
-              AppCategoriesUsers(users: stats.monthUsers ?? []),
+              AppCategoriesUsers(users: weekUsers),
+              if (stats.monthUsers != null)
+                AppCategoriesUsers(users: stats.monthUsers ?? const []),
             ],
           ),
         ),

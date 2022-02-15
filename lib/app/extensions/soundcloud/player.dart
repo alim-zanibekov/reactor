@@ -9,7 +9,7 @@ import '../common/options.dart';
 import '../common/video-thumbnail.dart';
 
 class AppSoundCloudPlayer extends StatefulWidget {
-  final String? url;
+  final String url;
   final OEmbedMetadata? metadata;
   final Future<OEmbedMetadata>? futureMetadata;
 
@@ -23,18 +23,18 @@ class AppSoundCloudPlayer extends StatefulWidget {
 
 class _AppSoundCloudPlayerState extends State<AppSoundCloudPlayer> {
   late String _url;
-  OEmbedMetadata? metadata;
-  bool webViewShow = false;
+  OEmbedMetadata? _metadata;
+  bool _webViewShow = false;
 
-  bool error = false;
+  bool _error = false;
 
   @override
   void initState() {
     super.initState();
-    metadata = widget.metadata;
-    if (metadata == null) {
-      widget.futureMetadata!.then((value) {
-        metadata = value;
+    _metadata = widget.metadata;
+    if (_metadata == null) {
+      widget.futureMetadata?.then((value) {
+        _metadata = value;
         if (mounted) {
           setState(() {});
         }
@@ -43,7 +43,7 @@ class _AppSoundCloudPlayerState extends State<AppSoundCloudPlayer> {
       });
     }
     _url = 'https://w.soundcloud.com/player/'
-        '?url=${Uri.encodeQueryComponent(widget.url!)}';
+        '?url=${Uri.encodeQueryComponent(widget.url)}';
   }
 
   Widget getVideo(BuildContext context) {
@@ -72,7 +72,7 @@ class _AppSoundCloudPlayerState extends State<AppSoundCloudPlayer> {
             return NavigationActionPolicy.CANCEL;
           },
           onLoadError: (controller, _, err1, err2) {
-            error = true;
+            _error = true;
             if (mounted) {
               setState(() {});
             }
@@ -84,21 +84,21 @@ class _AppSoundCloudPlayerState extends State<AppSoundCloudPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    if (error) {
+    if (_error) {
       return SizedBox(
         height: 162.0,
         child: AppOnErrorReload(
           text: 'Произошла ошибка при загруке',
           onReloadPressed: () {
             setState(() {
-              webViewShow = false;
-              error = false;
+              _webViewShow = false;
+              _error = false;
             });
           },
         ),
       );
     }
-    if (webViewShow) {
+    if (_webViewShow) {
       return SizedBox(
         height: 162.0,
         child: getVideo(context),
@@ -109,10 +109,10 @@ class _AppSoundCloudPlayerState extends State<AppSoundCloudPlayer> {
       height: 162,
       alignment: Alignment.center,
       child: VideoThumbnail(
-        imageUrl: metadata?.thumbnailUrl,
+        imageUrl: _metadata?.thumbnailUrl,
         aspectRatio: 1,
         icon: const AssetImage('assets/icons/soundcloud-play.png'),
-        onPlay: () => setState(() => webViewShow = true),
+        onPlay: () => setState(() => _webViewShow = true),
       ),
     );
   }

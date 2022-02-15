@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class FadeIcon extends StatefulWidget {
-  final Icon? icon;
+  final Icon icon;
   final Color? color;
 
-  const FadeIcon({Key? key, this.icon, this.color}) : super(key: key);
+  const FadeIcon({Key? key, required this.icon, this.color}) : super(key: key);
 
   @override
   _FadeIconState createState() => _FadeIconState();

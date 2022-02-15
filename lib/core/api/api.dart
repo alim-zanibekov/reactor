@@ -104,7 +104,7 @@ class Api {
       return ContentPage.empty<Post>();
     }
     final page = _postsParser.parsePage(res.data);
-    if (_auth.authorized && !page.authorized!) {
+    if (_auth.authorized && !page.authorized) {
       Future.microtask(() {
         _auth.logout();
         InAppNotificationsManager.show(

@@ -109,22 +109,23 @@ class _AppPagePostsState extends State<AppPage> {
 class _AppPageTagsState extends State<AppPage> {
   late List<TagLoader> _tagLoaders;
   late String _title;
+  late Tag tag = widget.tag as Tag;
 
   @override
   void initState() {
     _tagLoaders = [
       TagLoader(
-        path: widget.tag!.link,
-        prefix: widget.tag!.prefix,
+        path: tag.link!,
+        prefix: tag.prefix,
         tagListType: TagListType.BEST,
       ),
       TagLoader(
-        path: widget.tag!.link,
-        prefix: widget.tag!.prefix,
+        path: tag.link!,
+        prefix: tag.prefix,
         tagListType: TagListType.NEW,
       ),
     ];
-    _title = widget.tag?.value ?? '';
+    _title = tag.value;
     super.initState();
   }
 
@@ -140,8 +141,7 @@ class _AppPageTagsState extends State<AppPage> {
       main: widget.main,
       tabs: ['Лучшие', 'Новые'],
       title: _title,
-      builder:
-          (BuildContext context, int index, onScrollChange, onReloadPress) {
+      builder: (BuildContext _, int index, onScrollChange, onReloadPress) {
         return AppTagList(
           pageStorageKey:
               PageStorageKey<String>('tag-' + _title + index.toString()),

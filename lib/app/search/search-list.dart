@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../../core/content/post-loader.dart';
@@ -39,11 +41,12 @@ class _AppSearchListState extends State<AppSearchList> {
 
   @override
   Widget build(BuildContext context) {
+    var isPrimary = Platform.isIOS; // https://github.com/flutter/flutter/issues/70165
     return PageWrapper(
       child: Scaffold(
-        primary: false,
+        primary: isPrimary,
         appBar: AppBar(
-          primary: false,
+          primary: isPrimary,
           title: Text('Поиск'),
         ),
         body: AppPostList(

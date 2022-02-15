@@ -25,6 +25,15 @@ final StreamController<AppBottomBarState> _appBottomBarState =
 final StreamController<AppBottomBarPage> _appBottomBarPage =
     StreamController<AppBottomBarPage>();
 
+class AnimationControllerExt extends AnimationController {
+  AnimationControllerExt({
+    Duration? duration,
+    required TickerProvider vsync,
+  }) : super(vsync: vsync, duration: duration);
+
+  void notify() => super.notifyListeners();
+}
+
 class AppPages extends StatefulWidget {
   static StreamSink<AppBottomBarState> get appBottomBarState =>
       _appBottomBarState;
@@ -46,7 +55,7 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
   final _auth = Auth();
   double _bottomBarHeight = 54.0;
   late List<StreamSubscription> _subscriptions;
-  late AnimationController _animationController;
+  late AnimationControllerExt _animationController;
   late TabController _tabController;
   final double _bottomBarMaxHeight = 54.0;
 
@@ -69,11 +78,10 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
         }
       });
     }
-
     _tabController = TabController(length: 4, vsync: this)
       ..addListener(() {
         _pageController.jumpToPage(_tabController.index);
-        _animationController.notifyListeners();
+        _animationController.notify();
         if (_authorized != _auth.authorized) {
           setState(() {
             _authorized = _auth.authorized;
@@ -81,7 +89,7 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
         }
       });
 
-    _animationController = AnimationController(
+    _animationController = AnimationControllerExt(
       vsync: this,
       duration: Duration(milliseconds: 200),
     );
@@ -105,7 +113,7 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
       }),
       if (!kIsWeb)
         linkStream.listen(
-          (link) => goToLink(context, link!),
+          (link) => link != null ? goToLink(context, link) : null,
           onError: (err) {
             print(err);
           },
@@ -130,6 +138,7 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final host = Preferences().host;
 
+    final MediaQueryData data = MediaQuery.of(context);
     return Scaffold(
       body: PageView(
         controller: _pageController,
@@ -155,23 +164,27 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
         animation: _animationController,
         builder: (BuildContext context, Widget? child) {
           return SizedBox(
-            height: _bottomBarHeight * _animationController.value,
-            child: OverflowBox(
-              alignment: Alignment.topLeft,
-              maxHeight: _bottomBarMaxHeight,
-              child: TabBar(
-                controller: _tabController,
-                indicatorWeight: 1,
-                enableFeedback: false,
-                labelColor: ThemeInfo.primaryColor,
-                unselectedLabelColor: ThemeInfo.colors.shade200,
-                indicatorColor: Colors.transparent,
-                tabs: const <Tab>[
-                  Tab(icon: Icon(Icons.view_stream)),
-                  Tab(icon: Icon(Icons.category)),
-                  Tab(icon: Icon(Icons.portrait)),
-                  Tab(icon: Icon(Icons.settings)),
-                ],
+            height: (_bottomBarHeight + data.padding.bottom) *
+                _animationController.value,
+            child: Align(
+              alignment: AlignmentDirectional.topStart,
+              child: OverflowBox(
+                alignment: Alignment.topLeft,
+                maxHeight: _bottomBarMaxHeight,
+                child: TabBar(
+                  controller: _tabController,
+                  indicatorWeight: 1,
+                  enableFeedback: false,
+                  labelColor: ThemeInfo.primaryColor,
+                  unselectedLabelColor: ThemeInfo.colors.shade200,
+                  indicatorColor: Colors.transparent,
+                  tabs: const <Tab>[
+                    Tab(icon: Icon(Icons.view_stream)),
+                    Tab(icon: Icon(Icons.category)),
+                    Tab(icon: Icon(Icons.portrait)),
+                    Tab(icon: Icon(Icons.settings)),
+                  ],
+                ),
               ),
             ),
           );

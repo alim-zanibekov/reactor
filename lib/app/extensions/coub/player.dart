@@ -25,23 +25,24 @@ class AppCoubPlayer extends StatefulWidget {
 
 class _AppCoubPlayerState extends State<AppCoubPlayer> {
   late String _url;
-  OEmbedMetadata? metadata;
-  double aspectRatio = 16.0 / 9.0;
-  bool webViewShow = false;
+  OEmbedMetadata? _metadata;
+  double _aspectRatio = 16.0 / 9.0;
+  bool _webViewShow = false;
 
-  bool error = false;
+  bool _error = false;
 
   @override
   void initState() {
     super.initState();
-    metadata = widget.metadata;
+    final metadata = widget.metadata;
+    _metadata = metadata;
 
     if (metadata != null) {
-      aspectRatio = metadata!.width! / metadata!.height!;
+      _aspectRatio = metadata.width / metadata.height;
     } else {
-      widget.futureMetadata!.then((value) {
-        metadata = value;
-        aspectRatio = metadata!.width! / metadata!.height!;
+      widget.futureMetadata?.then((value) {
+        _metadata = value;
+        _aspectRatio = value.width / value.height;
         if (mounted) {
           setState(() {});
         }
@@ -78,7 +79,7 @@ class _AppCoubPlayerState extends State<AppCoubPlayer> {
           },
           onLoadError:
               (InAppWebViewController controller, Uri? url, err1, err2) {
-            error = true;
+            _error = true;
             if (mounted) {
               setState(() {});
             }
@@ -90,32 +91,32 @@ class _AppCoubPlayerState extends State<AppCoubPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    if (error) {
+    if (_error) {
       return AspectRatio(
-        aspectRatio: aspectRatio,
+        aspectRatio: _aspectRatio,
         child: AppOnErrorReload(
           text: 'Произошла ошибка при загруке',
           onReloadPressed: () {
             setState(() {
-              webViewShow = false;
-              error = false;
+              _webViewShow = false;
+              _error = false;
             });
           },
         ),
       );
     }
-    if (webViewShow) {
+    if (_webViewShow) {
       return AspectRatio(
-        aspectRatio: aspectRatio,
+        aspectRatio: _aspectRatio,
         child: getVideo(context),
       );
     }
 
     return VideoThumbnail(
-      imageUrl: metadata?.thumbnailUrl,
-      aspectRatio: aspectRatio,
+      imageUrl: _metadata?.thumbnailUrl,
+      aspectRatio: _aspectRatio,
       icon: const AssetImage('assets/icons/coub-play.png'),
-      onPlay: () => setState(() => webViewShow = true),
+      onPlay: () => setState(() => _webViewShow = true),
     );
   }
 }

@@ -64,7 +64,7 @@ class _AppQuizState extends State<AppQuiz> {
                     onChanged: (_) {},
                   ),
                 ),
-                Text(e.text!, style: const TextStyle(fontSize: 13)),
+                Text(e.text, style: const TextStyle(fontSize: 13)),
               ]),
             ),
           ),
@@ -79,14 +79,14 @@ class _AppQuizState extends State<AppQuiz> {
           children: <Widget>[
             Padding(
               padding: EdgeInsets.symmetric(vertical: 5),
-              child: Text(e.text!),
+              child: Text(e.text),
             ),
             Row(
               children: <Widget>[
                 SizedBox(
                   width: width - maxLenText * 8,
                   child: LinearProgressIndicator(
-                    value: e.percent! / 100.0,
+                    value: e.percent / 100.0,
                   ),
                 ),
                 Expanded(child: SizedBox()),

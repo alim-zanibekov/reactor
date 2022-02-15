@@ -2,20 +2,20 @@ import 'content.dart';
 import 'user.dart';
 
 abstract class HasChildren<T> {
-  List<T>? children;
+  List<T> children = [];
 }
 
 class QuizAnswer {
   final int? id;
-  final String? text;
-  final double? percent;
+  final String text;
+  final double percent;
   final int? count;
 
   const QuizAnswer({
     this.id,
-    this.text,
+    required this.text,
+    required this.percent,
     this.count,
-    this.percent,
   });
 }
 
@@ -30,7 +30,7 @@ class Tag {
   static final _extractTag3LDomainRegex =
       RegExp(r'https?:\/\/(.*?)\.reactor\.');
 
-  final bool? isMain;
+  final bool isMain;
   final String? prefix;
   final String? link;
   String value;
@@ -49,7 +49,8 @@ class Tag {
 
   static final _linkRegex = RegExp(r'tag\/([^\/]+)');
 
-  Tag(this.value, {this.isMain = false, this.prefix, this.link});
+  Tag(this.value, {this.isMain = false, this.prefix, this.link})
+      : assert(!isMain || (isMain && link != null));
 }
 
 class IconTag extends Tag {
@@ -58,12 +59,12 @@ class IconTag extends Tag {
   IconTag(
     String value, {
     this.icon,
-    isMain,
-    prefix,
-    link,
+    bool? isMain,
+    String? prefix,
+    String? link,
   }) : super(
           value,
-          isMain: isMain,
+          isMain: isMain ?? false,
           prefix: prefix,
           link: link,
         );
@@ -124,17 +125,17 @@ class ContentPage<T> {
   final int id;
   final List<T> content;
   final PageInfo? pageInfo;
-  final bool? isLast;
-  final bool? authorized;
-  final bool? reversedPagination;
+  final bool isLast;
+  final bool authorized;
+  final bool reversedPagination;
 
   ContentPage({
     required this.id,
     required this.content,
     this.pageInfo,
-    this.isLast,
-    this.authorized,
-    this.reversedPagination,
+    this.isLast = false,
+    this.authorized = false,
+    this.reversedPagination = false,
   });
 
   static empty<T>() {
@@ -162,7 +163,7 @@ class Post {
   int? commentsCount;
   double? rating;
   bool votedUp;
-  bool? canVote;
+  bool canVote;
   bool votedDown;
   bool favorite;
   List<PostComment>? comments;
@@ -184,7 +185,7 @@ class Post {
     this.user,
     this.dateTime,
     this.hidden = false,
-    this.canVote,
+    this.canVote = false,
     this.unsafe = false,
     this.commentsCount,
     this.favorite = false,
@@ -204,11 +205,11 @@ class PostComment implements HasChildren<PostComment> {
 
   double? rating;
   bool hidden;
-  List<PostComment>? children = [];
+  List<PostComment> children = [];
   List<ContentUnit>? content;
-  bool? votedUp;
-  bool? canVote;
-  bool? votedDown;
+  bool votedUp;
+  bool canVote;
+  bool votedDown;
 
   bool deleted = false;
 
@@ -218,9 +219,9 @@ class PostComment implements HasChildren<PostComment> {
     required this.postId,
     this.user,
     this.content,
-    this.canVote,
-    this.votedUp,
-    this.votedDown,
+    this.canVote = false,
+    this.votedUp = false,
+    this.votedDown = false,
     this.rating,
     this.time,
     this.hidden = false,
@@ -228,5 +229,5 @@ class PostComment implements HasChildren<PostComment> {
 }
 
 class CommentParent implements HasChildren<PostComment> {
-  List<PostComment>? children = [];
+  List<PostComment> children = [];
 }

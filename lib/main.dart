@@ -30,7 +30,10 @@ void main() {
     if (isInDebugMode) {
       FlutterError.dumpErrorToConsole(details);
     } else {
-      Zone.current.handleUncaughtError(details.exception, details.stack!);
+      Zone.current.handleUncaughtError(
+        details.exception,
+        details.stack ?? StackTrace.current,
+      );
     }
   };
 
@@ -115,9 +118,7 @@ class _AppState extends State<App> {
       home: Scaffold(
         body: DoubleBackToCloseApp(
           child: Builder(builder: (context) {
-            if (_notificationsSubscription != null) {
-              _notificationsSubscription!.cancel();
-            }
+            _notificationsSubscription?.cancel();
             _notificationsSubscription =
                 InAppNotificationsManager.messages$.listen((String text) {
               ScaffoldMessenger.of(context)
@@ -178,6 +179,7 @@ class ThemeInfo {
           width: 1,
         );
       }
+      return null;
     },
   );
 

@@ -8,12 +8,9 @@ class TagParser {
   ContentPage<ExtendedTag> parsePage(String? c) {
     final parsedPage = parser.parse(c);
     final current = parsedPage.querySelector('.pagination_expanded .current');
-    final pageId = current != null
-        ? Utils.getNumberInt(parsedPage
-                .querySelector('.pagination_expanded .current')
-                ?.text) ??
-            0
-        : 0;
+    final _pageId = Utils.getNumberInt(
+        parsedPage.querySelector('.pagination_expanded .current')?.text);
+    final pageId = current != null ? _pageId ?? 0 : 0;
 
     final pageInfo = parsePageInfo(parsedPage.getElementById('tagArticle'));
 
@@ -32,15 +29,16 @@ class TagParser {
   }
 
   ExtendedTag _parse(Element element) {
-    final image = (element.querySelector('img')?.attributes ?? {})['src'];
+    final image = (element.querySelector('img')?.attributes ?? {})['src'] as String?;
     final tagLink = element.querySelector('.blog_list_name a');
 
-    final nameSplit = tagLink?.text.split('(') ?? [];
-    final name = nameSplit[0].trim();
+    final nameSplit = tagLink?.text.split('(').asMap() ?? {};
+    final name = nameSplit[0]?.trim() ?? '';
     final count = Utils.getNumberInt(nameSplit[1]) ?? 0;
-    final smalls = element.querySelectorAll('.blog_list_name small');
-    final commonRating = Utils.getNumberDouble(smalls[0].text.split('/').first);
-    final subscribersCount = Utils.getNumberInt(smalls[1].text);
+    final smalls = element.querySelectorAll('.blog_list_name small').asMap();
+    final commonRating =
+        Utils.getNumberDouble(smalls[0]?.text.split('/').asMap()[0]);
+    final subscribersCount = Utils.getNumberInt(smalls[1]?.text);
 
     return ExtendedTag(
       name,
@@ -57,9 +55,10 @@ class TagParser {
   static PageInfo? parsePageInfo(Element? tagArticle) {
     final blogHeader = tagArticle?.querySelector('#blogHeader');
     final name = blogHeader?.querySelector('#blogName h1')?.text;
-    if (blogHeader == null || name == null) return null;
+    if (tagArticle == null || blogHeader == null || name == null) return null;
 
-    final infoMain = blogHeader.querySelectorAll('#blogSubscribers > span');
+    final infoMain =
+        blogHeader.querySelectorAll('#blogSubscribers > span').asMap();
 
     final fav = blogHeader.querySelector('#blogFavroiteLinks');
     var image =
@@ -72,7 +71,8 @@ class TagParser {
 
     int? tagId;
     if (tagIdStr != null && _extractTagIdRegex.hasMatch(tagIdStr)) {
-      tagId = int.tryParse(_extractTagIdRegex.firstMatch(tagIdStr)!.group(1)!);
+      tagId =
+          Utils.getNumberInt(_extractTagIdRegex.firstMatch(tagIdStr)?.group(1));
     }
     if (tagId == null) {
       return null;
@@ -82,11 +82,11 @@ class TagParser {
       name,
       icon: image,
       tagId: tagId,
-      bg: (tagArticle!.querySelector('#contentInnerHeader')?.attributes ??
+      bg: (tagArticle.querySelector('#contentInnerHeader')?.attributes ??
           {})['src'],
-      subscribersCount: Utils.getNumberInt(infoMain[0].text),
-      count: Utils.getNumberInt(infoMain[1].text) ?? 0,
-      commonRating: Utils.getNumberDouble(infoMain[2].text),
+      subscribersCount: Utils.getNumberInt(infoMain[0]?.text),
+      count: Utils.getNumberInt(infoMain[1]?.text) ?? 0,
+      commonRating: Utils.getNumberDouble(infoMain[2]?.text),
       subscribed: fav?.querySelector('.remove_from_fav') != null,
       blocked: fav?.querySelector('.remove_from_unpopular') != null,
     );

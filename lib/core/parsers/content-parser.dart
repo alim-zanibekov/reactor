@@ -1,31 +1,29 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as parser;
+import 'package:reactor/core/parsers/utils.dart';
 
 import './types/module.dart';
 import '../common/pair.dart';
 import 'types/utils.dart';
 
 class ContentParser {
-  List<ContentUnit> parseContent(String? c) {
+  List<ContentUnit> parseContent(String c) {
     final parsedPage = parser.parse(c);
-    return parse(parsedPage.body!);
+    final body = parsedPage.body;
+    return body != null ? parse(body) : [];
   }
 
   ContentUnit? _parseImage(Element element) {
     final iFrame = element.querySelector('iframe');
+    final src = iFrame?.attributes['src']?.isNotEmpty == true
+        ? iFrame?.attributes['src']
+        : null;
+
     final youTubeVideo =
         element.querySelector('.youtube-player')?.attributes['src'];
-    final embedHasSrc =
-        iFrame != null && (iFrame.attributes['src']?.isNotEmpty ?? false);
-
-    final coub = embedHasSrc &&
-        iFrame!.attributes['src']!.contains('://coub.com/embed/');
-
-    final vimeo =
-        embedHasSrc && iFrame!.attributes['src']!.contains('vimeo.com/video/');
-
-    final soundCloud = embedHasSrc &&
-        iFrame!.attributes['src']!.contains('soundcloud.com/player');
+    final coub = src?.contains('://coub.com/embed/') ?? false;
+    final vimeo = src?.contains('vimeo.com/video/') ?? false;
+    final soundCloud = src?.contains('soundcloud.com/player') ?? false;
 
     final gif = element.querySelectorAll('source');
     final image = element.querySelector('img');
@@ -33,60 +31,63 @@ class ContentParser {
 
     if (gif.isNotEmpty) {
       final href = element.querySelector('.video_gif_source');
-      final width = double.parse(gif.first.parentNode!.attributes['width']!);
-      final height = double.parse(gif.first.parentNode!.attributes['height']!);
-      final src = gif.map((e) => e.attributes['src']).toList();
-      final srcWebm = src.indexWhere((e) => e!.toLowerCase().endsWith('webm'));
-      final srcMp4 = src.indexWhere((e) => e!.toLowerCase().endsWith('mp4'));
+      final width = Utils.getNumberDouble(
+          (gif.first.parentNode?.attributes ?? {})['width']);
+      final height = Utils.getNumberDouble(
+          (gif.first.parentNode?.attributes ?? {})['height']);
+      final src =
+          gif.map((e) => e.attributes['src']).whereType<String>().toList();
+      final srcWebm = src.indexWhere((e) => e.toLowerCase().endsWith('webm'));
+      final srcMp4 = src.indexWhere((e) => e.toLowerCase().endsWith('mp4'));
 
       if (srcMp4 != -1 || srcWebm != -1) {
         return ContentUnitGif(
-            srcMp4 != -1 ? src[srcMp4]! : src[srcWebm]!, width, height,
-            gifUrl: href?.attributes['href']);
+          srcMp4 != -1 ? src[srcMp4] : src[srcWebm],
+          width ?? 0,
+          height ?? 0,
+          gifUrl: href?.attributes['href'],
+        );
       }
     } else if (youTubeVideo != null) {
       final link = _youtubeRegex.firstMatch(youTubeVideo)?.group(1);
       final id = link != null ? convertYouTubeUrlToId(link) : null;
       if (id != null) return ContentUnitYouTubeVideo(id);
     } else if (coub) {
-      final link = iFrame!.attributes['src'];
-      final id = link != null ? convertCoubUrlToId(link) : null;
+      final id = src != null ? convertCoubUrlToId(src) : null;
       if (id != null) return ContentUnitCoubVideo(id);
     } else if (vimeo) {
-      final link = iFrame!.attributes['src'];
-      final id = link != null ? convertVimeoUrlToId(link) : null;
+      final id = src != null ? convertVimeoUrlToId(src) : null;
       if (id != null) return ContentUnitVimeoVideo(id);
     } else if (soundCloud) {
-      final link = iFrame!.attributes['src'];
-      final id = link != null ? getSoundCloudUrl(link) : null;
+      final id = src != null ? getSoundCloudUrl(src) : null;
       if (id != null) return ContentUnitSoundCloudAudio(id);
     } else if (image != null) {
-      var width = double.tryParse(image.attributes['width']!);
-      var height = double.tryParse(image.attributes['height']!);
+      var width = Utils.getNumberDouble(image.attributes['width']);
+      var height = Utils.getNumberDouble(image.attributes['height']);
       if (height == null || width == null) {
         width = height = null;
       }
       final src = image.attributes['src'];
       if (src != null) {
-        return ContentUnitImage(src, width, height,
-            prettyImageLink: (prettyPhoto?.attributes ?? {})['href']);
+        return ContentUnitImage(
+          src,
+          width,
+          height,
+          prettyImageLink: (prettyPhoto?.attributes ?? {})['href'],
+        );
       }
     }
     return null;
   }
 
-  List<ContentTextStyle> _extractStyles(List<ContentTextStyle?> stack) {
-    return Set.of([
-      for (var style in stack)
-        if (style != null) style
-    ]).toList();
-  }
+  List<ContentTextStyle> _extractStyles(List<ContentTextStyle> stack) =>
+      Set.of(stack).toList();
 
-  ContentTextSize? _extractTextSize(List<ContentTextSize?> stack) {
-    try {
-      return stack.lastWhere((element) => element != null);
-    } on StateError {
+  ContentTextSize _extractTextSize(List<ContentTextSize> stack) {
+    if (stack.isEmpty) {
       return ContentTextSize.s12;
+    } else {
+      return stack.last;
     }
   }
 
@@ -103,8 +104,8 @@ class ContentParser {
     List<Pair<int, Object>> nodes = content.nodes.reversed
         .map<Pair<int, Object>>((e) => Pair(0, e))
         .toList();
-    List<Pair<int, ContentTextSize?>> sizes = [Pair(0, ContentTextSize.s12)];
-    List<Pair<int, ContentTextStyle?>> styles = [
+    List<Pair<int, ContentTextSize>> sizes = [Pair(0, ContentTextSize.s12)];
+    List<Pair<int, ContentTextStyle>> styles = [
       Pair(0, ContentTextStyle.NORMAL)
     ];
     List<Pair<int, String?>> links = [Pair(0, null)];
@@ -171,8 +172,8 @@ class ContentParser {
 
           final block = BLOCK_NODES.contains(element.localName);
 
-          sizes.add(Pair(nextDepth, size));
-          styles.add(Pair(nextDepth, style));
+          sizes.add(Pair(nextDepth, size ?? ContentTextSize.s12));
+          styles.add(Pair(nextDepth, style ?? ContentTextStyle.NORMAL));
           links.add(Pair(nextDepth,
               (element.localName == 'a') ? element.attributes['href'] : null));
 
@@ -191,20 +192,21 @@ class ContentParser {
       } else if (node is Node &&
           node.nodeType == Node.TEXT_NODE &&
           node.text != null &&
-          node.text!.trim().isNotEmpty) {
-        String? link = _extractLink(links.map((e) => e.right).toList());
-        String text = node.text!;
+          node.text?.trim().isNotEmpty == true) {
+        var text = node.text as String;
+        var link = _extractLink(links.map((e) => e.right).toList());
+
         if (result.isEmpty || result.last is ContentUnitBreak) {
           text = text.trimLeft();
         }
-        final size = _extractTextSize(sizes.map((e) => e.right).toList()) ??
-            ContentTextSize.s12;
+        final size = _extractTextSize(sizes.map((e) => e.right).toList());
         final style = _extractStyles(styles.map((e) => e.right).toList());
 
         if (link != null) {
-          if (_redirectRegex.hasMatch(link)) {
-            link = Uri.decodeQueryComponent(
-                _redirectRegex.firstMatch(link)!.group(1)!);
+          var match = _redirectRegex.firstMatch(link);
+          var group = match?.group(1);
+          if (group != null) {
+            link = Uri.decodeQueryComponent(group);
           }
           result.add(ContentUnitLink(
             text,
@@ -224,10 +226,9 @@ class ContentParser {
     late ContentUnit prev;
     final preResult = result.where((e) {
       bool res = e is! ContentUnitBreak ||
-          (e is ContentUnitBreak &&
-                  (e.value == ContentBreak.BLOCK_BREAK &&
-                      prev.value != e.value &&
-                      prev.value != ContentBreak.LINEBREAK) ||
+          ((e.value == ContentBreak.BLOCK_BREAK &&
+                  prev.value != e.value &&
+                  prev.value != ContentBreak.LINEBREAK) ||
               e.value == ContentBreak.LINEBREAK);
       prev = e;
       return res;
@@ -236,20 +237,20 @@ class ContentParser {
     while (preResult.isNotEmpty && preResult.last is ContentBreak) {
       preResult.removeLast();
     }
-    List<ContentUnit<String?>> answer = [];
+    List<ContentUnit<String>> answer = [];
 
     for (int i = 0; i < preResult.length; ++i) {
       if (preResult[i] is ContentUnitBreak) {
         if (answer.isNotEmpty && answer.last is ContentUnitText) {
-          answer.last.value = (answer.last.value ?? '') + '\n';
+          answer.last.value = answer.last.value + '\n';
         }
       } else {
-        answer.add(preResult[i] as ContentUnit<String?>);
+        answer.add(preResult[i] as ContentUnit<String>);
       }
     }
 
     if (answer.isNotEmpty && answer.last is ContentUnitText) {
-      answer.last.value = answer.last.value!.trim();
+      answer.last.value = answer.last.value.trim();
     }
 
     return answer;

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/parsers/types/module.dart';
 
 class AppPostTags extends StatefulWidget {
-  final List<Tag>? tags;
+  final List<Tag> tags;
   final void Function(Tag) openTag;
 
   AppPostTags({Key? key, required this.tags, required this.openTag})
@@ -17,14 +17,14 @@ class AppPostTags extends StatefulWidget {
 
 class _AppPostTagsState extends State<AppPostTags> {
   bool _opened = true;
-  List<Tag>? _tags = [];
+  late List<Tag> _tags;
 
   @override
   void initState() {
     super.initState();
-    if (widget.tags!.length - 5 > 5) {
+    if (widget.tags.length - 5 > 5) {
       _opened = false;
-      _tags = widget.tags!.sublist(0, 5);
+      _tags = widget.tags.sublist(0, 5);
     } else {
       _tags = widget.tags;
     }
@@ -48,7 +48,7 @@ class _AppPostTagsState extends State<AppPostTags> {
       runSpacing: 7,
       alignment: WrapAlignment.start,
       children: <Widget>[
-        ..._tags!.map(
+        ..._tags.map(
           (e) => Material(
             type: MaterialType.transparency,
             child: InkWell(

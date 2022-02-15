@@ -4,7 +4,7 @@ import '../../core/parsers/types/module.dart';
 import '../common/open.dart';
 
 class AppCategoriesComments extends StatelessWidget {
-  final List<StatsComment>? comments;
+  final List<StatsComment> comments;
 
   const AppCategoriesComments({Key? key, this.comments = const []})
       : super(key: key);
@@ -13,7 +13,7 @@ class AppCategoriesComments extends StatelessWidget {
   Widget build(BuildContext context) {
     int index = 0;
     return Column(children: <Widget>[
-      ...comments!.map((e) => _children(context, e, ++index))
+      ...comments.map((e) => _children(context, e, ++index))
     ]);
   }
 

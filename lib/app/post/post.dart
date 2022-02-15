@@ -14,14 +14,14 @@ class MountInfo {
   final bool state;
   final Post post;
   final GlobalKey? key;
-  final Function? collapse;
+  final Function collapse;
 
   MountInfo({
     required this.state,
     required this.post,
     this.key,
-    this.collapse,
-  });
+    Function? collapse,
+  }) : this.collapse = collapse ?? (() {});
 }
 
 class AppPostContent extends StatefulWidget {
@@ -80,10 +80,9 @@ class _AppPostContentState extends State<AppPostContent>
         SchedulerBinding.instance?.addPostFrameCallback(_postFrameCallback);
       }
     }
-    if (widget.onMountInfo != null) {
-      widget.onMountInfo!(MountInfo(
-          state: true, key: _wrapKey, post: _post, collapse: collapse));
-    }
+    widget.onMountInfo?.call(
+        MountInfo(state: true, key: _wrapKey, post: _post, collapse: collapse));
+
     _loader = AppContentLoader(
       content: (!_post.censored && !_post.hidden && !_post.unsafe)
           ? _post.content
@@ -95,9 +94,8 @@ class _AppPostContentState extends State<AppPostContent>
 
   @override
   void dispose() {
-    if (widget.onMountInfo != null) {
-      widget.onMountInfo!(MountInfo(state: false, post: _post));
-    }
+    widget.onMountInfo?.call(MountInfo(state: false, post: _post));
+
     _loader.destroy();
     super.dispose();
   }

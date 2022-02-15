@@ -147,22 +147,24 @@ class _AppPostListState extends State<AppPostList>
   }
 
   void _onScrollChange() {
-    if (!_collapsing && widget.onScrollChange != null) {
-      widget.onScrollChange!(_scrollController.offset - _scrollPrevious);
+    if (!_collapsing) {
+      widget.onScrollChange?.call(_scrollController.offset - _scrollPrevious);
     }
     bool isCollapseShow = _showCollapsePostId != null;
     int? postId;
     _mounted.forEach((element) {
       if (element.post.expanded) {
-        RenderBox renderBoxTop =
-            _pageKey.currentContext!.findRenderObject() as RenderBox;
-        RenderBox renderBox =
-            element.key!.currentContext!.findRenderObject() as RenderBox;
-        final offset = renderBox.localToGlobal(Offset.zero) -
-            renderBoxTop.localToGlobal(Offset.zero);
-        Size postSize = element.key!.currentContext!.size!;
-        Size renderBoxWrapperSize = _pageKey.currentContext!.size!;
-        if (offset.dy + postSize.height - renderBoxWrapperSize.height - 60 >
+        final renderBoxTop =
+            _pageKey.currentContext?.findRenderObject() as RenderBox?;
+        final renderBox =
+            element.key?.currentContext?.findRenderObject() as RenderBox?;
+        final offset = (renderBox?.localToGlobal(Offset.zero) ?? Offset.zero) -
+            (renderBoxTop?.localToGlobal(Offset.zero) ?? Offset.zero);
+        final postSize = element.key?.currentContext?.size;
+        final renderBoxWrapperSize = _pageKey.currentContext?.size;
+        if (postSize != null &&
+            renderBoxWrapperSize != null &&
+            offset.dy + postSize.height - renderBoxWrapperSize.height - 60 >
                 0 &&
             offset.dy < renderBoxWrapperSize.height / 1.5) {
           postId = element.post.id;
@@ -183,14 +185,16 @@ class _AppPostListState extends State<AppPostList>
   void _closePost() {
     _mounted.forEach((element) {
       if (element.post.expanded) {
-        RenderBox renderBox =
-            element.key!.currentContext!.findRenderObject() as RenderBox;
-        final offset = renderBox.localToGlobal(Offset.zero);
-        RenderBox renderBoxTop =
-            _pageKey.currentContext!.findRenderObject() as RenderBox;
-        final offsetTop = renderBoxTop.localToGlobal(Offset.zero);
-        _onPostCollapse(true, -offset.dy + offsetTop.dy);
-        element.collapse!();
+        final renderBox =
+            element.key?.currentContext?.findRenderObject() as RenderBox?;
+        final offset = renderBox?.localToGlobal(Offset.zero);
+        final renderBoxTop =
+            _pageKey.currentContext?.findRenderObject() as RenderBox?;
+        final offsetTop = renderBoxTop?.localToGlobal(Offset.zero);
+        if (offset != null && offsetTop != null) {
+          _onPostCollapse(true, -offset.dy + offsetTop.dy);
+        }
+        element.collapse();
       }
     });
     _showCollapsePostId = null;
@@ -199,12 +203,13 @@ class _AppPostListState extends State<AppPostList>
 
   Widget _itemBuilder(context, index, hasError) {
     if (_showHeader && index == 0) {
-      if (widget.loader.firstPage.pageInfo == null) {
+      final pageInfo = widget.loader.firstPage.pageInfo;
+      if (pageInfo == null) {
         return SizedBox();
       }
       return AppTagHeader(
         prefix: widget.loader.prefix,
-        pageInfo: widget.loader.firstPage.pageInfo!,
+        pageInfo: pageInfo,
         onBlock: () {
           _posts = null;
           AppFuturePageState? appFuturePageState =
@@ -246,9 +251,10 @@ class _AppPostListState extends State<AppPostList>
         height: 50,
         child: Center(
           child: SizedBox(
-              child: CircularProgressIndicator(strokeWidth: 2),
-              height: 20.0,
-              width: 20.0),
+            child: CircularProgressIndicator(strokeWidth: 2),
+            height: 20.0,
+            width: 20.0,
+          ),
         ),
       );
     }
@@ -267,7 +273,7 @@ class _AppPostListState extends State<AppPostList>
             _posts = null;
             widget.loader.reset();
           }
-          final isFirst = _posts == null || _posts!.isEmpty;
+          final isFirst = _posts == null || _posts?.isEmpty == true;
 
           final create =
               await (isFirst ? widget.loader.load() : widget.loader.loadNext());

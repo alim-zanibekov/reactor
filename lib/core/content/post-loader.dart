@@ -73,15 +73,15 @@ class PostLoader extends Loader<Post> {
     if (search) {
       return _api.search(query: query, author: author, tags: tags);
     } else if (favorite != null) {
-      return _api.loadFavorite(favorite!);
-    } else if (user) {
-      return _api.loadUser(path!);
+      return _api.loadFavorite(favorite as String);
     } else if (subscriptions) {
       return _api.loadSubscriptions();
     } else if (path == null) {
       return _api.load(postListType);
+    } else if (user) {
+      return _api.loadUser(path as String);
     } else {
-      return _api.loadTag(path!, postListType);
+      return _api.loadTag(path as String, postListType);
     }
   }
 
@@ -89,15 +89,15 @@ class PostLoader extends Loader<Post> {
     if (search) {
       return _api.searchByPageId(id, query: query, author: author, tags: tags);
     } else if (favorite != null) {
-      return _api.loadFavoriteByPageId(favorite!, id);
-    } else if (user) {
-      return _api.loadUserByPageId(path!, id);
+      return _api.loadFavoriteByPageId(favorite as String, id);
     } else if (subscriptions) {
       return _api.loadSubscriptionsByPageId(id);
     } else if (path == null) {
       return _api.loadByPageId(id, postListType);
+    } else if (user) {
+      return _api.loadUserByPageId(path as String, id);
     } else {
-      return _api.loadTagByPageId(path!, id, postListType);
+      return _api.loadTagByPageId(path as String, id, postListType);
     }
   }
 
@@ -105,14 +105,13 @@ class PostLoader extends Loader<Post> {
     final pageId = _startPageId;
     final page = await (pageId != null ? _loadPageById(pageId) : _loadPage());
 
-    _reversedPagination = page.reversedPagination ?? false;
+    _reversedPagination = page.reversedPagination;
     _pages.add(page);
     final posts = _reversedLoading ? page.content.reversed : page.content;
 
     posts.forEach((post) => _postIds.add(post.id));
     _posts.addAll(posts);
-    _complete = (_posts.isEmpty ||
-        ((_pages.last.isLast ?? false) && !_reversedLoading));
+    _complete = (_posts.isEmpty || (_pages.last.isLast && !_reversedLoading));
     _loadCount += 1;
     _postsPerPage = posts.length;
 
@@ -155,7 +154,7 @@ class PostLoader extends Loader<Post> {
         _postsPerPage = max(page.content.length, _postsPerPage);
         _pages.add(page);
 
-        if (page.content.isEmpty || (page.isLast ?? false)) {
+        if (page.content.isEmpty || page.isLast) {
           _complete = true;
         }
         final posts = _reversedLoading ? page.content.reversed : page.content;

@@ -71,7 +71,7 @@ class _AppSearchState extends State<AppSearch> {
                     ],
                   ),
                   SizedBox(height: 20),
-                  ChipsInput<String?>(
+                  ChipsInput<String>(
                     initialValue: [],
                     decoration: InputDecoration(
                       labelText: 'Теги',
@@ -95,7 +95,7 @@ class _AppSearchState extends State<AppSearch> {
                           key: ObjectKey(tag),
                           padding: const EdgeInsets.fromLTRB(10, 4.5, 10, 4.5),
                           child:
-                              Text(tag!, style: const TextStyle(fontSize: 13)),
+                              Text(tag, style: const TextStyle(fontSize: 13)),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(50),
                             color: Theme.of(context).splashColor,
@@ -107,7 +107,7 @@ class _AppSearchState extends State<AppSearch> {
                     suggestionBuilder: (context, state, tag) {
                       return ListTile(
                         key: ObjectKey(tag),
-                        title: Text(tag!),
+                        title: Text(tag),
                         onTap: () => state.selectSuggestion(tag),
                       );
                     },

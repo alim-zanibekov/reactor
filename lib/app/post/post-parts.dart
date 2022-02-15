@@ -38,7 +38,7 @@ class PostTopControls extends StatelessWidget {
           if (browser == null) {
             browser = InAppBrowser();
           }
-          browser!.openUrlRequest(
+          browser?.openUrlRequest(
               urlRequest: URLRequest(url: Uri.parse(post.link)));
         },
       ),
@@ -166,7 +166,7 @@ class PostExpandCollapseButton extends StatelessWidget {
           color: isDark ? Colors.white : Colors.grey[100],
         ),
         child: TextButton(
-          onPressed: toggle as void Function()?,
+          onPressed: () => toggle(),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[

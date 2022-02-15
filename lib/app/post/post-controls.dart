@@ -116,7 +116,7 @@ class _AppPostControlsState extends State<AppPostControls> {
           ]),
           if (_auth.authorized)
             Row(children: <Widget>[
-              if (widget.post.canVote!)
+              if (widget.post.canVote)
                 Padding(
                   padding: EdgeInsets.only(right: 10),
                   child: InkWell(
@@ -127,7 +127,7 @@ class _AppPostControlsState extends State<AppPostControls> {
                   ),
                 ),
               Text(widget.post.rating?.toString() ?? '––'),
-              if (widget.post.canVote!)
+              if (widget.post.canVote)
                 Padding(
                   padding: EdgeInsets.only(left: 10),
                   child: InkWell(

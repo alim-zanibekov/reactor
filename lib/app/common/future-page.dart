@@ -60,9 +60,7 @@ class AppFuturePageState<T> extends State<AppFuturePage<T>> {
       _load();
     } else {
       _fromUser = false;
-      RefreshIndicatorState? refreshIndicatorState =
-          _refreshKey.currentState as RefreshIndicatorState?;
-      refreshIndicatorState?.show();
+      (_refreshKey.currentState as RefreshIndicatorState?)?.show();
     }
     if (hideContent) {
       _loading = true;

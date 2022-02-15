@@ -12,7 +12,7 @@ class CommentsLoader extends Loader<PostComment> {
   final List<PostComment> _comments = [];
 
   bool get complete {
-    return (_pages.last.isLast ?? false) || _complete;
+    return _pages.last.isLast || _complete;
   }
 
   List<PostComment> get elements {
@@ -36,12 +36,13 @@ class CommentsLoader extends Loader<PostComment> {
   Future<List<PostComment>> load() async {
     final page = await _api.loadUserComments(username);
     _pages.add(page);
+    _complete = _pages.last.content.isEmpty || _pages.last.isLast;
     _comments.addAll(page.content);
     return page.content;
   }
 
   Future<List<PostComment>> loadNext() async {
-    if (_pages.last.isLast! || _complete) {
+    if (_pages.isEmpty || _pages.last.isLast || _complete) {
       return [];
     }
     int id = _pages.last.id + 1;

@@ -14,7 +14,7 @@ class AppComment extends StatefulWidget {
   final PostComment comment;
   final int depth;
   final Color? color;
-  final bool? showAnswer;
+  final bool showAnswer;
   final bool showGoToPost;
   final Function? onSend;
   final Function? onDelete;
@@ -93,7 +93,7 @@ class _AppCommentState extends State<AppComment>
   }
 
   _vote(VoteType type) async {
-    if (widget.comment.votedDown! || _loading) return;
+    if (widget.comment.votedDown || _loading) return;
     _loading = true;
     try {
       final value = await Api().voteComment(widget.comment.id, type);
@@ -171,7 +171,7 @@ class _AppCommentState extends State<AppComment>
             ),
           ),
         ),
-      if (widget.showAnswer! && widget.comment.user?.username == _auth.username)
+      if (widget.showAnswer && widget.comment.user?.username == _auth.username)
         SizedBox(
           height: 25,
           child: TextButton(
@@ -186,23 +186,23 @@ class _AppCommentState extends State<AppComment>
           ),
         ),
       const Expanded(child: SizedBox()),
-      if (widget.comment.canVote!)
+      if (widget.comment.canVote)
         Padding(
           padding: const EdgeInsets.only(right: 10),
           child: InkWell(
             onTap: () => _vote(VoteType.UP),
-            child: widget.comment.votedUp!
+            child: widget.comment.votedUp
                 ? Icon(Icons.mood, color: Colors.green[600], size: 18)
                 : Icon(Icons.mood, size: 18),
           ),
         ),
       Text(widget.comment.rating?.toString() ?? '––'),
-      if (widget.comment.canVote!)
+      if (widget.comment.canVote)
         Padding(
           padding: const EdgeInsets.only(left: 10),
           child: InkWell(
             onTap: () => _vote(VoteType.DOWN),
-            child: widget.comment.votedDown!
+            child: widget.comment.votedDown
                 ? Icon(Icons.mood_bad, color: Colors.red[600], size: 18)
                 : Icon(Icons.mood_bad, size: 18),
           ),
@@ -258,7 +258,7 @@ class _AppCommentState extends State<AppComment>
             Padding(
               padding: const EdgeInsets.only(right: 5),
               child: InkWell(
-                onTap: widget.scrollToParent as void Function()?,
+                onTap: () => widget.scrollToParent?.call(),
                 child: const Icon(Icons.keyboard_arrow_up),
               ),
             )
@@ -310,7 +310,7 @@ class _AppCommentState extends State<AppComment>
               padding: EdgeInsets.only(left: 15.0 * depth),
             )
           ]),
-        if (_auth.authorized && widget.showAnswer!)
+        if (_auth.authorized && widget.showAnswer)
           AnimatedBuilder(
             animation: _controller.view,
             builder: (context, child) {
@@ -353,10 +353,10 @@ class AppComments extends StatefulWidget {
 
   static List<AppComment> getCommentsList({
     required List<PostComment> comments,
-    bool? showAnswer,
-    void Function(int?)? goTo,
-    Function? reload,
-    Color? Function(int?)? getColor,
+    bool showAnswer = false,
+    required void Function(int) goTo,
+    required Function reload,
+    Color? Function(int)? getColor,
   }) {
     final stack = List.of(comments.reversed);
     final depthStack = List.filled(stack.length, 0, growable: true);
@@ -379,14 +379,14 @@ class AppComments extends StatefulWidget {
         showAnswer: showAnswer,
         onSend: reload,
         scrollToParent: () {
-          goTo!(parentId);
+          goTo(parentId);
         },
         onDelete: reload,
       ));
 
-      depthStack.addAll(List.filled(comment.children!.length, depth + 1));
-      parentStack.addAll(List.filled(comment.children!.length, comment.id));
-      stack.addAll(comment.children!.reversed);
+      depthStack.addAll(List.filled(comment.children.length, depth + 1));
+      parentStack.addAll(List.filled(comment.children.length, comment.id));
+      stack.addAll(comment.children.reversed);
     }
     return children.toList();
   }
@@ -424,8 +424,8 @@ class _AppCommentsState extends State<AppComments> {
         showAnswer: false,
       ));
 
-      depthStack.addAll(List.filled(comment.children!.length, depth + 1));
-      stack.addAll(comment.children!.reversed);
+      depthStack.addAll(List.filled(comment.children.length, depth + 1));
+      stack.addAll(comment.children.reversed);
     }
 
     return Container(

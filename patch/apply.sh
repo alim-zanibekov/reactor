@@ -7,7 +7,7 @@ if [ "$1" == "r" ];
 then
   if ! patch --dry-run -s -f $p1 $p2 >/dev/null; then
     patch -R $p1 $p2
-    echo "reversed"
+    echo "rolled back"
   fi
 else
   if ! patch -R --dry-run -s -f $p1 $p2 >/dev/null; then

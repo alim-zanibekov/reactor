@@ -35,14 +35,15 @@ class _AppVimeoPlayerState extends State<AppVimeoPlayer>
   @override
   void initState() {
     super.initState();
-    _metadata = widget.metadata;
+    final metadata = widget.metadata;
+    _metadata = metadata;
 
-    if (_metadata != null) {
-      _aspectRatio = _metadata!.width! / _metadata!.height!;
+    if (metadata != null) {
+      _aspectRatio = metadata.width / metadata.height;
     } else {
-      widget.futureMetadata!.then((value) {
+      widget.futureMetadata?.then((value) {
         _metadata = value;
-        _aspectRatio = _metadata!.width! / _metadata!.height!;
+        _aspectRatio = value.width / value.height;
         if (mounted) {
           setState(() {});
         }

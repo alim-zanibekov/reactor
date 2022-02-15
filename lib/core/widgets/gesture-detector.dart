@@ -9,32 +9,41 @@ import '../common/value-updater.dart';
 
 class MatrixGestureDetectorDetails {
   final Offset position;
-  final Matrix4? translateMatrix;
-  final Matrix4? scaleMatrix;
-  final double? scale;
   final VelocityTracker? _velocityTracker;
 
-  const MatrixGestureDetectorDetails({
-    required this.position,
-    this.scale,
-    velocityTracker,
-    this.translateMatrix,
-    this.scaleMatrix,
-  }) : this._velocityTracker = velocityTracker;
+  const MatrixGestureDetectorDetails(
+      {required this.position, VelocityTracker? velocityTracker})
+      : this._velocityTracker = velocityTracker;
 
   VelocityEstimate? get velocityEstimate =>
-      _velocityTracker!.getVelocityEstimate();
+      _velocityTracker?.getVelocityEstimate();
 }
 
-typedef GestureDetectorCallback<T> = void Function(
-    MatrixGestureDetectorDetails details);
+class MatrixGestureDetectorOnUpdateDetails
+    extends MatrixGestureDetectorDetails {
+  final Matrix4 translateMatrix;
+  final Matrix4 scaleMatrix;
+  final double scale;
+  final VelocityTracker? _velocityTracker;
+
+  const MatrixGestureDetectorOnUpdateDetails({
+    required Offset position,
+    required this.scale,
+    VelocityTracker? velocityTracker,
+    required this.translateMatrix,
+    required this.scaleMatrix,
+  })  : this._velocityTracker = velocityTracker,
+        super(position: position, velocityTracker: velocityTracker);
+}
+
+typedef GestureDetectorCallback<T> = void Function(T details);
 
 class MatrixGestureDetector extends StatefulWidget {
   final Widget child;
-  final GestureDetectorCallback? onStart;
-  final GestureDetectorCallback? onUpdate;
-  final GestureDetectorCallback? onEnd;
-  final GestureDetectorCallback? onDoubleTap;
+  final GestureDetectorCallback<MatrixGestureDetectorDetails>? onStart;
+  final GestureDetectorCallback<MatrixGestureDetectorOnUpdateDetails>? onUpdate;
+  final GestureDetectorCallback<MatrixGestureDetectorDetails>? onEnd;
+  final GestureDetectorCallback<MatrixGestureDetectorDetails>? onDoubleTap;
 
   const MatrixGestureDetector({
     Key? key,
@@ -88,12 +97,10 @@ class _MatrixGestureDetectorState extends State<MatrixGestureDetector> {
   }
 
   void _onDoubleTap(Offset localPoint) {
-    if (widget.onDoubleTap != null) {
-      widget.onDoubleTap!(MatrixGestureDetectorDetails(
-        position: localPoint,
-        velocityTracker: _velocityTracker,
-      ));
-    }
+    widget.onDoubleTap?.call(MatrixGestureDetectorDetails(
+      position: localPoint,
+      velocityTracker: _velocityTracker,
+    ));
   }
 
   void _onScaleStart(ScaleStartDetails details) {
@@ -101,18 +108,16 @@ class _MatrixGestureDetectorState extends State<MatrixGestureDetector> {
     _scaleUpdater.value = 1.0;
 
     _velocityTracker = VelocityTracker.withKind(PointerDeviceKind.touch);
-    if (widget.onStart != null) {
-      widget.onStart!(MatrixGestureDetectorDetails(
-        position: details.localFocalPoint,
-      ));
-    }
+    widget.onStart?.call(MatrixGestureDetectorDetails(
+      position: details.localFocalPoint,
+    ));
 
     _startTime = DateTime.now();
   }
 
   void _onScaleUpdate(ScaleUpdateDetails details) {
     _lastPosition = details.localFocalPoint;
-    _velocityTracker!.addPosition(
+    _velocityTracker?.addPosition(
       _startTime.difference(DateTime.now()),
       details.localFocalPoint,
     );
@@ -129,16 +134,13 @@ class _MatrixGestureDetectorState extends State<MatrixGestureDetector> {
       details.localFocalPoint,
     );
 
-    if (widget.onUpdate != null) {
-      widget.onUpdate!(
-        MatrixGestureDetectorDetails(
-            scale: details.scale,
-            position: details.localFocalPoint,
-            scaleMatrix: scaleDeltaMatrix,
-            translateMatrix: translationDeltaMatrix,
-            velocityTracker: _velocityTracker),
-      );
-    }
+    widget.onUpdate?.call(MatrixGestureDetectorOnUpdateDetails(
+      scale: details.scale,
+      position: details.localFocalPoint,
+      scaleMatrix: scaleDeltaMatrix,
+      translateMatrix: translationDeltaMatrix,
+      velocityTracker: _velocityTracker,
+    ));
   }
 
   void _onScaleEnd(ScaleEndDetails details) {
@@ -154,8 +156,8 @@ class _MatrixGestureDetectorState extends State<MatrixGestureDetector> {
       _doubleTapUpdater.update(Pair(Offset.zero, 0));
     }
     final lastPosition = _lastPosition;
-    if (widget.onEnd != null && lastPosition != null) {
-      widget.onEnd!(MatrixGestureDetectorDetails(
+    if (lastPosition != null) {
+      widget.onEnd?.call(MatrixGestureDetectorDetails(
         position: lastPosition,
         velocityTracker: _velocityTracker,
       ));
@@ -181,21 +183,21 @@ class Boxer {
   Boxer(this.bounds, this.src);
 
   void clamp(Matrix4 matrix) {
-    container = MatrixUtils.transformRect(matrix, src);
+    final _container = MatrixUtils.transformRect(matrix, src);
 
-    if (container!.contains(bounds.topLeft) &&
-        container!.contains(bounds.bottomRight)) {
+    if (_container.contains(bounds.topLeft) &&
+        _container.contains(bounds.bottomRight)) {
       return;
     }
 
-    final lowWidth = container!.width < bounds.width;
-    final lowHeight = container!.height < bounds.height;
+    final lowWidth = _container.width < bounds.width;
+    final lowHeight = _container.height < bounds.height;
 
     if (lowWidth || lowHeight) {
       vector.Vector3 t = vector.Vector3.zero();
 
       final scale = max(
-          container!.width / bounds.width, container!.height / bounds.height);
+          _container.width / bounds.width, _container.height / bounds.height);
       if (scale < 1) {
         t.x = (bounds.width - src.width) / 2;
         t.y = (bounds.height - src.height) / 2;
@@ -203,75 +205,81 @@ class Boxer {
             t, vector.Quaternion.identity(), vector.Vector3(1, 1, 0));
       } else {
         t.x =
-            lowWidth ? (bounds.width - container!.width) / 2 : container!.left;
+            lowWidth ? (bounds.width - _container.width) / 2 : _container.left;
         t.y = lowHeight
-            ? (bounds.height - container!.height) / 2
-            : container!.top;
+            ? (bounds.height - _container.height) / 2
+            : _container.top;
 
         matrix.setTranslation(t);
       }
     }
 
     if (!lowHeight) {
-      if (container!.top > bounds.top) {
-        matrix.leftTranslate(0.0, bounds.top - container!.top);
+      if (_container.top > bounds.top) {
+        matrix.leftTranslate(0.0, bounds.top - _container.top);
       }
-      if (container!.bottom < bounds.bottom) {
-        matrix.leftTranslate(0.0, bounds.bottom - container!.bottom);
+      if (_container.bottom < bounds.bottom) {
+        matrix.leftTranslate(0.0, bounds.bottom - _container.bottom);
       }
     }
     if (!lowWidth) {
-      if (container!.left > bounds.left) {
-        matrix.leftTranslate(bounds.left - container!.left, 0.0);
+      if (_container.left > bounds.left) {
+        matrix.leftTranslate(bounds.left - _container.left, 0.0);
       }
-      if (container!.right < bounds.right) {
-        matrix.leftTranslate(bounds.right - container!.right, 0.0);
+      if (_container.right < bounds.right) {
+        matrix.leftTranslate(bounds.right - _container.right, 0.0);
       }
     }
+
+    container = _container;
   }
 
   void restrictHorizontalMoveAndScale(Matrix4 matrix) {
-    container = MatrixUtils.transformRect(matrix, src);
+    final _container = MatrixUtils.transformRect(matrix, src);
     vector.Vector3 t = vector.Vector3.zero();
-    t.x = (bounds.width - container!.width) / 2;
-    t.y = container!.top;
+    t.x = (bounds.width - _container.width) / 2;
+    t.y = _container.top;
     matrix.setFromTranslationRotationScale(
       t,
       vector.Quaternion.identity(),
       vector.Vector3(1, 1, 0),
     );
+    container = _container;
   }
 
   void restrictVerticalMoveAndScale(Matrix4 matrix) {
-    container = MatrixUtils.transformRect(matrix, src);
+    final _container = MatrixUtils.transformRect(matrix, src);
     vector.Vector3 t = vector.Vector3.zero();
-    t.x = container!.left;
-    t.y = (bounds.height - container!.height) / 2;
+    t.x = _container.left;
+    t.y = (bounds.height - _container.height) / 2;
     matrix.setFromTranslationRotationScale(
       t,
       vector.Quaternion.identity(),
       vector.Vector3(1, 1, 0),
     );
+    container = _container;
   }
 
-  Rect? getRect(Matrix4 matrix) {
-    container = MatrixUtils.transformRect(matrix, src);
-    return container;
+  Rect getRect(Matrix4 matrix) {
+    final _container = MatrixUtils.transformRect(matrix, src);
+    container = _container;
+    return _container;
   }
 
   void fit(Matrix4 matrix, Offset focalPoint, {double scaleDelta = 0}) {
-    container = MatrixUtils.transformRect(matrix, src);
+    final _container = MatrixUtils.transformRect(matrix, src);
 
-    final arContainer = container!.size.width / container!.size.height;
+    final arContainer = _container.size.width / _container.size.height;
     final arBounds = bounds.size.width / bounds.size.height;
     double scale;
 
     if (arContainer > arBounds) {
-      scale = bounds.size.height / container!.size.height;
+      scale = bounds.size.height / _container.size.height;
     } else {
-      scale = bounds.size.width / container!.size.width;
+      scale = bounds.size.width / _container.size.width;
     }
     matrix.setFrom(
         MatrixGestureDetector.scaleMatrix(scale + scaleDelta, focalPoint));
+    container = _container;
   }
 }

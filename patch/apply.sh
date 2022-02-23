@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 DIRECTORY=$(cd $(dirname $0) && pwd)
-p1="$(dirname $(dirname $(which flutter)))/packages/flutter/lib/src/widgets/editable_text.dart"
+p1="$(dirname $(dirname $(readlink $(which flutter) 2>/dev/null || which flutter)))/packages/flutter/lib/src/widgets/editable_text.dart"
 p2="$DIRECTORY/editable_text.dart.patch"
 
 if [ "$1" == "r" ];

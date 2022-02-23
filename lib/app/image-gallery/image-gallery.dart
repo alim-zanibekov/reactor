@@ -308,12 +308,7 @@ class _ImageGalleryState extends State<ImageGallery>
                     .loadFromDiskCache();
             final url =
                 (_activeImage.imageProvider as AppNetworkImageWithRetry).url;
-            try {
-              await SaveFile.save(url, rawBytes);
-              SnackBarHelper.show(context, 'Сохранено');
-            } on Exception {
-              SnackBarHelper.show(context, 'Не удалось сохранить изображение');
-            }
+            await SaveFile.save(context, url, rawBytes);
           })
     ]);
 

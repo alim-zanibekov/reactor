@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 import 'app/home.dart';
 import 'core/auth/auth.dart';
@@ -25,6 +26,7 @@ class EmptyBehavior extends ScrollBehavior {
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  tz.initializeTimeZones();
 
   FlutterError.onError = (FlutterErrorDetails details) {
     if (isInDebugMode) {
@@ -114,6 +116,7 @@ class _AppState extends State<App> {
       ],
       supportedLocales: const [
         Locale('ru', 'RU'),
+        Locale('en', 'US'),
       ],
       home: Scaffold(
         body: DoubleBackToCloseApp(

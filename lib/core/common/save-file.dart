@@ -13,7 +13,7 @@ import 'notifications-manager.dart';
 import 'snack-bar.dart';
 
 class SaveFile {
-  static Future<File> save(String fileUrl, Uint8List data) async {
+  static Future<File> _save(String fileUrl, Uint8List data) async {
     if (!(await Permission.storage.isGranted)) {
       final status = await Permission.storage.request();
       if (status != PermissionStatus.granted) {
@@ -36,18 +36,35 @@ class SaveFile {
     return File('$path/$fileName').writeAsBytes(data);
   }
 
+  static Future<bool> save(
+      BuildContext context, String fileUrl, Uint8List data) async {
+    try {
+      await SaveFile._save(fileUrl, data);
+      SnackBarHelper.show(context,
+          Platform.isAndroid ? 'Сохранено в папку Загрузки' : 'Сохранено');
+      return true;
+    } on Exception {
+      SnackBarHelper.show(context, 'Не удалось загрузить');
+      return false;
+    }
+  }
+
   static downloadAndSave(BuildContext context, String url) async {
     try {
       final notification = AppNotification('Загрузка', url);
       notification.show();
-      final file = await (Api().downloadFile(url, headers: Headers.videoHeaders,
+      final file = await Api().downloadFile(url, headers: Headers.videoHeaders,
           onReceiveProgress: (int count, int total) {
         double percent = count.toDouble() / total.toDouble() * 100;
         notification.setProgress(percent.floor());
-      }) as FutureOr<Uint8List>);
+      });
       notification.hide();
-      SaveFile.save(url, file);
-      SnackBarHelper.show(context, 'Сохранено');
+      if (file == null) {
+        throw Exception("File invalid");
+      }
+      await SaveFile._save(url, file);
+      SnackBarHelper.show(context,
+          Platform.isAndroid ? 'Сохранено в папку Загрузки' : 'Сохранено');
     } on Exception {
       SnackBarHelper.show(context, 'Не удалось загрузить');
     }

@@ -58,7 +58,7 @@ class AppNotification {
   int _id;
   String _title;
   String _body;
-  late int _progress;
+  int? _progress;
   bool _showed = false;
 
   AppNotification(String title, String body)

@@ -1,5 +1,4 @@
 # Reactor
-[![Codemagic build status](https://api.codemagic.io/apps/601dd98d83016c22056b904e/601dd98d83016c22056b904d/status_badge.svg)](https://codemagic.io/apps/601dd98d83016c22056b904e/601dd98d83016c22056b904d/latest_build)
 
 JoyReactor mobile client
 

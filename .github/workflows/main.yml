@@ -20,10 +20,11 @@ jobs:
       - run: flutter config --no-analytics
       - run: ./patch/apply.sh
       - run: flutter build ios --profile --no-codesign
-      - run: |
+      - name: make ipa
+        run: |
           mkdir Reactor
           cp -R ./build/ios/iphoneos/Runner.app ./Reactor
-          zip -r reactor.zip Reactor
+          zip -qq -r reactor.zip Reactor
           mv reactor.zip reactor.ipa
       - uses: actions/upload-artifact@v2
         with:

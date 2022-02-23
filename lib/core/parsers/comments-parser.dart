@@ -82,24 +82,29 @@ class CommentsParser {
   }
 
   PostComment _parseComment(Element element, int depth, int postId) {
+    final creatorId = Utils.getNumberInt(element.attributes['userid']);
     final _ts = Utils.getNumberInt(element.attributes['timestamp']);
     final time =
         _ts != null ? DateTime.fromMillisecondsSinceEpoch(_ts * 1000) : null;
-    final bottom = element.querySelector('.comments_bottom');
-    final avatarElement = bottom?.querySelector('.avatar');
+    final txt = element.querySelector('.txt');
+    final avatarElement = txt?.querySelector('.avatar');
     final id = Utils.getNumberInt(
-        element.attributes['id']?.replaceFirst('comment', '')) ?? 0;
-    final creatorId = Utils.getNumberInt(element.attributes['userid']);
-    final ratingText = bottom?.querySelector('.comment_rating')?.text;
-    final avatar = avatarElement?.attributes['src'];
-    final username = avatarElement?.attributes['alt'];
+            element.attributes['id']?.replaceFirst('comment', '')) ??
+        0;
+    final ratingText = txt?.querySelector('.comment_rating')?.text;
+    final avatar = avatarElement?.attributes['src'] ??
+        (creatorId != null
+            ? "http://img2.reactor.cc/pics/avatar/user/$creatorId"
+            : null);
+
     final hidden = element.querySelector('.comment_show') != null;
-    final usernameElement = bottom?.querySelector('.comment_username');
+    final usernameElement = txt?.querySelector('.comment_username');
+    final username = usernameElement?.text.trim();
     final userLink = usernameElement?.attributes['href']?.split('/').last;
 
-    final votedUp = bottom?.querySelector('.vote-minus.vote-change') != null;
-    final votedDown = bottom?.querySelector('.vote-plus.vote-change') != null;
-    final canVote = bottom?.querySelector('.vote-plus') != null;
+    final votedUp = txt?.querySelector('.vote-minus.vote-change') != null;
+    final votedDown = txt?.querySelector('.vote-plus.vote-change') != null;
+    final canVote = txt?.querySelector('.vote-plus') != null;
     final content = element.querySelector('.txt');
 
     return PostComment(
@@ -119,9 +124,8 @@ class CommentsParser {
               link: userLink ?? username,
             )
           : null,
-      content: !hidden && content != null
-          ? _contentParser.parse(content)
-          : null,
+      content:
+          !hidden && content != null ? _contentParser.parse(content) : null,
       depth: depth,
     );
   }
@@ -131,7 +135,8 @@ class CommentsParser {
     final avatarElement = bottom?.querySelector('.avatar');
     final timestampString = bottom
         ?.querySelector('.comment_date')
-        ?.children.asMap()[0]
+        ?.children
+        .asMap()[0]
         ?.attributes['data-time'];
     final time = timestampString != null
         ? DateTime.fromMillisecondsSinceEpoch(int.parse(timestampString) * 1000)

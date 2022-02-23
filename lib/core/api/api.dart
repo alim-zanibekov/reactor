@@ -34,7 +34,10 @@ class Api {
   static final _session = Session();
   static final _auth = Auth();
   static final _dio = getDioInstance();
-  String _host = 'http://joyreactor.cc';
+  static var _apiHost = 'joyreactor.cc';
+  String? _prefix;
+
+  get _host => _prefix != null ? 'http://$_prefix.reactor.cc' : 'http://$_apiHost';
 
   factory Api() {
     return _api;
@@ -42,12 +45,12 @@ class Api {
 
   static Api withPrefix(String prefix) {
     final instance = Api._internal();
-    instance._host = 'http://$prefix.reactor.cc';
+    instance._prefix = prefix;
     return instance;
   }
 
-  void sethHost(String? host) {
-    _host = 'http://$host';
+  static void setHost(String host) {
+    _apiHost = host;
   }
 
   Api._internal();

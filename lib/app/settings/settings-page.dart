@@ -66,7 +66,7 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
                       setState(() => _host = value);
                       await _preferences.setHost(value);
                       ReloadService.reload();
-                      Api().sethHost(value);
+                      Api.setHost(value);
                     },
                     items: _preferences.hostList
                         .map<DropdownMenuItem<String>>((String value) {

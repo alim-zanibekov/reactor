@@ -128,6 +128,8 @@ class ContentParser {
       } else if (node is Node && node.nodeType == Node.ELEMENT_NODE) {
         Element element = node as Element;
         if (element.classes.contains('comments_bottom') ||
+            element.classes.contains('reply-link') ||
+            element.classes.contains('comment_rating') ||
             element.classes.contains('mainheader') ||
             element.classes.contains('post_poll_holder') ||
             element.classes.contains('blog_results')) {
@@ -193,6 +195,12 @@ class ContentParser {
           node.nodeType == Node.TEXT_NODE &&
           node.text != null &&
           node.text?.trim().isNotEmpty == true) {
+        if (node.text == ' — ' &&
+            node.parentNode != null &&
+            node.parentNode!.nodeType == Node.ELEMENT_NODE &&
+            (node.parentNode! as Element).className.contains('txt')) {
+          continue;
+        }
         var text = node.text as String;
         var link = _extractLink(links.map((e) => e.right).toList());
 

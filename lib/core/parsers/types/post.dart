@@ -171,10 +171,6 @@ class Post {
   bool expanded = false;
   Quiz? quiz;
 
-  get link {
-    return 'http://joyreactor.cc/post/$id';
-  }
-
   Post({
     required this.id,
     required this.tags,

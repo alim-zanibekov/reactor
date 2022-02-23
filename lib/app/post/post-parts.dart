@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:reactor/core/preferences/preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/common/clipboard.dart';
@@ -25,12 +26,16 @@ class PostTopControls extends StatelessWidget {
   final bool canOpenPost;
   final Function? loadContent;
 
+  get _link {
+    return 'http://${Preferences().host}/post/${post.id}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final menu = Menu(context, items: [
       MenuItem(
         text: 'Скопировать ссылку',
-        onSelect: () => ClipboardHelper.setClipboardData(context, post.link),
+        onSelect: () => ClipboardHelper.setClipboardData(context, _link),
       ),
       MenuItem(
         text: 'Открыть в браузере',
@@ -39,12 +44,12 @@ class PostTopControls extends StatelessWidget {
             browser = InAppBrowser();
           }
           browser?.openUrlRequest(
-              urlRequest: URLRequest(url: Uri.parse(post.link)));
+              urlRequest: URLRequest(url: Uri.parse(_link)));
         },
       ),
       MenuItem(
         text: 'Открыть в системном браузере',
-        onSelect: () => launch(post.link),
+        onSelect: () => launch(_link),
       ),
     ]);
 

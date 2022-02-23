@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import 'app/home.dart';
+import 'core/api/api.dart';
 import 'core/auth/auth.dart';
 import 'core/common/in-app-notifications-manager.dart';
 import 'core/common/user-agent/user-agent.dart';
@@ -45,7 +46,9 @@ void main() {
         return FutureBuilder(
           future: Future.wait([
             Auth().init(),
-            Preferences().init(),
+            Preferences()
+                .init()
+                .then((value) => Api.setHost(Preferences().host)),
             SentryReporter().init(),
             UserAgent.init(),
           ]),

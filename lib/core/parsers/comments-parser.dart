@@ -98,7 +98,7 @@ class CommentsParser {
             : null);
 
     final hidden = element.querySelector('.comment_show') != null;
-    final usernameElement = txt?.querySelector('.comment_username');
+    final usernameElement = txt?.querySelector('.reply-link a');
     final username = usernameElement?.text.trim();
     final userLink = usernameElement?.attributes['href']?.split('/').last;
 

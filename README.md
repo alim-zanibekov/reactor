@@ -9,7 +9,7 @@ JoyReactor mobile client
 |-|-|-|-|-|
 ![photo_2022-02-22 23 56 33](https://user-images.githubusercontent.com/19346040/155218209-7894c6f1-0c12-4e35-a9d7-fa67d315dca2.jpeg) | ![photo_2022-02-22 23 58 05](https://user-images.githubusercontent.com/19346040/155218205-8ca2d874-a58c-4d1d-8693-70de281b8f68.jpeg) | ![photo_2022-02-23 00 06 09](https://user-images.githubusercontent.com/19346040/155219462-1e9d6d93-d157-4118-b80d-9ab83303e9e1.jpeg) | ![photo_2022-02-22 23 56 32](https://user-images.githubusercontent.com/19346040/155218210-7d929ffd-185e-48fa-8ceb-d274a80ab63f.jpeg) | ![photo_2022-02-22 23 56 31](https://user-images.githubusercontent.com/19346040/155218213-869ac334-259b-4262-bbbc-859b8e837067.jpeg) 
 
-#### Demo (real device: Android, Snapdragon 855, 6gb RAM)
+#### Demo (real device: v0.7.1, Android, Snapdragon 855, 6gb RAM)
 
 https://user-images.githubusercontent.com/19346040/155216497-485d7836-c0e0-45fa-bf89-04aa5c9fbc75.mp4
 

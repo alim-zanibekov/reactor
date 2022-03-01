@@ -22,6 +22,7 @@ class Preferences {
   late bool _gifAutoPlay;
   late List<String> _hostList;
   late String _host;
+  String? _lastAlertVersion;
 
   Preferences._internal();
 
@@ -50,6 +51,8 @@ class Preferences {
         final host = prefs.getString('host') ?? _hostList[0];
         _host = host;
 
+        _lastAlertVersion = prefs.getString('last-alert-version');
+
         _session.setSFW(_sfw);
       });
 
@@ -64,6 +67,8 @@ class Preferences {
   bool get gifAutoPlay => _gifAutoPlay;
 
   String get host => _host;
+
+  String? get lastAlertVersion => _lastAlertVersion;
 
   List<String> get hostList => _hostList;
 
@@ -108,5 +113,15 @@ class Preferences {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('host-list', jsonEncode(hostList));
     _hostList = hostList;
+  }
+
+  setLastAlertVersion(String? version) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (version != null) {
+      prefs.setString('last-alert-version', version);
+    } else {
+      prefs.remove('last-alert-version');
+    }
+    _lastAlertVersion = version;
   }
 }

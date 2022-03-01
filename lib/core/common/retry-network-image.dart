@@ -1,6 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:advanced_image/cache.dart';
 import 'package:advanced_image/provider.dart';
-
 // ignore: implementation_imports
 import 'package:advanced_image/src/provider/_advanced_network_image_io.dart'
     if (dart.library.html) 'package:advanced_image/src/provider/_advanced_network_image_web.dart'
@@ -30,11 +31,11 @@ class AppNetworkImageWithRetry extends io.AdvancedNetworkImage {
     return super.evict(cache: null, configuration: configuration);
   }
 
-  existInCache() async {
+  Future<bool> existInCache() async {
     return _cacheManager.has(this.url.hashCode.toString());
   }
 
-  loadFromDiskCache() {
+  Future<Uint8List?> loadFromDiskCache() {
     return _cacheManager.get(this.url.hashCode.toString());
   }
 

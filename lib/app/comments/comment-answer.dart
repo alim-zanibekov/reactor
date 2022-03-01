@@ -37,7 +37,6 @@ class _AppCommentAnswerState extends State<AppCommentAnswer> {
         _file,
         onSendProgress: (sent, total) => setState(() {
           _progressSend = sent.toDouble() / total.toDouble();
-          print(_progressSend);
         }),
       );
       widget.onSend?.call();

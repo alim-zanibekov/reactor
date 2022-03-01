@@ -2,9 +2,11 @@ import 'user-agent-native.dart' if (dart.library.html) 'user-agent-web.dart'
     as ua;
 
 class UserAgent {
-  static String? userAgent;
+  static String? _userAgent;
 
-  static Future<void> init() {
-    return ua.getUserAgent();
+  static String? get userAgent => _userAgent;
+
+  static Future<void> init() async {
+    _userAgent = await ua.getUserAgent();
   }
 }

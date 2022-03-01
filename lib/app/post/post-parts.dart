@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:reactor/core/preferences/preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/common/clipboard.dart';
 import '../../core/common/menu.dart';
 import '../../core/parsers/types/module.dart';
+import '../../core/preferences/preferences.dart';
 import '../comments/comments.dart';
 import '../common/open.dart';
 import '../user/user-short.dart';

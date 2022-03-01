@@ -5,6 +5,7 @@ import '../../core/common/reload-service.dart';
 import '../../core/common/snack-bar.dart';
 import '../../core/preferences/preferences.dart';
 import '../../main.dart';
+import 'settings-update.dart';
 
 class AppSettingsPage extends StatefulWidget {
   const AppSettingsPage({Key? key}) : super(key: key);
@@ -170,7 +171,11 @@ class _AppSettingsPageState extends State<AppSettingsPage> {
               // setState(() => _sendErrorStatistics = sendErrorStatistics);
               // await _preferences.setSendErrorStatistics(sendErrorStatistics);
             },
-          )
+          ),
+          Padding(
+            padding: padding.copyWith(left: 15),
+            child: SettingsUpdate(),
+          ),
         ],
       ),
     );

@@ -1,7 +1,5 @@
-import 'package:flutter/services.dart';
-
-const platform = const MethodChannel('channel:reactor');
+import 'package:reactor/core/common/platform.dart';
 
 Future<String?> getUserAgent() {
-  return platform.invokeMethod('getUserAgent');
+  return AppPlatform.getUserAgent();
 }

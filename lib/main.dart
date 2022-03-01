@@ -8,6 +8,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'app/home.dart';
 import 'core/api/api.dart';
 import 'core/auth/auth.dart';
+import 'core/common/app-updater.dart';
 import 'core/common/in-app-notifications-manager.dart';
 import 'core/common/user-agent/user-agent.dart';
 import 'core/external/error-reporter.dart';
@@ -79,6 +80,7 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   AppTheme? _theme = Preferences().theme;
   StreamSubscription<String>? _notificationsSubscription;
+  int _buildCount = 0;
 
   @override
   void initState() {
@@ -124,6 +126,10 @@ class _AppState extends State<App> {
       home: Scaffold(
         body: DoubleBackToCloseApp(
           child: Builder(builder: (context) {
+            if (_buildCount == 0) {
+              AppUpdater().initialCheckUpdates(context);
+            }
+            _buildCount++;
             _notificationsSubscription?.cancel();
             _notificationsSubscription =
                 InAppNotificationsManager.messages$.listen((String text) {

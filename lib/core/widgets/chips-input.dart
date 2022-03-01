@@ -196,7 +196,6 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
               min(_suggestionBoxHeight, widget.suggestionsBoxMaxHeight!);
         }
         final showTop = topAvailableSpace > bottomAvailableSpace;
-        // print("showTop: $showTop" );
         final compositedTransformFollowerOffset =
             showTop ? Offset(0, -size.height) : Offset.zero;
 
@@ -315,8 +314,6 @@ class ChipsInputState<T> extends State<ChipsInput<T>>
 
   @override
   void updateEditingValue(TextEditingValue value) {
-    //print("updateEditingValue FIRED with ${value.text}");
-    // _receivedRemoteTextEditingValue = value;
     final _oldTextEditingValue = _value;
     if (value.text != _oldTextEditingValue.text) {
       setState(() {
@@ -505,7 +502,6 @@ class SuggestionsBoxController {
   }
 
   void close() {
-    // debugPrint("Closing suggestion box");
     if (!_isOpened) return;
     assert(overlayEntry != null);
     overlayEntry?.remove();

@@ -46,8 +46,23 @@ jobs:
           cache: true
       - run: flutter config --no-analytics
       - run: ./patch/apply.sh
-      - run: flutter build apk --profile
-      - run: cp ./build/app/outputs/flutter-apk/app-profile.apk ./reactor.apk
+      - name: Decode and configure keystore
+        env:
+          ENCODED_KEY_STORE: ${{ secrets.KEY_STORE }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+        run: |
+          ks_dir="$RUNNER_TEMP/keystore"
+          ks_path="$ks_dir/reactor.jks"
+          mkdir "$ks_dir"
+          echo $ENCODED_KEY_STORE | base64 -di > $ks_path
+          echo "storePassword=$KEY_STORE_PASSWORD" > ./android/key.properties
+          echo "keyPassword=$KEY_PASSWORD" >> ./android/key.properties
+          echo "keyAlias=$KEY_ALIAS" >> ./android/key.properties
+          echo "storeFile=$ks_path" >> ./android/key.properties
+      - run: flutter build apk --release
+      - run: cp ./build/app/outputs/flutter-apk/app-release.apk ./reactor.apk
       - uses: actions/upload-artifact@v2
         with:
           name: reactor.apk

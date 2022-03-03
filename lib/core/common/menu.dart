@@ -21,6 +21,10 @@ class Menu {
           )
       ];
 
+  void addItem(MenuItem item) {
+    items.add(item);
+  }
+
   void process(int? index) {
     if (index != null) {
       items[index].onSelect();

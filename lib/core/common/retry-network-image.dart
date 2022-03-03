@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:advanced_image/cache.dart';
@@ -35,8 +36,12 @@ class AppNetworkImageWithRetry extends io.AdvancedNetworkImage {
     return _cacheManager.has(this.url.hashCode.toString());
   }
 
-  Future<Uint8List?> loadFromDiskCache() {
+  Future<Uint8List?> loadContentsFromDiskCache() {
     return _cacheManager.get(this.url.hashCode.toString());
+  }
+
+  Future<File?> loadFromDiskCache() {
+    return _cacheManager.getFile(this.url.hashCode.toString());
   }
 
   static isUrlExistInCache(String url) async {

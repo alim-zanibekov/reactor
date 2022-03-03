@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
 import '../../core/common/menu.dart';
@@ -303,17 +304,30 @@ class _ImageGalleryState extends State<ImageGallery>
               SnackBarHelper.show(context, 'Дождитесь загрузки изображения');
               return;
             }
-            final rawBytes =
-                await (_activeImage.imageProvider as AppNetworkImageWithRetry)
-                    .loadFromDiskCache();
-            final url =
-                (_activeImage.imageProvider as AppNetworkImageWithRetry).url;
+            final image =
+                _activeImage.imageProvider as AppNetworkImageWithRetry;
+            final rawBytes = await image.loadContentsFromDiskCache();
+            final url = image.url;
             if (rawBytes != null) {
               await SaveFile.save(context, url, rawBytes);
             } else {
               SnackBarHelper.show(context, 'Не удалось загрузить изображение');
             }
-          })
+          }),
+      MenuItem(
+        text: "Поделиться",
+        onSelect: () async {
+          if (_activeImage.info == null) {
+            SnackBarHelper.show(context, 'Дождитесь загрузки изображения');
+            return;
+          }
+          final image = _activeImage.imageProvider as AppNetworkImageWithRetry;
+          final file = await image.loadFromDiskCache();
+          if (file != null) {
+            Share.shareFiles([file.path]);
+          }
+        },
+      )
     ]);
 
     return PopupMenuButton<int>(

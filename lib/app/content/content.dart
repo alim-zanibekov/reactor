@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../core/common/clipboard.dart';
 import '../../core/common/menu.dart';
@@ -100,7 +101,8 @@ class AppContentLoader {
       }
     }
 
-    _filteredFutures = _futures.where((it) => it != null).map((it) => it!).toList();
+    _filteredFutures =
+        _futures.where((it) => it != null).map((it) => it!).toList();
 
     if (_undefinedSizeImages.isEmpty) {
       if (_filteredFutures.isNotEmpty) {
@@ -341,8 +343,26 @@ class _AppContentState extends State<AppContent> {
           onSelect: () {
             SaveFile.downloadAndSave(
                 context, image.prettyImageLink ?? image.value);
-          }),
+          })
     ]);
+    final checkMenu = () async {
+      final exist = await widget.loader.images[index].existInCache();
+      if (!exist || menu.items.any((it) => it.text == "Поделиться")) {
+        return;
+      }
+
+      menu.addItem(MenuItem(
+        text: "Поделиться",
+        onSelect: () async {
+          final image = widget.loader.images[index];
+          final file = await image.loadFromDiskCache();
+          if (file != null) {
+            Share.shareFiles([file.path]);
+          }
+        },
+      ));
+    };
+    checkMenu();
     return GestureDetector(
       onLongPress: () {
         menu.openUnderTap(pos);
@@ -360,6 +380,7 @@ class _AppContentState extends State<AppContent> {
         child: AppSafeImage(
           imageProvider: widget.loader.images[index],
           onInfo: (e) {
+            checkMenu();
             if (widget.loader.onImageInfo(e, image)) {
               if (mounted) setState(() {});
             }

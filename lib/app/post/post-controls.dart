@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../core/api/api.dart';
 import '../../core/api/types.dart';
 import '../../core/auth/auth.dart';
 import '../../core/common/snack-bar.dart';
 import '../../core/parsers/types/module.dart';
+import '../../core/preferences/preferences.dart';
 
 class AppPostControls extends StatefulWidget {
   final Post post;
@@ -78,10 +80,14 @@ class _AppPostControlsState extends State<AppPostControls> {
     }
   }
 
+  get _link {
+    return 'http://${Preferences().host}/post/${widget.post.id}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -101,40 +107,66 @@ class _AppPostControlsState extends State<AppPostControls> {
             ),
             if (_auth.authorized)
               Padding(
-                padding: const EdgeInsets.only(left: 15),
+                padding: const EdgeInsets.only(left: 10),
                 child: InkWell(
                   onTap: _toggleFavorite,
-                  child: widget.post.favorite
-                      ? Icon(
-                          Icons.star,
-                          color: Theme.of(context).colorScheme.secondary,
-                          size: 22,
-                        )
-                      : Icon(Icons.star_border, size: 22),
+                  borderRadius: BorderRadius.circular(30),
+                  child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: widget.post.favorite
+                        ? Icon(
+                            Icons.star,
+                            color: Theme.of(context).colorScheme.secondary,
+                            size: 22,
+                          )
+                        : Icon(Icons.star_border, size: 22),
+                  ),
                 ),
-              )
+              ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: InkWell(
+                onTap: () async {
+                  await Share.share(_link);
+                },
+                borderRadius: BorderRadius.circular(30),
+                child: Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Icon(Icons.share, size: 22),
+                ),
+              ),
+            )
           ]),
           if (_auth.authorized)
             Row(children: <Widget>[
               if (widget.post.canVote)
                 Padding(
-                  padding: EdgeInsets.only(right: 10),
+                  padding: EdgeInsets.only(right: 5),
                   child: InkWell(
                     onTap: () => _vote(VoteType.UP),
-                    child: widget.post.votedUp
-                        ? Icon(Icons.mood, color: Colors.green[600], size: 22)
-                        : Icon(Icons.mood, size: 22),
+                    borderRadius: BorderRadius.circular(30),
+                    child: Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: widget.post.votedUp
+                          ? Icon(Icons.mood, color: Colors.green[600], size: 22)
+                          : Icon(Icons.mood, size: 22),
+                    ),
                   ),
                 ),
               Text(widget.post.rating?.toString() ?? '––'),
               if (widget.post.canVote)
                 Padding(
-                  padding: EdgeInsets.only(left: 10),
+                  padding: EdgeInsets.only(left: 5),
                   child: InkWell(
                     onTap: () => _vote(VoteType.DOWN),
-                    child: widget.post.votedDown
-                        ? Icon(Icons.mood_bad, color: Colors.red[600], size: 22)
-                        : Icon(Icons.mood_bad, size: 22),
+                    borderRadius: BorderRadius.circular(30),
+                    child: Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: widget.post.votedDown
+                          ? Icon(Icons.mood_bad,
+                              color: Colors.red[600], size: 22)
+                          : Icon(Icons.mood_bad, size: 22),
+                    ),
                   ),
                 ),
             ])

@@ -132,7 +132,7 @@ class _AppPostControlsState extends State<AppPostControls> {
                 borderRadius: BorderRadius.circular(30),
                 child: Padding(
                   padding: const EdgeInsets.all(5),
-                  child: Icon(Icons.share, size: 22),
+                  child: Icon(Icons.share_outlined, size: 22),
                 ),
               ),
             )

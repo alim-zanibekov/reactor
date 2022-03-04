@@ -1,6 +1,8 @@
 # Reactor
+![](https://img.shields.io/github/v/release/alim-zanibekov/reactor)
 
 JoyReactor mobile client
+
 
 #### Screenshots
 

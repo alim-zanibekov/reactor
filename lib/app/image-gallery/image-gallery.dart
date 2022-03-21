@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mime/mime.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
@@ -324,7 +325,9 @@ class _ImageGalleryState extends State<ImageGallery>
           final image = _activeImage.imageProvider as AppNetworkImageWithRetry;
           final file = await image.loadFromDiskCache();
           if (file != null) {
-            Share.shareFiles([file.path]);
+            final mime = lookupMimeType(image.url);
+            Share.shareFiles([file.path],
+                mimeTypes: mime != null ? [mime] : null);
           }
         },
       )

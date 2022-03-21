@@ -152,6 +152,27 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
 
   @override
   Widget build(BuildContext context) {
+    final page = AppFuturePage(
+      key: _pageKey,
+      load: (fromUser) async {
+        if (fromUser) {
+          _post = await Api().loadPost(widget.postId ?? widget.post!.id);
+          return;
+        }
+        if (_post == null) {
+          if (widget.postId == null) {
+            _post = widget.post;
+          } else {
+            _post = await Api().loadPost(widget.postId ?? widget.post!.id);
+          }
+        }
+        if (_post!.comments == null) {
+          _post!.comments = await Api().loadComments(_post!.id);
+        }
+      },
+      builder: (context, dynamic value, hasError) => _list(),
+    );
+
     return Scaffold(
       body: Column(
         children: [
@@ -160,30 +181,7 @@ class _AppOnePostPageState extends State<AppOnePostPage> {
             // https://github.com/flutter/flutter/issues/70165
             title: const Text('Пост'),
           ),
-          Expanded(
-            child: AppFuturePage(
-              key: _pageKey,
-              load: (fromUser) async {
-                if (fromUser) {
-                  _post =
-                      await Api().loadPost(widget.postId ?? widget.post!.id);
-                  return;
-                }
-                if (_post == null) {
-                  if (widget.postId == null) {
-                    _post = widget.post;
-                  } else {
-                    _post =
-                        await Api().loadPost(widget.postId ?? widget.post!.id);
-                  }
-                }
-                if (_post?.comments == null) {
-                  _post!.comments = await Api().loadComments(_post!.id);
-                }
-              },
-              builder: (context, dynamic value, hasError) => _list(),
-            ),
-          ),
+          Expanded(child: page),
         ],
       ),
     );

@@ -26,7 +26,7 @@ class Preferences {
 
   Preferences._internal();
 
-  Future init() => SharedPreferences.getInstance().then((prefs) {
+  Future<void> init() => SharedPreferences.getInstance().then((prefs) {
         final theme = prefs.getInt('theme') ?? 0;
         _theme = AppTheme.values[theme];
         final openDefault = prefs.getInt('open-default') ?? 0;

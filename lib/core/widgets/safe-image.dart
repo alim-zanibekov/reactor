@@ -156,7 +156,9 @@ class _AppSafeImageState extends State<AppSafeImage> {
       return AppOnErrorReload(
         text: 'При загрузке изображения произошла ошибка',
         onReloadPressed: () async {
-          await widget.imageProvider.evict();
+          try {
+            await widget.imageProvider.evict();
+          } catch (e) {}
           _load();
         },
       );

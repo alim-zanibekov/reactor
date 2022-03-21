@@ -50,24 +50,23 @@ class _AppQuizState extends State<AppQuiz> {
               _vote(e.id!);
             }
           },
-          child: SizedBox(
-            height: 40,
-            child: Padding(
-              padding: EdgeInsets.zero,
-              child: Row(children: <Widget>[
-                SizedBox(
-                  height: 35,
-                  child: Radio<bool>(
-                    activeColor: Theme.of(context).colorScheme.secondary,
-                    groupValue: false,
-                    value: true,
-                    onChanged: (_) {},
-                  ),
-                ),
-                Text(e.text, style: const TextStyle(fontSize: 13)),
-              ]),
+          child: Row(children: <Widget>[
+            SizedBox(
+              height: 35,
+              child: Radio<bool>(
+                activeColor: Theme.of(context).colorScheme.secondary,
+                groupValue: false,
+                value: true,
+                onChanged: (_) {},
+              ),
             ),
-          ),
+            Flexible(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(0, 5, 10, 5),
+                child: Text(e.text, style: const TextStyle(fontSize: 13)),
+              ),
+            ),
+          ]),
         );
       }
       return Padding(
@@ -87,6 +86,10 @@ class _AppQuizState extends State<AppQuiz> {
                   width: width - maxLenText * 8,
                   child: LinearProgressIndicator(
                     value: e.percent / 100.0,
+                    backgroundColor:
+                        Theme.of(context).brightness == Brightness.light
+                            ? Colors.black12
+                            : null,
                   ),
                 ),
                 Expanded(child: SizedBox()),

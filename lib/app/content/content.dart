@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:mime/mime.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/common/clipboard.dart';
@@ -357,7 +358,9 @@ class _AppContentState extends State<AppContent> {
           final image = widget.loader.images[index];
           final file = await image.loadFromDiskCache();
           if (file != null) {
-            Share.shareFiles([file.path]);
+            final mime = lookupMimeType(image.url);
+            Share.shareFiles([file.path],
+                mimeTypes: mime != null ? [mime] : null);
           }
         },
       ));

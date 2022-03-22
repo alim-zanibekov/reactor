@@ -96,7 +96,7 @@ class _AppYouTubePlayerState extends State<AppYouTubePlayer>
       shouldOverrideUrlLoading: (controller, request) async {
         _webView.evaluateJavascript(
             source:
-                'document.querySelector(\'iframe\')).contentWindow.postMessage({ type: \'pause\'}, \'*\');');
+                "document.querySelector('iframe').contentWindow.postMessage({ type: 'pause'}, '*');");
 
         canLaunch(request.request.url.toString()).then((value) => value
             ? launch(request.request.url.toString())

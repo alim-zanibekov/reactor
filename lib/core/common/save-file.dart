@@ -13,7 +13,8 @@ import 'notifications-manager.dart';
 import 'snack-bar.dart';
 
 class SaveFile {
-  static Future<File> _saveToDir(String filePath, Uint8List data, { bool checkPermissions = false }) async {
+  static Future<File> _saveToDir(String filePath, Uint8List data,
+      {bool checkPermissions = false}) async {
     if (checkPermissions && !(await Permission.storage.isGranted)) {
       final status = await Permission.storage.request();
       if (status != PermissionStatus.granted) {
@@ -90,5 +91,11 @@ class SaveFile {
     }
 
     return _saveToDir(filePath, file, checkPermissions: false);
+  }
+
+  static Future<File> downloadAndSaveTmp(String url) async {
+    final dir = await getTemporaryDirectory();
+    String fileName = Uri.decodeComponent(url.split('/').last);
+    return downloadAndSaveExternal(url, "${dir.path}/$fileName");
   }
 }

@@ -314,6 +314,17 @@ class _AppContentState extends State<AppContent> {
           onSelect: () {
             SaveFile.downloadAndSave(context, entry.value);
           }),
+      MenuItem(
+        text: "Поделиться",
+        onSelect: () async {
+          final file = await SaveFile.downloadAndSaveTmp(entry.value);
+          final mime = lookupMimeType(entry.value);
+          Share.shareFiles(
+            [file.path],
+            mimeTypes: mime != null ? [mime] : null,
+          );
+        },
+      )
     ]);
     return GestureDetector(
       onLongPress: () {

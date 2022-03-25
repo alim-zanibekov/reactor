@@ -24,7 +24,7 @@ https://user-images.githubusercontent.com/19346040/155216497-485d7836-c0e0-45fa-
 
 2. Install dependencies `flutter pub get` 
 
-3. Connect your device or launch emulator (`flutter emulators` and `flutter emulators --launch [emulator name]`)
+3. Connect to your device or launch emulator (`flutter emulators` and `flutter emulators --launch [emulator name]`)
 
 4. Get available devices: `flutter devices`
 

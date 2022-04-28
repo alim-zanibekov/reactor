@@ -62,8 +62,15 @@ class ContentParser {
       final id = src != null ? getSoundCloudUrl(src) : null;
       if (id != null) return ContentUnitSoundCloudAudio(id);
     } else if (image != null) {
-      var width = Utils.getNumberDouble(image.attributes['width']);
-      var height = Utils.getNumberDouble(image.attributes['height']);
+      final widthStr = image.attributes['width'] ?? '';
+      final heightStr = image.attributes['height'] ?? '';
+
+      var width = _onlyNumbersRegex.hasMatch(widthStr)
+          ? Utils.getNumberDouble(widthStr)
+          : null;
+      var height = _onlyNumbersRegex.hasMatch(heightStr)
+          ? Utils.getNumberDouble(heightStr)
+          : null;
       if (height == null || width == null) {
         width = height = null;
       }
@@ -263,6 +270,8 @@ class ContentParser {
 
     return answer;
   }
+
+  static final _onlyNumbersRegex = RegExp('^[0-9]+\$');
 
   static final _youtubeRegex = RegExp(
     r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})',

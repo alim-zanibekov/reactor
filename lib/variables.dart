@@ -3,7 +3,7 @@ import 'dart:io';
 class Headers {
   static final reactorHeaders = {
     HttpHeaders.userAgentHeader: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_'
-        '4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36',
+        '7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36',
     HttpHeaders.acceptHeader: '*/*',
     HttpHeaders.refererHeader: 'http://joyreactor.cc/',
   };
@@ -14,7 +14,7 @@ class Headers {
     HttpHeaders.cookieHeader: 'showVideoGif3=1',
     HttpHeaders.acceptEncodingHeader: 'identity;q=1, *;q=0',
     HttpHeaders.userAgentHeader: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_'
-        '4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/s537.36',
+        '7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36',
     HttpHeaders.acceptHeader: '*/*',
     HttpHeaders.refererHeader: 'http://joyreactor.cc/'
   };

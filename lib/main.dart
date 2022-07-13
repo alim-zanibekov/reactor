@@ -105,7 +105,7 @@ class _AppState extends State<App> {
       themeMode = _theme == AppTheme.DARK ? ThemeMode.dark : ThemeMode.light;
     }
     if (UserAgent.userAgent != null) {
-      Headers.updateUserAgent(UserAgent.userAgent!);
+      AppHeaders.updateUserAgent(UserAgent.userAgent!);
     }
 
     return MaterialApp(

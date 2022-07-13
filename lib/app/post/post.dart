@@ -74,10 +74,10 @@ class _AppPostContentState extends State<AppPostContent>
           _currentMaxHeight = _post.height;
         }
         if (widget.onPage) {
-          SchedulerBinding.instance?.addPostFrameCallback(_postFrameCallback);
+          SchedulerBinding.instance.addPostFrameCallback(_postFrameCallback);
         }
       } else {
-        SchedulerBinding.instance?.addPostFrameCallback(_postFrameCallback);
+        SchedulerBinding.instance.addPostFrameCallback(_postFrameCallback);
       }
     }
     widget.onMountInfo?.call(

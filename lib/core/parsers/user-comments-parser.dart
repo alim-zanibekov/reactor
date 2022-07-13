@@ -1,7 +1,7 @@
 import 'package:html/parser.dart' as parser;
-import 'package:reactor/core/common/pair.dart';
 
 import './types/module.dart';
+import '../common/pair.dart';
 import 'comments-parser.dart';
 import 'types/post.dart';
 import 'utils.dart';

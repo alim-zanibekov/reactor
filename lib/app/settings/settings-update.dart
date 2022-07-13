@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:reactor/core/common/snack-bar.dart';
 
 import '../../core/common/app-updater.dart';
+import '../../core/common/snack-bar.dart';
 
 class SettingsUpdate extends StatefulWidget {
   const SettingsUpdate({Key? key}) : super(key: key);

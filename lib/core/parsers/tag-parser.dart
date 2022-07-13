@@ -65,7 +65,7 @@ class TagParser {
         (blogHeader.querySelector('.blog_avatar')?.attributes ?? {})['src'];
 
     if (image != null && image is String && image.startsWith('/'))
-      image = 'http://joyreactor.cc$image';
+      image = 'https://joyreactor.cc$image';
 
     final tagIdStr = (fav?.querySelector('a')?.attributes ?? {})['href'];
 

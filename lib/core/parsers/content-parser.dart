@@ -1,10 +1,10 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as parser;
-import 'package:reactor/core/parsers/utils.dart';
 
 import './types/module.dart';
 import '../common/pair.dart';
 import 'types/utils.dart';
+import 'utils.dart';
 
 class ContentParser {
   List<ContentUnit> parseContent(String c) {
@@ -42,7 +42,7 @@ class ContentParser {
 
       if (srcMp4 != -1 || srcWebm != -1) {
         return ContentUnitGif(
-          srcMp4 != -1 ? src[srcMp4] : src[srcWebm],
+          Utils.fulfillUrl(srcMp4 != -1 ? src[srcMp4] : src[srcWebm]),
           width ?? 0,
           height ?? 0,
           gifUrl: href?.attributes['href'],
@@ -77,7 +77,7 @@ class ContentParser {
       final src = image.attributes['src'];
       if (src != null) {
         return ContentUnitImage(
-          src,
+          Utils.fulfillUrl(src),
           width,
           height,
           prettyImageLink: (prettyPhoto?.attributes ?? {})['href'],

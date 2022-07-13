@@ -48,7 +48,11 @@ class UserParser {
       var icon = (tagImg?.attributes ?? {})['src'];
       if (link == null) throw Exception('Invalid tag');
 
-      if (icon.startsWith('/')) icon = 'http://joyreactor.cc$icon';
+      if (icon != null && icon.startsWith('//')) icon = Utils.fulfillUrl(icon);
+
+      if (icon != null && icon.startsWith('/'))
+        icon = 'https://joyreactor.cc$icon';
+
       return UserTag(
         link.text,
         isMain: Tag.parseIsMain(link.attributes['href']),

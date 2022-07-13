@@ -72,7 +72,7 @@ class _AppPagesState extends State<AppPages> with TickerProviderStateMixin {
     if (!kIsWeb) {
       _initUniLink().then((link) {
         if (link != null) {
-          SchedulerBinding.instance?.addPostFrameCallback(
+          SchedulerBinding.instance.addPostFrameCallback(
             (_) => _postFrameCallback(context, link),
           );
         }

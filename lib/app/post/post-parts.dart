@@ -27,17 +27,17 @@ class PostTopControls extends StatelessWidget {
   final Function? loadContent;
 
   get _link {
-    return 'http://${Preferences().host}/post/${post.id}';
+    return 'https://${Preferences().host}/post/${post.id}';
   }
 
   @override
   Widget build(BuildContext context) {
     final menu = Menu(context, items: [
-      MenuItem(
+      SimpleMenuItem(
         text: 'Скопировать ссылку',
         onSelect: () => ClipboardHelper.setClipboardData(context, _link),
       ),
-      MenuItem(
+      SimpleMenuItem(
         text: 'Открыть в браузере',
         onSelect: () {
           if (browser == null) {
@@ -47,9 +47,9 @@ class PostTopControls extends StatelessWidget {
               urlRequest: URLRequest(url: Uri.parse(_link)));
         },
       ),
-      MenuItem(
+      SimpleMenuItem(
         text: 'Открыть в системном браузере',
-        onSelect: () => launch(_link),
+        onSelect: () => launchUrl(_link),
       ),
     ]);
 

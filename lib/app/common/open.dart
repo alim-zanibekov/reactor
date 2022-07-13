@@ -137,8 +137,9 @@ goToLinkOrOpen(BuildContext context, String link) async {
   } else if (parsed is UserLink) {
     openUser(context, parsed.username, parsed.link);
   } else {
-    if (await canLaunch(link)) {
-      await launch(link, forceSafariVC: false);
+    final url = Uri.parse(link);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
     }
   }
 }

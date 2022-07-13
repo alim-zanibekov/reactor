@@ -298,7 +298,7 @@ class _ImageGalleryState extends State<ImageGallery>
 
   Widget copyLinkPopup() {
     final menu = Menu(context, items: [
-      MenuItem(
+      SimpleMenuItem(
           text: 'Сохранить в загрузки',
           onSelect: () async {
             if (_activeImage.info == null) {
@@ -315,7 +315,7 @@ class _ImageGalleryState extends State<ImageGallery>
               SnackBarHelper.show(context, 'Не удалось загрузить изображение');
             }
           }),
-      MenuItem(
+      SimpleMenuItem(
         text: "Поделиться",
         onSelect: () async {
           if (_activeImage.info == null) {

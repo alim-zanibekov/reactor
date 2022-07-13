@@ -37,7 +37,7 @@ class Api {
   static var _apiHost = 'joyreactor.cc';
   String? _prefix;
 
-  get _host => _prefix != null ? 'http://$_prefix.reactor.cc' : 'http://$_apiHost';
+  get _host => _prefix != null ? 'https://$_prefix.reactor.cc' : 'https://$_apiHost';
 
   factory Api() {
     return _api;
@@ -144,16 +144,16 @@ class Api {
       _loadPage('$_host/user/$username/$pageId');
 
   Future<ContentPage<Post>> loadSubscriptions() =>
-      _loadPage('http://old.reactor.cc/subscriptions');
+      _loadPage('https://joyreactor.cc/subscriptions');
 
   Future<ContentPage<Post>> loadSubscriptionsByPageId(int id) =>
-      _loadPage('http://old.reactor.cc/subscriptions/$id');
+      _loadPage('https://joyreactor.cc/subscriptions/$id');
 
   Future<ContentPage<Post>> loadFavorite(String username) =>
-      _loadPage('http://old.reactor.cc/user/$username/favorite');
+      _loadPage('https://joyreactor.cc/user/$username/favorite');
 
   Future<ContentPage<Post>> loadFavoriteByPageId(String username, int id) =>
-      _loadPage('http://old.reactor.cc/user/$username/favorite/$id');
+      _loadPage('https://joyreactor.cc/user/$username/favorite/$id');
 
   Future<List<ContentUnit>> loadComment(int id) async {
     final res = await _session.get('$_host/post/comment/$id');
@@ -258,7 +258,7 @@ class Api {
   }
 
   Future<bool> checkHost(String host) async {
-    final res = await _session.get('http://$host');
+    final res = await _session.get('https://$host');
     final page = _postsParser.parsePage(res.data);
     return page.content.isNotEmpty;
   }

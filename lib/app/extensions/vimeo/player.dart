@@ -70,8 +70,9 @@ class _AppVimeoPlayerState extends State<AppVimeoPlayer>
                 source: 'document.querySelector("button.play").click()');
           },
           shouldOverrideUrlLoading: (controller, request) async {
-            canLaunch(request.request.url.toString()).then((value) => value
-                ? launch(request.request.url.toString())
+            final url = Uri.parse(request.request.url.toString());
+            canLaunchUrl(url).then((value) => value
+                ? launchUrl(url)
                 : Future.value(false));
 
             return NavigationActionPolicy.CANCEL;

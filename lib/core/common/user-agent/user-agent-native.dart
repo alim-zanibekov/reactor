@@ -1,4 +1,4 @@
-import 'package:reactor/core/common/platform.dart';
+import '../platform.dart';
 
 Future<String?> getUserAgent() {
   return AppPlatform.getUserAgent();

@@ -81,7 +81,7 @@ class _AppPostControlsState extends State<AppPostControls> {
   }
 
   get _link {
-    return 'http://${Preferences().host}/post/${widget.post.id}';
+    return 'https://${Preferences().host}/post/${widget.post.id}';
   }
 
   @override

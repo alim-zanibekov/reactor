@@ -98,8 +98,9 @@ class _AppYouTubePlayerState extends State<AppYouTubePlayer>
             source:
                 "document.querySelector('iframe').contentWindow.postMessage({ type: 'pause'}, '*');");
 
-        canLaunch(request.request.url.toString()).then((value) => value
-            ? launch(request.request.url.toString())
+        final url = Uri.parse(request.request.url.toString());
+        canLaunchUrl(url).then((value) => value
+            ? launchUrl(url)
             : Future.value(false));
 
         return NavigationActionPolicy.CANCEL;

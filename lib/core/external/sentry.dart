@@ -125,11 +125,11 @@ class SentryReporter {
   }
 
   void setUserContext(String username) {
-    _scope.user = SentryUser(id: username.toLowerCase(), username: username);
+    _scope.setUser(SentryUser(id: username.toLowerCase(), username: username));
   }
 
   void resetUserContext() {
-    _scope.user = null;
+    _scope.setUser(null);
   }
 
   Future<void> capture(dynamic error, dynamic stackTrace) =>

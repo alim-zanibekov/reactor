@@ -94,7 +94,7 @@ class CommentsParser {
     final ratingText = txt?.querySelector('.comment_rating')?.text;
     final avatar = avatarElement?.attributes['src'] ??
         (creatorId != null
-            ? "http://img2.reactor.cc/pics/avatar/user/$creatorId"
+            ? "https://img2.reactor.cc/pics/avatar/user/$creatorId"
             : null);
 
     final hidden = element.querySelector('.comment_show') != null;

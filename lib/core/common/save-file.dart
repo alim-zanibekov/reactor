@@ -57,7 +57,7 @@ class SaveFile {
     try {
       final notification = AppNotification('Загрузка', url);
       notification.show();
-      final file = await Api().downloadFile(url, headers: Headers.videoHeaders,
+      final file = await Api().downloadFile(url, headers: AppHeaders.videoHeaders,
           onReceiveProgress: (int count, int total) {
         double percent = count.toDouble() / total.toDouble() * 100;
         notification.setProgress(percent.floor());
@@ -80,7 +80,7 @@ class SaveFile {
   ) async {
     final notification = AppNotification('Загрузка', url);
     notification.show();
-    final file = await Api().downloadFile(url, headers: Headers.videoHeaders,
+    final file = await Api().downloadFile(url, headers: AppHeaders.videoHeaders,
         onReceiveProgress: (int count, int total) {
       double percent = count.toDouble() / total.toDouble() * 100;
       notification.setProgress(percent.floor());

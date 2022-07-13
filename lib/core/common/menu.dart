@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-class MenuItem {
+class SimpleMenuItem {
   final String text;
   final Function() onSelect;
 
-  MenuItem({required this.text, required this.onSelect});
+  SimpleMenuItem({required this.text, required this.onSelect});
 }
 
 class Menu {
   final BuildContext context;
-  final List<MenuItem> items;
+  final List<SimpleMenuItem> items;
 
   Menu(this.context, {required this.items});
 
@@ -21,7 +21,7 @@ class Menu {
           )
       ];
 
-  void addItem(MenuItem item) {
+  void addItem(SimpleMenuItem item) {
     items.add(item);
   }
 

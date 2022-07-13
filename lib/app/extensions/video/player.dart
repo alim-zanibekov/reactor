@@ -4,6 +4,7 @@ import 'package:decorated_icon/decorated_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../core/parsers/utils.dart';
 import '../../../core/preferences/preferences.dart';
 import '../../../core/widgets/fade-icon.dart';
 import '../../../core/widgets/onerror-reload.dart';
@@ -88,8 +89,8 @@ class _AppVideoPlayerState extends State<AppVideoPlayer> {
 
     if (mounted) {
       final controller = VideoPlayerController.network(
-        widget.url,
-        httpHeaders: Headers.videoHeaders,
+        Utils.fulfillUrl(widget.url),
+        httpHeaders: AppHeaders.videoHeaders,
         maxCacheSize: 200 << 20,
         maxFileSize: 10 << 20,
         videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),

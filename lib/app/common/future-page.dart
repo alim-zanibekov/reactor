@@ -32,7 +32,7 @@ class AppFuturePageState<T> extends State<AppFuturePage<T>> {
 
   @override
   void initState() {
-    SchedulerBinding.instance?.addPostFrameCallback((_) => reload());
+    SchedulerBinding.instance.addPostFrameCallback((_) => reload());
     super.initState();
   }
 

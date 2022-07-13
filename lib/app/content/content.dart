@@ -76,7 +76,7 @@ class AppContentLoader {
       if (entry is ContentUnitImage) {
         final imageProvider = AppNetworkImageWithRetry(
           entry.value,
-          headers: Headers.reactorHeaders,
+          headers: AppHeaders.reactorHeaders,
         );
 
         if (entry.width == null || entry.height == null) {
@@ -162,7 +162,7 @@ class AppContentLoader {
           _imagesForGallery[index].url != images[index].prettyImageLink) {
         _imagesForGallery[index] = AppNetworkImageWithRetry(
           images[index].prettyImageLink!,
-          headers: Headers.reactorHeaders,
+          headers: AppHeaders.reactorHeaders,
         );
       }
     }
@@ -304,17 +304,17 @@ class _AppContentState extends State<AppContent> {
     Offset pos = Offset.zero;
     final menu = Menu(context, items: [
       if (entry.gifUrl != null)
-        MenuItem(
+        SimpleMenuItem(
             text: "Скачать как гиф",
             onSelect: () {
               SaveFile.downloadAndSave(context, entry.gifUrl!);
             }),
-      MenuItem(
+      SimpleMenuItem(
           text: "Скачать как видео",
           onSelect: () {
             SaveFile.downloadAndSave(context, entry.value);
           }),
-      MenuItem(
+      SimpleMenuItem(
         text: "Поделиться",
         onSelect: () async {
           final file = await SaveFile.downloadAndSaveTmp(entry.value);
@@ -344,13 +344,13 @@ class _AppContentState extends State<AppContent> {
   Widget _buildImage(ContentUnitImage image, BuildContext context, int index) {
     Offset pos = Offset.zero;
     final menu = Menu(context, items: [
-      MenuItem(
+      SimpleMenuItem(
           text: "Открыть в хорошем качестве",
           onSelect: () {
             widget.loader.fillGalleryImage(index);
             openImage(context, widget.loader.imagesForGallery, index);
           }),
-      MenuItem(
+      SimpleMenuItem(
           text: "Скачать",
           onSelect: () {
             SaveFile.downloadAndSave(
@@ -363,7 +363,7 @@ class _AppContentState extends State<AppContent> {
         return;
       }
 
-      menu.addItem(MenuItem(
+      menu.addItem(SimpleMenuItem(
         text: "Поделиться",
         onSelect: () async {
           final image = widget.loader.images[index];
@@ -435,7 +435,7 @@ class _AppContentState extends State<AppContent> {
       if (text is ContentUnitLink) {
         Timer? timer;
         final menu = Menu(context, items: [
-          MenuItem(
+          SimpleMenuItem(
             text: "Скопировать",
             onSelect: () {
               ClipboardHelper.setClipboardData(context, text.link);

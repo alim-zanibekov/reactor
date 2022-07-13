@@ -66,15 +66,15 @@ class _AppUserPageState extends State<AppUserPage>
   Widget build(BuildContext context) {
     super.build(context);
     final menu = Menu(context, items: [
-      MenuItem(
+      SimpleMenuItem(
         text: 'Скопировать ссылку',
         onSelect: () => ClipboardHelper.setClipboardData(
           context,
-          'http://joyreactor.cc/user/${widget.link}',
+          'https://joyreactor.cc/user/${widget.link}',
         ),
       ),
       if (widget.main)
-        MenuItem(
+        SimpleMenuItem(
           text: 'Выход',
           onSelect: () {
             Auth().logout();

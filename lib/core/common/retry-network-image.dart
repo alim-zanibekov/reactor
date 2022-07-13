@@ -10,6 +10,7 @@ import 'package:advanced_image/src/provider/_advanced_network_image_io.dart'
 import 'package:flutter/widgets.dart';
 
 import '../http/dio-instance.dart';
+import '../parsers/utils.dart';
 
 class AppNetworkImageWithRetry extends io.AdvancedNetworkImage {
   static final RetryOptions _retryOptions = const RetryOptions(maxAttempts: 3);
@@ -18,7 +19,7 @@ class AppNetworkImageWithRetry extends io.AdvancedNetworkImage {
   static final _dio = getDioInstance();
 
   AppNetworkImageWithRetry(String url, {Map<String, String>? headers})
-      : super(url,
+      : super(Utils.fulfillUrl(url),
             headers: headers,
             retryOptions: _retryOptions,
             cacheManager: _cacheManager,

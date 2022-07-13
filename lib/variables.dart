@@ -1,11 +1,11 @@
 import 'dart:io';
 
-class Headers {
+class AppHeaders {
   static final reactorHeaders = {
     HttpHeaders.userAgentHeader: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_'
         '7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36',
     HttpHeaders.acceptHeader: '*/*',
-    HttpHeaders.refererHeader: 'http://joyreactor.cc/',
+    HttpHeaders.refererHeader: 'https://joyreactor.cc/',
   };
 
   static final videoHeaders = {
@@ -16,7 +16,7 @@ class Headers {
     HttpHeaders.userAgentHeader: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_'
         '7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36',
     HttpHeaders.acceptHeader: '*/*',
-    HttpHeaders.refererHeader: 'http://joyreactor.cc/'
+    HttpHeaders.refererHeader: 'https://joyreactor.cc/'
   };
 
   static updateUserAgent(String userAgent) {

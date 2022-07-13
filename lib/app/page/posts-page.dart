@@ -67,7 +67,7 @@ class _AppPagePostsState extends State<AppPage> {
   @override
   Widget build(BuildContext context) {
     final menu = Menu(context, items: [
-      MenuItem(
+      SimpleMenuItem(
           text: _reversed ? 'В прямом порядке' : 'В обратном порядке',
           onSelect: () {
             _postLoaders.forEach((it) {

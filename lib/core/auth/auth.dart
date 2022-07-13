@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:reactor/core/common/user-agent/user-agent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../external/sentry.dart';
@@ -52,7 +53,7 @@ class Auth {
     });
   }
 
-  String? _parseTokenHeader(Response res) {
+  String? _parseSessionCookie(Response res) {
     final setCookieHeader = res.headers[HttpHeaders.setCookieHeader];
     if (setCookieHeader != null && setCookieHeader.isNotEmpty) {
       for (final value in setCookieHeader) {
@@ -64,17 +65,9 @@ class Auth {
     return null;
   }
 
-  String _getTokenHeader(Response res) {
-    final token = _parseTokenHeader(res);
-    if (token == null) {
-      throw InvalidUsernameOrPasswordException();
-    }
-    return token;
-  }
-
   void updateTokenIfNeed(Response res) {
     if (authorized) {
-      final token = _parseTokenHeader(res);
+      final token = _parseSessionCookie(res);
       if (token != null && token != _token) {
         _token = token;
         _session.setToken(token);
@@ -86,15 +79,27 @@ class Auth {
 
   Future login(String username, String password) async {
     try {
-      final init = await _dio.get('http://joyreactor.cc/login');
-      final sessionToken = _getTokenHeader(init);
+      final init = await _dio.get(
+        'https://joyreactor.cc/login',
+        options: Options(headers: {
+          HttpHeaders.pragmaHeader: 'no-cache',
+          'User-Agent': UserAgent.userAgent,
+          'Referer': 'https://joyreactor.cc',
+        }),
+      );
+      var sessionToken = _parseSessionCookie(init);
+      if (sessionToken == null) {
+        throw InvalidUsernameOrPasswordException();
+      }
 
       final pre = await _dio.post(
         'https://api.joyreactor.cc/graphql',
         options: Options(headers: {
-          'Content-Type': 'application/json',
-          'pragma': 'no-cache',
-          'origin': 'http://joyreactor.cc',
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.pragmaHeader: 'no-cache',
+          'Origin': 'https://joyreactor.cc',
+          'User-Agent': UserAgent.userAgent,
+          'Referer': 'https://joyreactor.cc/login',
         }),
         data: jsonEncode({
           'query': 'mutation Login(\$login: String!, \$pass: String!) '
@@ -115,14 +120,19 @@ class Auth {
         }
         throw InvalidUsernameOrPasswordException();
       }
+
       final jwt = pre.data['data']['login']['me']['token'];
+
       final res = await _dio.get(
-        'http://joyreactor.cc/login',
+        'https://joyreactor.cc/login',
         options: Options(
-          validateStatus: (status) => (status ?? 0) < 400,
+          validateStatus: (status) => (status ?? 500) < 400,
           headers: {
-            'Connection': 'keep-alive',
-            'Cookie': 'joyreactor_sess3=$sessionToken; jr_jwt=$jwt'
+            HttpHeaders.pragmaHeader: 'no-cache',
+            HttpHeaders.connectionHeader: 'keep-alive',
+            'User-Agent': UserAgent.userAgent,
+            'Cookie': 'joyreactor_sess3=$sessionToken; jr_jwt=$jwt',
+            'Referer': 'https://joyreactor.cc/login',
           },
           followRedirects: false,
           maxRedirects: 0,
@@ -133,7 +143,10 @@ class Auth {
         throw InvalidStatusCodeException();
       }
 
-      final token = _getTokenHeader(res);
+      final token = _parseSessionCookie(res);
+      if (token == null) {
+        throw InvalidStatusCodeException();
+      }
 
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('auth-token', token);

@@ -1,143 +1,145 @@
---- /Users/alimzanibekov/.flutter_bin/flutter/packages/flutter/lib/src/widgets/editable_text.dart	2022-02-10 05:53:44.000000000 +0300
-+++ ./editable_text.dart	2022-02-10 06:55:09.000000000 +0300
-@@ -7,6 +7,7 @@
- import 'dart:ui' as ui hide TextStyle;
- 
- import 'package:characters/characters.dart' show CharacterRange;
-+import 'package:flutter/cupertino.dart';
- import 'package:flutter/foundation.dart';
- import 'package:flutter/gestures.dart' show DragStartBehavior;
- import 'package:flutter/rendering.dart';
-@@ -2970,78 +2971,61 @@
-           focusNode: widget.focusNode,
-           includeSemantics: false,
-           debugLabel: 'EditableText',
--          child: Scrollable(
--            excludeFromSemantics: true,
--            axisDirection: _isMultiline ? AxisDirection.down : AxisDirection.right,
--            controller: _scrollController,
--            physics: widget.scrollPhysics,
--            dragStartBehavior: widget.dragStartBehavior,
--            restorationId: widget.restorationId,
--            // If a ScrollBehavior is not provided, only apply scrollbars when
--            // multiline. The overscroll indicator should not be applied in
--            // either case, glowing or stretching.
--            scrollBehavior: widget.scrollBehavior ?? ScrollConfiguration.of(context).copyWith(
--              scrollbars: _isMultiline,
--              overscroll: false,
-+          child: CompositedTransformTarget(
-+            link: _toolbarLayerLink,
-+            child: Semantics(
-+              onCopy: _semanticsOnCopy(controls),
-+              onCut: _semanticsOnCut(controls),
-+              onPaste: _semanticsOnPaste(controls),
-+              child: _Editable(
-+                key: _editableKey,
-+                startHandleLayerLink: _startHandleLayerLink,
-+                endHandleLayerLink: _endHandleLayerLink,
-+                inlineSpan: buildTextSpan(),
-+                value: _value,
-+                cursorColor: _cursorColor,
-+                backgroundCursorColor: widget.backgroundCursorColor,
-+                showCursor: EditableText.debugDeterministicCursor
-+                    ? ValueNotifier<bool>(widget.showCursor)
-+                    : _cursorVisibilityNotifier,
-+                forceLine: widget.forceLine,
-+                readOnly: widget.readOnly,
-+                hasFocus: _hasFocus,
-+                maxLines: widget.maxLines,
-+                minLines: widget.minLines,
-+                expands: widget.expands,
-+                strutStyle: widget.strutStyle,
-+                selectionColor: widget.selectionColor,
-+                textScaleFactor: widget.textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
-+                textAlign: widget.textAlign,
-+                textDirection: _textDirection,
-+                locale: widget.locale,
-+                textHeightBehavior: widget.textHeightBehavior ?? DefaultTextHeightBehavior.of(context),
-+                textWidthBasis: widget.textWidthBasis,
-+                obscuringCharacter: widget.obscuringCharacter,
-+                obscureText: widget.obscureText,
-+                autocorrect: widget.autocorrect,
-+                smartDashesType: widget.smartDashesType,
-+                smartQuotesType: widget.smartQuotesType,
-+                enableSuggestions: widget.enableSuggestions,
-+                offset: ViewportOffset.zero(),
-+                onCaretChanged: _handleCaretChanged,
-+                rendererIgnoresPointer: widget.rendererIgnoresPointer,
-+                cursorWidth: widget.cursorWidth,
-+                cursorHeight: widget.cursorHeight,
-+                cursorRadius: widget.cursorRadius,
-+                cursorOffset: widget.cursorOffset ?? Offset.zero,
-+                selectionHeightStyle: widget.selectionHeightStyle,
-+                selectionWidthStyle: widget.selectionWidthStyle,
-+                paintCursorAboveText: widget.paintCursorAboveText,
-+                enableInteractiveSelection: widget.enableInteractiveSelection,
-+                textSelectionDelegate: this,
-+                devicePixelRatio: _devicePixelRatio,
-+                promptRectRange: _currentPromptRectRange,
-+                promptRectColor: widget.autocorrectionTextRectColor,
-+                clipBehavior: widget.clipBehavior,
+--- ./editable_text.dart	2022-07-09 12:35:01.000000000 +0300
++++ ./editable_text.m.dart	2022-07-09 12:39:58.000000000 +0300
+@@ -3264,83 +3264,66 @@
+             focusNode: widget.focusNode,
+             includeSemantics: false,
+             debugLabel: 'EditableText',
+-            child: Scrollable(
+-              excludeFromSemantics: true,
+-              axisDirection: _isMultiline ? AxisDirection.down : AxisDirection.right,
+-              controller: _scrollController,
+-              physics: widget.scrollPhysics,
+-              dragStartBehavior: widget.dragStartBehavior,
+-              restorationId: widget.restorationId,
+-              // If a ScrollBehavior is not provided, only apply scrollbars when
+-              // multiline. The overscroll indicator should not be applied in
+-              // either case, glowing or stretching.
+-              scrollBehavior: widget.scrollBehavior ?? ScrollConfiguration.of(context).copyWith(
+-                scrollbars: _isMultiline,
+-                overscroll: false,
+-              ),
+-              viewportBuilder: (BuildContext context, ViewportOffset offset) {
+-                return CompositedTransformTarget(
+-                  link: _toolbarLayerLink,
+-                  child: Semantics(
+-                    onCopy: _semanticsOnCopy(controls),
+-                    onCut: _semanticsOnCut(controls),
+-                    onPaste: _semanticsOnPaste(controls),
+-                    child: _ScribbleFocusable(
+-                      focusNode: widget.focusNode,
+-                      editableKey: _editableKey,
+-                      enabled: widget.scribbleEnabled,
+-                      updateSelectionRects: () {
+-                        _openInputConnection();
+-                        _updateSelectionRects(force: true);
+-                      },
+-                      child: _Editable(
+-                        key: _editableKey,
+-                        startHandleLayerLink: _startHandleLayerLink,
+-                        endHandleLayerLink: _endHandleLayerLink,
+-                        inlineSpan: buildTextSpan(),
+-                        value: _value,
+-                        cursorColor: _cursorColor,
+-                        backgroundCursorColor: widget.backgroundCursorColor,
+-                        showCursor: EditableText.debugDeterministicCursor
+-                            ? ValueNotifier<bool>(widget.showCursor)
+-                            : _cursorVisibilityNotifier,
+-                        forceLine: widget.forceLine,
+-                        readOnly: widget.readOnly,
+-                        hasFocus: _hasFocus,
+-                        maxLines: widget.maxLines,
+-                        minLines: widget.minLines,
+-                        expands: widget.expands,
+-                        strutStyle: widget.strutStyle,
+-                        selectionColor: widget.selectionColor,
+-                        textScaleFactor: widget.textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
+-                        textAlign: widget.textAlign,
+-                        textDirection: _textDirection,
+-                        locale: widget.locale,
+-                        textHeightBehavior: widget.textHeightBehavior ?? DefaultTextHeightBehavior.of(context),
+-                        textWidthBasis: widget.textWidthBasis,
+-                        obscuringCharacter: widget.obscuringCharacter,
+-                        obscureText: widget.obscureText,
+-                        offset: offset,
+-                        onCaretChanged: _handleCaretChanged,
+-                        rendererIgnoresPointer: widget.rendererIgnoresPointer,
+-                        cursorWidth: widget.cursorWidth,
+-                        cursorHeight: widget.cursorHeight,
+-                        cursorRadius: widget.cursorRadius,
+-                        cursorOffset: widget.cursorOffset ?? Offset.zero,
+-                        selectionHeightStyle: widget.selectionHeightStyle,
+-                        selectionWidthStyle: widget.selectionWidthStyle,
+-                        paintCursorAboveText: widget.paintCursorAboveText,
+-                        enableInteractiveSelection: widget._userSelectionEnabled,
+-                        textSelectionDelegate: this,
+-                        devicePixelRatio: _devicePixelRatio,
+-                        promptRectRange: _currentPromptRectRange,
+-                        promptRectColor: widget.autocorrectionTextRectColor,
+-                        clipBehavior: widget.clipBehavior,
+-                      ),
+-                    ),
++            child: CompositedTransformTarget(
++              link: _toolbarLayerLink,
++              child: Semantics(
++                onCopy: _semanticsOnCopy(controls),
++                onCut: _semanticsOnCut(controls),
++                onPaste: _semanticsOnPaste(controls),
++                child: _ScribbleFocusable(
++                  focusNode: widget.focusNode,
++                  editableKey: _editableKey,
++                  enabled: widget.scribbleEnabled,
++                  updateSelectionRects: () {
++                    _openInputConnection();
++                    _updateSelectionRects(force: true);
++                  },
++                  child: _Editable(
++                    key: _editableKey,
++                    startHandleLayerLink: _startHandleLayerLink,
++                    endHandleLayerLink: _endHandleLayerLink,
++                    inlineSpan: buildTextSpan(),
++                    value: _value,
++                    cursorColor: _cursorColor,
++                    backgroundCursorColor: widget.backgroundCursorColor,
++                    showCursor: EditableText.debugDeterministicCursor
++                        ? ValueNotifier<bool>(widget.showCursor)
++                        : _cursorVisibilityNotifier,
++                    forceLine: widget.forceLine,
++                    readOnly: widget.readOnly,
++                    hasFocus: _hasFocus,
++                    maxLines: widget.maxLines,
++                    minLines: widget.minLines,
++                    expands: widget.expands,
++                    strutStyle: widget.strutStyle,
++                    selectionColor: widget.selectionColor,
++                    textScaleFactor: widget.textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
++                    textAlign: widget.textAlign,
++                    textDirection: _textDirection,
++                    locale: widget.locale,
++                    textHeightBehavior: widget.textHeightBehavior ?? DefaultTextHeightBehavior.of(context),
++                    textWidthBasis: widget.textWidthBasis,
++                    obscuringCharacter: widget.obscuringCharacter,
++                    obscureText: widget.obscureText,
++                    offset: ViewportOffset.zero(),
++                    onCaretChanged: _handleCaretChanged,
++                    rendererIgnoresPointer: widget.rendererIgnoresPointer,
++                    cursorWidth: widget.cursorWidth,
++                    cursorHeight: widget.cursorHeight,
++                    cursorRadius: widget.cursorRadius,
++                    cursorOffset: widget.cursorOffset ?? Offset.zero,
++                    selectionHeightStyle: widget.selectionHeightStyle,
++                    selectionWidthStyle: widget.selectionWidthStyle,
++                    paintCursorAboveText: widget.paintCursorAboveText,
++                    enableInteractiveSelection: widget._userSelectionEnabled,
++                    textSelectionDelegate: this,
++                    devicePixelRatio: _devicePixelRatio,
++                    promptRectRange: _currentPromptRectRange,
++                    promptRectColor: widget.autocorrectionTextRectColor,
++                    clipBehavior: widget.clipBehavior,
+                   ),
+-                );
+-              },
++                ),
 +              ),
              ),
--            viewportBuilder: (BuildContext context, ViewportOffset offset) {
--              return CompositedTransformTarget(
--                link: _toolbarLayerLink,
--                child: Semantics(
--                  onCopy: _semanticsOnCopy(controls),
--                  onCut: _semanticsOnCut(controls),
--                  onPaste: _semanticsOnPaste(controls),
--                  child: _Editable(
--                    key: _editableKey,
--                    startHandleLayerLink: _startHandleLayerLink,
--                    endHandleLayerLink: _endHandleLayerLink,
--                    inlineSpan: buildTextSpan(),
--                    value: _value,
--                    cursorColor: _cursorColor,
--                    backgroundCursorColor: widget.backgroundCursorColor,
--                    showCursor: EditableText.debugDeterministicCursor
--                        ? ValueNotifier<bool>(widget.showCursor)
--                        : _cursorVisibilityNotifier,
--                    forceLine: widget.forceLine,
--                    readOnly: widget.readOnly,
--                    hasFocus: _hasFocus,
--                    maxLines: widget.maxLines,
--                    minLines: widget.minLines,
--                    expands: widget.expands,
--                    strutStyle: widget.strutStyle,
--                    selectionColor: widget.selectionColor,
--                    textScaleFactor: widget.textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
--                    textAlign: widget.textAlign,
--                    textDirection: _textDirection,
--                    locale: widget.locale,
--                    textHeightBehavior: widget.textHeightBehavior ?? DefaultTextHeightBehavior.of(context),
--                    textWidthBasis: widget.textWidthBasis,
--                    obscuringCharacter: widget.obscuringCharacter,
--                    obscureText: widget.obscureText,
--                    autocorrect: widget.autocorrect,
--                    smartDashesType: widget.smartDashesType,
--                    smartQuotesType: widget.smartQuotesType,
--                    enableSuggestions: widget.enableSuggestions,
--                    offset: offset,
--                    onCaretChanged: _handleCaretChanged,
--                    rendererIgnoresPointer: widget.rendererIgnoresPointer,
--                    cursorWidth: widget.cursorWidth,
--                    cursorHeight: widget.cursorHeight,
--                    cursorRadius: widget.cursorRadius,
--                    cursorOffset: widget.cursorOffset ?? Offset.zero,
--                    selectionHeightStyle: widget.selectionHeightStyle,
--                    selectionWidthStyle: widget.selectionWidthStyle,
--                    paintCursorAboveText: widget.paintCursorAboveText,
--                    enableInteractiveSelection: widget.enableInteractiveSelection,
--                    textSelectionDelegate: this,
--                    devicePixelRatio: _devicePixelRatio,
--                    promptRectRange: _currentPromptRectRange,
--                    promptRectColor: widget.autocorrectionTextRectColor,
--                    clipBehavior: widget.clipBehavior,
--                  ),
--                ),
--              );
--            },
            ),
          ),
-       ),

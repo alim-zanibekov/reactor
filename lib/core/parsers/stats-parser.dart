@@ -64,7 +64,11 @@ class StatsParser {
     final bool isDelta = infoBlock?.text.contains('+') ?? false;
     var icon = (tagImg?.attributes ?? {})['src'];
 
-    if (icon.startsWith('/')) icon = 'http://joyreactor.cc$icon';
+    if (icon != null && icon.startsWith('//')) icon = Utils.fulfillUrl(icon);
+
+    if (icon != null && icon.startsWith('/'))
+      icon = 'https://joyreactor.cc$icon';
+
     return ExtendedTag(
       (link?.attributes ?? {})['title'],
       isMain: Tag.parseIsMain((link?.attributes ?? {})['href']),
@@ -82,7 +86,11 @@ class StatsParser {
     final link = block.querySelector('a');
     var icon = (tagImg?.attributes ?? {})['src'];
 
-    if (icon.startsWith('/')) icon = 'http://joyreactor.cc$icon';
+    if (icon != null && icon.startsWith('//')) icon = Utils.fulfillUrl(icon);
+
+    if (icon != null && icon.startsWith('/'))
+      icon = 'https://joyreactor.cc$icon';
+
     return IconTag(
       (link?.attributes ?? {})['title'],
       isMain: Tag.parseIsMain((link?.attributes ?? {})['href']),

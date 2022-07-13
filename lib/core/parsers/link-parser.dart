@@ -1,4 +1,4 @@
-import 'package:reactor/core/parsers/utils.dart';
+import 'utils.dart';
 
 import 'types/module.dart';
 

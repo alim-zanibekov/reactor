@@ -32,7 +32,8 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion flutter.compileSdkVersion
+    ndkVersion flutter.ndkVersion
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -41,8 +42,8 @@ android {
 
     defaultConfig {
         applicationId "ru.alimzanibekov.reactor"
-        minSdkVersion 22
-        targetSdkVersion 31
+        minSdkVersion flutter.minSdkVersion
+        targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

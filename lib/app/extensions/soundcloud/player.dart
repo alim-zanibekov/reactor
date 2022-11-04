@@ -66,8 +66,9 @@ class _AppSoundCloudPlayerState extends State<AppSoundCloudPlayer> {
           },
           shouldOverrideUrlLoading: (controller, request) async {
             final url = Uri.parse(request.request.url.toString());
-            canLaunchUrl(url)
-                .then((value) => value ? launchUrl(url) : Future.value(false));
+            canLaunchUrl(url).then((value) => value
+                ? launchUrl(url, mode: LaunchMode.externalApplication)
+                : Future.value(false));
 
             return NavigationActionPolicy.CANCEL;
           },

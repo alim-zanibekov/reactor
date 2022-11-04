@@ -100,7 +100,7 @@ class _AppYouTubePlayerState extends State<AppYouTubePlayer>
 
         final url = Uri.parse(request.request.url.toString());
         canLaunchUrl(url).then((value) => value
-            ? launchUrl(url)
+            ? launchUrl(url, mode: LaunchMode.externalApplication)
             : Future.value(false));
 
         return NavigationActionPolicy.CANCEL;
@@ -177,14 +177,6 @@ String _initPlayerJS = '''function fixYouTubePlayer() {
   style.appendChild(document.createTextNode(`
     .ytp-bezel-text-hide, .ytp-watermark, .ytp-large-play-button { 
       display: none!important; 
-    }
-    .html5-video-player, video {
-      left: 0!important;
-      top: 0!important;
-      min-height:  100vh!important;
-      max-height: 100vh!important;
-      min-width: 100vw!important;
-      max-width: 100vw!important;
     }
   `));
   doc.head.appendChild(style);

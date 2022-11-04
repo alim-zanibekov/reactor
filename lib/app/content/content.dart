@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:mime/mime.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/common/clipboard.dart';
@@ -318,11 +317,9 @@ class _AppContentState extends State<AppContent> {
         text: "Поделиться",
         onSelect: () async {
           final file = await SaveFile.downloadAndSaveTmp(entry.value);
-          final mime = lookupMimeType(entry.value);
-          Share.shareFiles(
-            [file.path],
-            mimeTypes: mime != null ? [mime] : null,
-          );
+          // final mime = lookupMimeType(entry.value);
+
+          Share.shareXFiles([XFile(file.path)]);
         },
       )
     ]);
@@ -369,9 +366,7 @@ class _AppContentState extends State<AppContent> {
           final image = widget.loader.images[index];
           final file = await image.loadFromDiskCache();
           if (file != null) {
-            final mime = lookupMimeType(image.url);
-            Share.shareFiles([file.path],
-                mimeTypes: mime != null ? [mime] : null);
+            Share.shareXFiles([XFile(file.path)]);
           }
         },
       ));

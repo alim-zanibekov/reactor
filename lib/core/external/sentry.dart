@@ -64,7 +64,7 @@ class SentryReporter {
           'model': androidDeviceInfo.model,
           'device': androidDeviceInfo.device,
           'id': androidDeviceInfo.id,
-          'androidId': androidDeviceInfo.androidId,
+          'androidId': androidDeviceInfo.id,
           'brand': androidDeviceInfo.brand,
           'display': androidDeviceInfo.display,
           'hardware': androidDeviceInfo.hardware,
@@ -76,12 +76,12 @@ class SentryReporter {
           'supportedAbis': androidDeviceInfo.supportedAbis,
           'isPhysicalDevice': androidDeviceInfo.isPhysicalDevice,
         };
-        appHash = androidDeviceInfo.androidId;
+        appHash = androidDeviceInfo.hashCode.toString();
         device = SentryDevice(
           brand: androidDeviceInfo.brand,
           model: androidDeviceInfo.model,
           modelId: androidDeviceInfo.device,
-          simulator: !(androidDeviceInfo.isPhysicalDevice ?? false),
+          simulator: !androidDeviceInfo.isPhysicalDevice,
         );
       } else if (Platform.isIOS) {
         final IosDeviceInfo iosDeviceInfo = await deviceInfo.iosInfo;

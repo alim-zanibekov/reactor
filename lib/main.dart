@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
@@ -40,6 +41,7 @@ void main() {
       );
     }
   };
+  AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
 
   runZonedGuarded<Future<void>>(() async {
     runApp(Builder(
@@ -204,10 +206,10 @@ class ThemeInfo {
       indicatorColor: Color.fromRGBO(253, 207, 93, 1),
       primaryColor: Color.fromRGBO(253, 178, 1, 1),
       outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(primary: Colors.black87)
+          style: OutlinedButton.styleFrom(foregroundColor: Colors.black87)
               .copyWith(side: outlinedButtonSide)),
       textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(primary: Colors.black87)),
+          style: TextButton.styleFrom(foregroundColor: Colors.black87)),
     );
   }
 
@@ -221,10 +223,10 @@ class ThemeInfo {
       indicatorColor: Color.fromRGBO(253, 207, 93, 1),
       brightness: Brightness.dark,
       outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(primary: Colors.white)
+          style: OutlinedButton.styleFrom(foregroundColor: Colors.white)
               .copyWith(side: outlinedButtonSide)),
       textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(primary: Colors.white)),
+          style: TextButton.styleFrom(foregroundColor: Colors.white)),
     );
   }
 }

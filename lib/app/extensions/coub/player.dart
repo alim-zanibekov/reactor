@@ -61,8 +61,11 @@ class _AppCoubPlayerState extends State<AppCoubPlayer> {
           initialOptions: inAppWebViewDefaultOptions(),
           onProgressChanged: (controller, _) {
             controller.injectCSSCode(
-              source: '.viewer__pause__share { display: none!important; }'
-                  ' .viewer__click { opacity: 0!important; }',
+              source: '.viewer__share__social.copy, .viewer__get-app,'
+                  ' .viewer__open-in-app, .viewer-music-inner.-double'
+                  ' { display: none!important; }'
+                  ' .viewer__click { opacity: 0!important; }'
+                  ' .viewer__floating-controls { text-align: right; padding: 5px 0 0; }',
             );
           },
           onLoadStop: (InAppWebViewController controller, Uri? url) {
@@ -73,7 +76,8 @@ class _AppCoubPlayerState extends State<AppCoubPlayer> {
           shouldOverrideUrlLoading: (controller, request) async {
             final url = Uri.parse(request.request.url.toString());
             canLaunchUrl(url)
-                .then((value) => value ? launchUrl(url) : Future.value(false));
+                .then((value) => value ? launchUrl(url, mode: LaunchMode.externalApplication)
+                : Future.value(false));
 
             return NavigationActionPolicy.CANCEL;
           },

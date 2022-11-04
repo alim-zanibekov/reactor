@@ -12,7 +12,7 @@ class NotificationsManager {
   final _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   final _initializationSettings = InitializationSettings(
     android: AndroidInitializationSettings('ic_splash'),
-    iOS: IOSInitializationSettings(),
+    iOS: DarwinInitializationSettings(),
   );
 
   NotificationsManager._internal() {
@@ -39,7 +39,7 @@ class NotificationsManager {
           maxProgress: 100,
           progress: progress ?? 0,
         ),
-        iOS: IOSNotificationDetails(
+        iOS: DarwinNotificationDetails(
           presentSound: false,
           presentAlert: false,
         ),

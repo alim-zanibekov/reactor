@@ -3,7 +3,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 InAppWebViewGroupOptions inAppWebViewDefaultOptions() =>
     InAppWebViewGroupOptions(
       crossPlatform: InAppWebViewOptions(
-        // debuggingEnabled: isInDebugMode,
         mediaPlaybackRequiresUserGesture: false,
         horizontalScrollBarEnabled: false,
         transparentBackground: true,

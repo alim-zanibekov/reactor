@@ -1,9 +1,9 @@
 name: reactor
 description: JoyReactor client.
-version: 0.8.0
+version: 0.8.1
 
 environment:
-  sdk: '>=2.14.0 <3.0.0'
+  sdk: '>=2.17.5 <3.0.0'
 
 dependencies:
   video_player:
@@ -16,33 +16,28 @@ dependencies:
       url: https://github.com/alim-zanibekov/advanced_image.git
       ref: master
   dio: ^4.0.4
-  html: ^0.15.0
+  html: ^0.15.1
   page_transition: ^2.0.9
-  flutter_inappwebview: ^5.4.3+7
-  url_launcher: ^6.1.4
+  flutter_inappwebview: ^5.7.1
+  url_launcher: ^6.1.6
   decorated_icon: ^1.2.1
   shared_preferences: ^2.0.15
-  permission_handler: ^10.0.0
+  permission_handler: ^10.2.0
   double_back_to_close_app: ^2.1.0
-  scrollable_positioned_list: ^0.3.2
+  scrollable_positioned_list: ^0.3.5
   uni_links: ^0.5.1
-  sentry: ^6.6.3
-  file_picker: ^4.6.1
-  device_info_plus: ^4.0.0
-  package_info_plus: ^1.4.0
+  sentry: ^6.14.0
+  file_picker: ^5.2.2
+  device_info_plus: ^8.0.0
+  package_info_plus: ^3.0.1
   path_provider: ^2.0.11
-  flutter_local_notifications: ^9.6.1
-  share_plus: ^4.0.10
+  flutter_local_notifications: ^12.0.3
+  share_plus: ^6.2.0
   mime: ^1.0.2
 
   flutter:
     sdk: flutter
   flutter_localizations:
-    sdk: flutter
-
-dev_dependencies:
-  test: ^1.19.5
-  flutter_test:
     sdk: flutter
 
 flutter:

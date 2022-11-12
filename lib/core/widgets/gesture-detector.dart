@@ -242,7 +242,7 @@ class Boxer {
     matrix.setFromTranslationRotationScale(
       t,
       vector.Quaternion.identity(),
-      vector.Vector3(1, 1, 0),
+      vector.Vector3(1, 1, 1),
     );
     container = _container;
   }
@@ -255,7 +255,7 @@ class Boxer {
     matrix.setFromTranslationRotationScale(
       t,
       vector.Quaternion.identity(),
-      vector.Vector3(1, 1, 0),
+      vector.Vector3(1, 1, 1),
     );
     container = _container;
   }

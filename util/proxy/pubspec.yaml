@@ -6,4 +6,4 @@ environment:
   sdk: '>=2.18.4 <3.0.0'
 
 dependencies:
-  dio: ^4.0.4
+  dio: ">=4.0.4 <6.0.0"

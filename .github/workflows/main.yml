@@ -12,10 +12,10 @@ jobs:
   build-ios:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.3.7'
+          flutter-version: '3.7.7'
           channel: "stable"
           cache: true
       - run: flutter config --no-analytics
@@ -27,21 +27,21 @@ jobs:
           cp -R ./build/ios/iphoneos/Runner.app ./Reactor
           zip -qq -r reactor.zip Reactor
           mv reactor.zip reactor.ipa
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: reactor.ipa
           path: reactor.ipa
   build-android:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-java@v2
         with:
           distribution: "zulu"
           java-version: "11"
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.3.7'
+          flutter-version: '3.7.7'
           channel: "stable"
           cache: true
       - run: flutter config --no-analytics
@@ -63,7 +63,7 @@ jobs:
           echo "storeFile=$ks_path" >> ./android/key.properties
       - run: flutter build apk --release
       - run: cp ./build/app/outputs/flutter-apk/app-release.apk ./reactor.apk
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: reactor.apk
           path: reactor.apk
@@ -72,10 +72,10 @@ jobs:
     needs: [ build-android, build-ios ]
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: reactor.apk
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: reactor.ipa
       - name: Get the tag name

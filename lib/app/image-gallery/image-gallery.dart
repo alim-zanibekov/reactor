@@ -189,7 +189,7 @@ class _ImageGalleryState extends State<ImageGallery>
       _activeImage.transform = details.scaleMatrix *
           details.translateMatrix *
           _activeImage.transform;
-      _activeImage.boxer.clamp(_activeImage.transform);
+      _activeImage.boxer.clamp(_activeImage.transform, restrictLowScale: false);
     }
     _controllerImage.notifyAll();
   }
@@ -231,7 +231,12 @@ class _ImageGalleryState extends State<ImageGallery>
     } else {
       final magnitude = velocity.pixelsPerSecond.distance;
 
-      if (!_scaleChanged && magnitude >= 400.0) {
+      if (_scaleChanged) {
+        _animating = true;
+        _activeImage.transformPrev = _activeImage.transform.clone();
+        _activeImage.boxer.clamp(_activeImage.transform);
+        _controllerImage.forward(from: 0);
+      } else if (magnitude >= 400.0) {
         _moveDirection = velocity.pixelsPerSecond / magnitude;
         _activeImage.transformPrev = _activeImage.transform.clone();
         _movingMatrix = _activeImage.transform.clone();

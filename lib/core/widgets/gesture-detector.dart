@@ -182,7 +182,7 @@ class Boxer {
 
   Boxer(this.bounds, this.src);
 
-  void clamp(Matrix4 matrix) {
+  void clamp(Matrix4 matrix, {bool restrictLowScale = true}) {
     final _container = MatrixUtils.transformRect(matrix, src);
 
     if (_container.contains(bounds.topLeft) &&
@@ -199,10 +199,12 @@ class Boxer {
       final scale = max(
           _container.width / bounds.width, _container.height / bounds.height);
       if (scale < 1) {
-        t.x = (bounds.width - src.width) / 2;
-        t.y = (bounds.height - src.height) / 2;
-        matrix.setFromTranslationRotationScale(
-            t, vector.Quaternion.identity(), vector.Vector3(1, 1, 0));
+        if (restrictLowScale) {
+          t.x = (bounds.width - src.width) / 2;
+          t.y = (bounds.height - src.height) / 2;
+          matrix.setFromTranslationRotationScale(
+              t, vector.Quaternion.identity(), vector.Vector3(1, 1, 1));
+        }
       } else {
         t.x =
             lowWidth ? (bounds.width - _container.width) / 2 : _container.left;

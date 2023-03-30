@@ -1,6 +1,6 @@
 name: reactor
 description: JoyReactor client.
-version: 0.8.2
+version: 0.8.3
 
 environment:
   sdk: '>=2.18.4 <3.0.0'

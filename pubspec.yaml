@@ -14,26 +14,26 @@ dependencies:
   advanced_image:
     git:
       url: https://github.com/alim-zanibekov/advanced_image.git
-      ref: master
-  dio: ^4.0.4
-  html: ^0.15.1
-  page_transition: ^2.0.9
-  flutter_inappwebview: ^5.7.1
-  url_launcher: ^6.1.6
+      ref: e2bf0e1a5a452ae5b2d1a69efb475038a1298465
   decorated_icon: ^1.2.1
-  shared_preferences: ^2.0.15
-  permission_handler: ^10.2.0
+  device_info_plus: ^8.1.0
+  dio: ^5.1.1
   double_back_to_close_app: ^2.1.0
+  file_picker: ^5.2.6
+  flutter_inappwebview: ^5.7.2+3
+  flutter_local_notifications: ^13.0.0
+  html: ^0.15.2
+  mime: ^1.0.4
+  package_info_plus: ^3.0.3
+  path_provider: ^2.0.14
+  page_transition: ^2.0.9
+  permission_handler: ^10.2.0
   scrollable_positioned_list: ^0.3.5
+  sentry: ^7.4.0
+  share_plus: ^6.3.1
+  shared_preferences: ^2.0.20
   uni_links: ^0.5.1
-  sentry: ^6.14.0
-  file_picker: ^5.2.2
-  device_info_plus: ^8.0.0
-  package_info_plus: ^3.0.1
-  path_provider: ^2.0.11
-  flutter_local_notifications: ^12.0.3
-  share_plus: ^6.2.0
-  mime: ^1.0.2
+  url_launcher: ^6.1.10
 
   flutter:
     sdk: flutter
